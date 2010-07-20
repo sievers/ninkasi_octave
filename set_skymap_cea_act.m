@@ -1,0 +1,3 @@
+function[map]=set_skymap_cea_act(map)
+
+set_skymap_cea_predef_c(map,-0.0140108961842663, 0.0140108961842663,8554.0,10034.0,0.353814121044493,14055,1714);

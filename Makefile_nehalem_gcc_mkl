@@ -1,0 +1,130 @@
+#include Makefile.inc
+
+CPP=mkoctfile -v
+CC=g++
+
+MKL=/opt/intel/Compiler/11.0/081/mkl/
+IOMP=/opt/intel/Compiler/11.0/081/lib/intel64/
+
+
+#COBJECTS = nbody.o test_pgplot.o get_ncpu.o omp_utils.o matrix_mult.o mapmaker.o sum_race.o
+
+
+
+
+#NINKASI_INC=-I/cita/d/raid-sievers/sievers/act/ninkasi/include -I/cita/d/raid-sievers/sievers/tpb/libs/include/
+NINKASI_INC=-I/home/sievers/local/include/ -I/home/sievers/local/src/ninkasi/include/ -I${MKL}/include/ -D_MKL 
+
+
+
+#NINKASI_LIBS2= -L/home/sievers/local/lib/ -lninkasi   -lslim -lslalib -llapack  -lcblas -lptf77blas -latlas -lpthread -lgomp   -lm
+NINKASI_LIBS2= -L/home/sievers/local/lib/ -lninkasi   -lslim -lslalib  -L${MKL}/lib/em64t/ -lmkl -L${IOMP} -liomp5  -lpthread -lgomp   -lm
+
+
+#-Wl,--rpath -Wl,/cita/d/raid-sievers/sievers/act/ninkasi//lib
+
+
+CFLAGS=${NINKASI_INC} 
+
+CXXFLAGS=-fopenmp  -D_MKL
+
+
+#CPROGS = double_vec test_ninkasi_lib todfun_c maputils_c omp_median_c read_tod_header_c skymap2ninkasi corrnoise_utils matutils fft_utils noise_fun mpi_init
+
+CPROGS =  todfun_c maputils_c omp_median_c read_tod_header_c skymap2ninkasi corrnoise_utils matutils fft_utils noise_fun mpi_init mpi_finalize mpi_comm_rank mpi_comm_size octave_mpi_utils double_vec test_ninkasi_lib
+
+BINDIR=./
+
+%.o:%.cpp
+	$(CPP) ${CFLAGS} -c $< -o $@
+
+
+all: $(CPROGS)
+
+
+
+double_vec:double_vec.o
+	$(CPP) $(CFLAGS) double_vec.o -o $(BINDIR)$@.oct 
+
+
+omp_median_c:omp_median_c.o
+	$(CPP) $(CFLAGS) omp_median_c.o -o $(BINDIR)$@.oct 
+
+
+
+matutils:matutils.o
+	$(CPP) $(CFLAGS) matutils.o -o $(BINDIR)$@.oct  ${NINKASI_LIBS2}
+
+test_ninkasi_lib:test_ninkasi_lib.o
+	$(CPP) $(CFLAGS) test_ninkasi_lib.o -o $(BINDIR)$@.oct  ${NINKASI_LIBS2}
+
+
+skymap2ninkasi:skymap2ninkasi.o
+	$(CPP) $(CFLAGS) skymap2ninkasi.o -o $(BINDIR)$@.oct  ${NINKASI_LIBS2}
+
+
+
+fft_utils:fft_utils.o
+	$(CPP) $(CFLAGS) fft_utils.o -o $(BINDIR)$@.oct  ${NINKASI_LIBS2}
+
+
+
+#read_tod_header_c:read_tod_header_c.o
+#	$(CPP) $(CFLAGS) read_tod_header_c.o -o $(BINDIR)$@.oct  ${NINKASI_LIBS2}
+
+
+todfun_c:todfun_c.o
+	$(CPP) $(CFLAGS) todfun_c.o -o $(BINDIR)$@.oct  ${NINKASI_LIBS2}
+
+
+
+mpi_init:mpi_init.o
+	$(CPP) $(CFLAGS) mpi_init.o -o $(BINDIR)$@.oct  
+
+mpi_comm_rank:mpi_comm_rank.o
+	$(CPP) $(CFLAGS) mpi_comm_rank.o -o $(BINDIR)$@.oct  
+
+mpi_comm_size:mpi_comm_size.o
+	$(CPP) $(CFLAGS) mpi_comm_size.o -o $(BINDIR)$@.oct  
+
+mpi_finalize:mpi_finalize.o
+	$(CPP) $(CFLAGS) mpi_finalize.o -o $(BINDIR)$@.oct  
+
+octave_mpi_utils:octave_mpi_utils.o
+	$(CPP) $(CFLAGS) octave_mpi_utils.o -o $(BINDIR)$@.oct  
+
+
+noise_fun:noise_fun.o
+	$(CPP) $(CFLAGS) noise_fun.o -o $(BINDIR)$@.oct  ${NINKASI_LIBS2}
+
+corrnoise_utils:corrnoise_utils.o
+	$(CPP) $(CFLAGS) corrnoise_utils.o -o $(BINDIR)$@.oct  ${NINKASI_LIBS2}
+
+
+read_tod_header_c:read_tod_header_c.o
+	$(CPP) $(CFLAGS) read_tod_header_c.o -o $(BINDIR)$@.oct  ${NINKASI_LIBS2}
+
+
+
+maputils_c:maputils_c.o
+	$(CPP) $(CFLAGS) maputils_c.o -o $(BINDIR)$@.oct  ${NINKASI_LIBS2}
+
+
+
+
+clean:
+	cd $(BINDIR); rm -f $(CPROGS); cd $(SRCDIR); rm -f $(COBJECTS)
+
+oclean:
+	rm -f $(COBJECTS)
+
+
+
+
+
+
+
+
+
+
+
