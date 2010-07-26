@@ -183,6 +183,22 @@ DEFUN_DLD (get_tod_dt, args, nargout, "How long is a sample in a TOD.\n")
 }
 /*--------------------------------------------------------------------------------*/
 
+
+DEFUN_DLD (get_tod_tvec_c, args, nargout, "How long is a sample in a TOD.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->dt) {
+    dim_vector dm(mytod->ndata,1);
+    Matrix tvec(dm);
+    for (int i=0;i<mytod->ndata;i++)
+      tvec(i)=mytod->dt[i];
+    return octave_value(tvec);
+  }
+  else
+    return octave_value(0);
+}
+/*--------------------------------------------------------------------------------*/
+
 DEFUN_DLD (get_tod_ctime_c, args, nargout, "How long is a sample in a TOD.\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
@@ -275,6 +291,7 @@ DEFUN_DLD (merge_cuts_c, args, nargout, "Merge cuts, write 'em to disk.\n")
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (print_tod_uncut_regions, args, nargout, "Print out the uncut regions of a detector in a tod.\n")
 {
+  
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   int myrow=(int)get_value(args(1));
   int mycol=(int)get_value(args(2));
@@ -334,6 +351,13 @@ DEFUN_DLD (window_data_c, args, nargout, "Window the ends of a TOD. \n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   window_data(mytod);
+  return octave_value_list();
+
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (hello_ninkasi, args, nargout, "Window the ends of a TOD. \n")
+{
+  hello_ninkasi();
   return octave_value_list();
 
 }
@@ -1455,6 +1479,12 @@ DEFUN_DLD (allocate_tod_noise_bands_c, args, nargout, "Debutterworth the data.\n
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   Matrix bands=args(1).matrix_value();
+  if (mytod->noise)
+    printf("have noise in mbTOD\n");
+  else
+    printf("do not have noise in mbTOD\n");
+
+
   int nband=bands.length()-1;
 
   double *b=bands.fortran_vec();
@@ -1506,9 +1536,9 @@ DEFUN_DLD (get_simple_banded_noise_model_c, args, nargout, "Debutterworth the da
     }
     
   }
-
+  
   get_simple_banded_noise_model(mytod,do_rots,types);
-
+  
   dim_vector dm(mytod->ndet,1);
   Matrix facs(dm);
   for (int i=0;i<mytod->ndet;i++)
@@ -1575,6 +1605,27 @@ DEFUN_DLD (apply_banded_noise_model_c, args, nargout, "Debutterworth the data.\n
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   apply_banded_noise_model(mytod);
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (apply_tod_noise_model_c, args, nargout, "Apply the noise.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  apply_noise(mytod);
+
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (set_noise_powlaw_c, args, nargout, "Apply the noise.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix amps=args(1).matrix_value();
+  Matrix knees=args(2).matrix_value();
+  Matrix pows=args(3).matrix_value();
+  set_noise_powlaw(mytod,amps.fortran_vec(),knees.fortran_vec(),pows.fortran_vec());
+
   return octave_value_list();
 }
 

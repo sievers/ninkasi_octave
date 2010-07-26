@@ -68,6 +68,23 @@ DEFUN_DLD (set_tod_dt_c, args, nargout, "Read a TOD header, including pointing i
 
 /*--------------------------------------------------------------------------------*/
 
+DEFUN_DLD (set_tod_timevec_c, args, nargout, "Store a full time vector, useful for unevenly sampled data.\n")
+{
+
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix tvec=args(1).matrix_value();
+  if (mytod->dt)
+    free(mytod->dt);
+  mytod->dt=(float *)malloc(sizeof(float)*mytod->ndata);
+  double *tt=tvec.fortran_vec();
+  for (int i=0;i<mytod->ndata;i++)
+    mytod->dt[i]=tt[i];
+  
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+
 DEFUN_DLD (set_tod_ndata_c, args, nargout, "Read a TOD header, including pointing info etc.\n")
 {
 

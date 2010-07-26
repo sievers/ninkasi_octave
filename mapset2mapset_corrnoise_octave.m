@@ -39,9 +39,10 @@ for j=1:length(tods),
   %mtoc
   %do noise in here
   t2a=now;
-  if (do_noise)
-    apply_banded_noise_model_c(mytod);
-  end	
+  %if (do_noise)
+  %apply_banded_noise_model_c(mytod);
+  %end	
+  apply_tod_noise_model_c(mytod);
   t2b=now;
   mtoc
   t3a=now;

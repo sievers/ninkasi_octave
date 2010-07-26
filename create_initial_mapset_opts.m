@@ -21,7 +21,7 @@ signal_only=get_struct_mem(myopts,'signal_only')
 do_gauss=get_struct_mem(myopts,'gaussian_noise');
 monitor_tods=get_struct_mem(myopts,'monitor_tods');
 outroot=get_struct_mem(myopts,'outroot',datestr(now,30));
-write_cleaned_data=get_struct_mem(myopts,'write_cleaned_data')
+write_cleaned_data=get_struct_mem(myopts,'write_cleaned_data');
 
 
 if (do_gauss&hilton_noise)
@@ -39,6 +39,7 @@ end
 
 do_noise=get_struct_mem(myopts,'do_noise');
 if (do_noise)
+  noise_class=get_struct_mem(myopts,'noise_class');
   bands=get_struct_mem(myopts,'bands');
   rots=get_struct_mem(myopts,'rots');
   noise_types=get_struct_mem(myopts,'noise_types');
@@ -210,7 +211,7 @@ for j=1:length(tods),
         reconvolve_tod_time_constants_c(mytod);
       end
       %data_from_map=get_tod_data(mytod);
-      dat=dat+get_tod_data(mytod);
+      dat=dat-get_tod_data(mytod);
       push_tod_data(dat,mytod);
       
     else
@@ -257,6 +258,7 @@ for j=1:length(tods),
     if (do_array_detrend)
       mdisp('array detrending');
       array_detrend(mytod);
+      %gapfill_data_c(mytod);  %new!  
     else
       mdisp('detrending');
       detrend_data_c_c(mytod);
@@ -350,18 +352,20 @@ for j=1:length(tods),
 
   if (do_noise)
     mdisp('doing noise');
-    %allocate_tod_noise_bands_c(mytod,[-1  3 300]);
-    %get_simple_banded_noise_model_c(mytod,[ 1 0],[  1 0]);
-    allocate_tod_noise_bands_c(mytod,bands);
-    get_simple_banded_noise_model_c(mytod,rots,noise_types);
-    for jj=1:length(noise_scale_facs),
-      scale_tod_band_noise_c(mytod,jj-1,noise_scale_facs(jj));
+
+    if (strcmp(noise_class,'banded'))
+      allocate_tod_noise_bands_c(mytod,bands);
+      get_simple_banded_noise_model_c(mytod,rots,noise_types);
+      for jj=1:length(noise_scale_facs),
+        scale_tod_band_noise_c(mytod,jj-1,noise_scale_facs(jj));
+      end
+    end      
+    if strcmp(noise_class,'powlaw')
+      fitp=get_mustang_noise(mytod,'order',1,'freqs',1.411);
+      set_noise_powlaw_c(mytod,fitp(1,:)/get_tod_ndata(mytod),fitp(2,:),fitp(3,:));
     end
-							 
-    %fit_tod_noise_c(mytod);
   end
 
-  
   if (highpass_val>0)
     mdisp('highpassing');
     highpass_tod(mytod,highpass_val);
@@ -369,7 +373,8 @@ for j=1:length(tods),
 
   if (do_noise)
     mdisp('applying noise');
-    apply_banded_noise_model_c(mytod);
+    %apply_banded_noise_model_c(mytod);
+    apply_tod_noise_model_c(mytod);
     if	check_for_nans,
        datamat=get_tod_data(mytod);
        nn=sum(sum(isnan(datamat))); 
