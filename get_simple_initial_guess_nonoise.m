@@ -27,23 +27,24 @@ for j=1:length(tods),
   allocate_tod_storage(mytod);
   push_tod_data(data,mytod);
   clear data;
-  tod2map(mytod,mapset.skymap.mapptr);
+  if isfield(mapset,'skymap')
+    tod2map(mytod,mapset.skymap.mapptr);
+  end
   
   free_tod_storage(mytod);
   
 end
+if isfield(mapset,'skymap')
+  mm=mpi_allreduce(skymap2octave(mapset.skymap.mapptr));
 
-mm=mpi_allreduce(skymap2octave(mapset.skymap.mapptr));
-
-
-wt=make_map_copy(mapset.skymap.mapptr);
-make_weightmap_octave(tods,wt);
-weight=skymap2octave(wt);
-weight=mpi_allreduce(weight);
-weight_inv=1./weight;
-weight_inv(weight==0)=0;
-mm=mm.*weight_inv;
-
-destroy_map(wt);
-mapset.skymap.map=mm;
-
+  wt=make_map_copy(mapset.skymap.mapptr);
+  make_weightmap_octave(tods,wt);
+  weight=skymap2octave(wt);
+  weight=mpi_allreduce(weight);
+  weight_inv=1./weight;
+  weight_inv(weight==0)=0;
+  mm=mm.*weight_inv;
+  
+  destroy_map(wt);
+  mapset.skymap.map=mm;
+end

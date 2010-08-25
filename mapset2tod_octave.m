@@ -4,7 +4,9 @@ function[data]=mapset2tod_octave(mapset,tod,which_tod)
 %because that contains the pointing info.
 
 
-map2tod(mapset.skymap.mapptr,tod);
+if isfield(mapset,'skymap')
+  map2tod(mapset.skymap.mapptr,tod);
+end
 
 if isfield(mapset,'corrnoise')
     corrnoise=mapset.corrnoise(which_tod);

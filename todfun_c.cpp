@@ -292,6 +292,10 @@ DEFUN_DLD (merge_cuts_c, args, nargout, "Merge cuts, write 'em to disk.\n")
 DEFUN_DLD (print_tod_uncut_regions, args, nargout, "Print out the uncut regions of a detector in a tod.\n")
 {
   
+  if (args.length()<3) {
+    fprintf(stderr,"Error - usage is (tod,row,column)\n");
+    return octave_value_list();
+  }
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   int myrow=(int)get_value(args(1));
   int mycol=(int)get_value(args(2));
@@ -357,7 +361,7 @@ DEFUN_DLD (window_data_c, args, nargout, "Window the ends of a TOD. \n")
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (hello_ninkasi, args, nargout, "Window the ends of a TOD. \n")
 {
-  hello_ninkasi();
+  //hello_ninkasi();
   return octave_value_list();
 
 }

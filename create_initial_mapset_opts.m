@@ -442,13 +442,16 @@ for j=1:length(tods),
   
 end
 
-mapset.skymap.map=mpi_allreduce(mapset.skymap.map);
-octave2skymap(mapset.skymap);
-
+if isfield(mapset,'skymap')
+  mapset.skymap.map=mpi_allreduce(mapset.skymap.map);
+  octave2skymap(mapset.skymap);
+end
 
 if (signal_only)
-  signal_mapset.skymap.map=mpi_allreduce(signal_mapset.skymap.map);
-  octave2skymap(signal_mapset.skymap);
+  if isfield(mapset,'skyamp')
+    signal_mapset.skymap.map=mpi_allreduce(signal_mapset.skymap.map);
+    octave2skymap(signal_mapset.skymap);
+  end
 end
 
 

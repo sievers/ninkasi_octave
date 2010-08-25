@@ -3,7 +3,10 @@ if ~exist('fac')
     fac=1;
 end
 
-a.skymap.map=a.skymap.map+fac*b.skymap.map;
+if isfield(a,'skymap')
+  a.skymap.map=a.skymap.map+fac*b.skymap.map;
+end
+
 
 if (isfield(a,'corrnoise')),
     for j=1:length(a.corrnoise),

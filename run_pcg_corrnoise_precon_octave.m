@@ -50,7 +50,9 @@ end
 
 [ax,tod_times,node_times]=mapset2mapset_corrnoise_octave(tods,x,varargin{:});
 if myid==1
-  write_map(ax.skymap,[save_tag '_ax']);
+  if isfield(ax,'skymap')
+    write_map(ax.skymap,[save_tag '_ax']);
+  end
   fieldnames(ax)
 end
 
@@ -117,17 +119,17 @@ last_failed=0;
 while ((rMr>r0sqr*tol)&(iter<maxiter)),
   %tic;
     aa=now;
-    sz1=size(d.skymap.map);
+    %sz1=size(d.skymap.map);
     Ad=mapset2mapset_corrnoise_octave(tods,d,varargin{:});
     cc=now;
 
-    sz2=size(Ad.skymap.map); 
-    if min(sz1==sz2)==0, error(['spot 1 size mismatch: ' num2str(sz1) ' vs ' num2str(sz2)]);end;
+    %sz2=size(Ad.skymap.map); 
+    %if min(sz1==sz2)==0, error(['spot 1 size mismatch: ' num2str(sz1) ' vs ' num2str(sz2)]);end;
     if exist('priorfun')
       Ad=feval(priorfun,Ad,d);
     end
-    sz2=size(Ad.skymap.map); 
-    if min(sz1==sz2)==0, error(['spot 2 size mismatch: ' num2str(sz1) ' vs ' num2str(sz2)]);end;
+    %sz2=size(Ad.skymap.map); 
+    %if min(sz1==sz2)==0, error(['spot 2 size mismatch: ' num2str(sz1) ' vs ' num2str(sz2)]);end;
 
     dAd=mapsetdotmapset(d,Ad);
     if (iter==1)
@@ -181,9 +183,11 @@ while ((rMr>r0sqr*tol)&(iter<maxiter)),
           end
         end
         if (do_print)
-          octave2skymap(x.skymap);
-          write_map(x.skymap.mapptr,[save_tag num2str(iter)]);
-          %write_simple_map_c(x.skymap.mapptr,[save_tag num2str(iter) '.map']);          
+          if isfield(x,'skymap')
+            octave2skymap(x.skymap);
+            write_map(x.skymap.mapptr,[save_tag num2str(iter)]);
+            %write_simple_map_c(x.skymap.mapptr,[save_tag num2str(iter) '.map']);          
+          end
         end
       end
       old_dAd=dAd;

@@ -1,10 +1,12 @@
 function[mapset]=apply_prior_to_mapset(mapset,mapset_org)
 
-if isfield(mapset.skymap,'has_prior')
+if isfield(mapset,'skymap')
+  if isfield(mapset.skymap,'has_prior')
     if (mapset.skymap.has_prior)
-        disp('applying sky prior')
-        mapset.skymap=apply_skymap_prior(mapset.skymap,mapset_org.skymap);
+      disp('applying sky prior')
+      mapset.skymap=apply_skymap_prior(mapset.skymap,mapset_org.skymap);
     end
+  end
 end
 
 if isfield(mapset,'corrnoise')

@@ -1,8 +1,10 @@
 function[mapset]=tod2mapset_octave(mapset,tod,which_tod)
 
 
-tod2map(tod,mapset.skymap.mapptr);
-mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
+if isfield(mapset,'skymap')
+  tod2map(tod,mapset.skymap.mapptr);
+  mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
+end
 
 if isfield(mapset,'corrnoise'),
 

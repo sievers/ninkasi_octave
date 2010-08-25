@@ -4,7 +4,9 @@ do_noise=get_keyval_default('do_noise',false,varargin{:});
 
 new_mapset=clear_mapset(mapset,'true');
 
-octave2skymap(mapset.skymap);
+if isfield(mapset,'skymap')
+  octave2skymap(mapset.skymap);
+end
 
 
 %tod_times=zeros(size(tods));
@@ -66,10 +68,13 @@ node_time=86400*(now-node_start);
 
 
 %need to make sure we don't memory leak...
-new_mapset.skymap.map=skymap2octave(new_mapset.skymap.mapptr);
-new_mapset.skymap.map=mpi_allreduce(new_mapset.skymap.map);
-destroy_map(new_mapset.skymap.mapptr);
-new_mapset.skymap.mapptr=mapset.skymap.mapptr;
+if isfield(mapset,'skymap')
+  new_mapset.skymap.map=skymap2octave(new_mapset.skymap.mapptr);
+  new_mapset.skymap.map=mpi_allreduce(new_mapset.skymap.map);
+  destroy_map(new_mapset.skymap.mapptr);
+  new_mapset.skymap.mapptr=mapset.skymap.mapptr;
+end
+
 
 
 

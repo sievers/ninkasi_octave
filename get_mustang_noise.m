@@ -2,10 +2,13 @@ function[fitp]=get_mustang_noise(tod,varargin)
 
 global nuvec
 global datasqr
-
+global rescale
 
 
 data=get_tod_data_cleaned(tod,varargin{:});
+
+%clf;plot_ps(data(:,1),'dt',get_tod_dt(tod),'smooth',8,'r');
+
 coeffs=zeros(3,size(data,2));
 nuvec=get_tod_nuvec(tod);
 
@@ -24,23 +27,29 @@ nuvec=nuvec(ind);
 
 
 fitp=zeros(3,size(dataft,2));
-fitp(1,:)=median(dataft,1);
-fitp(2,:)=1.0;
-fitp(3,:)=1.5;
+fitp(1,:)=0.5*median(dataft,1);
+fitp(2,:)=3.0;
+fitp(3,:)=2.8;
 
 
 
 for j=1:size(dataft,2);
   datasqr=dataft(:,j);
+  rescale=fitp(1,j);
+  fitp(1,j)=1;
   fitp(:,j)=fminunc(@get_like_falpha,fitp(:,j));
+  fitp(1,j)=fitp(1,j)*rescale;
 end
 
 
 
 function[like]=get_like_falpha(fitp,datasqr,nuvec)
-amp=fitp(1);
+global rescale
+
+amp=fitp(1)*rescale;
 knee=fitp(2);
 slope=fitp(3);
+
 global nuvec
 global datasqr
 
@@ -52,4 +61,7 @@ like=sum(datasqr./model)+sum(log(model));
 if ~isreal(like)
   like=1e10;
 end
-%like
+
+%disp(sprintf('%14.2f %12.4e %12.4g %12.4f',like,amp,knee,slope));
+
+
