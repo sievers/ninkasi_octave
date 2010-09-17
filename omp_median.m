@@ -1,7 +1,10 @@
 function[meds]=omp_median(dat,dim)
 %broken right now, use this to get around it.
-meds=median(dat,dim);
-return
+if (1)
+  meds=median(dat,dim);
+  return
+end
+disp('hi')
 
 if ndims(dat)>2
   error('cannot deal with more than 2 dimensions in omp_median.');

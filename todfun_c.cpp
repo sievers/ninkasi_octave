@@ -239,6 +239,21 @@ DEFUN_DLD (read_cuts_c, args, nargout, "What is a TOD's name?.\n")
   return octave_value_list();
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (write_cuts_c, args, nargout, "Write cuts to disk.  Args are tod,fname.\n")
+{
+  if (args.length() !=2) {
+    printf("error - need exactly 2 inputs in write_cuts_c, not %d\n",args.length());
+    return octave_value_list();
+  }
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  char *fname=get_char_from_arg(args(1).char_matrix_value());
+
+  if (mytod->cuts)
+    mbCutsWrite(mytod->cuts,fname);
+  return octave_value_list();
+  
+}
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD (merge_cuts_c, args, nargout, "Merge cuts, write 'em to disk.\n")
 {
   if (args.length() !=3) {
@@ -355,12 +370,12 @@ DEFUN_DLD (window_data_c, args, nargout, "Window the ends of a TOD. \n")
 
 }
 /*--------------------------------------------------------------------------------*/
-DEFUN_DLD (hello_ninkasi, args, nargout, "Window the ends of a TOD. \n")
-{
-  hello_ninkasi();
-  return octave_value_list();
+//DEFUN_DLD (hello_ninkasi, args, nargout, "Window the ends of a TOD. \n")
+//{
+//  hello_ninkasi();
+//  return octave_value_list();
 
-}
+//}
 
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (highpass_tod_c, args, nargout, "Highpass a TOD.  Args are (tod,nu_low,nu_high). \n")
@@ -1479,10 +1494,10 @@ DEFUN_DLD (allocate_tod_noise_bands_c, args, nargout, "Debutterworth the data.\n
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   Matrix bands=args(1).matrix_value();
-  if (mytod->noise)
-    printf("have noise in mbTOD\n");
-  else
-    printf("do not have noise in mbTOD\n");
+  //if (mytod->noise)
+  // printf("have noise in mbTOD\n");
+  //else
+  //printf("do not have noise in mbTOD\n");
 
 
   int nband=bands.length()-1;

@@ -4,10 +4,15 @@ function[vecs,cc]=subtract_darks_from_tod_eig(tod,varargin)
 
 neig=get_keyval_default('neig_dark',7,varargin{:});
 minfreq=get_keyval_default('minfreq_dark',5,varargin{:});
+dirroot=get_keyval_default('dark_dirroot','',varargin{:});
 
 
 %JLS - 19Mar10, deal with potentially missing dark files
-crud=get_dark_timestreams(tod);
+if ~isempty(dirroot)
+  crud=get_dark_timestreams(tod,dirroot);
+else
+  crud=get_dark_timestreams(tod);
+end
 if isempty(crud)
   vecs=[];
   cc=[];

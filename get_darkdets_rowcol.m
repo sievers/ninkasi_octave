@@ -1,5 +1,10 @@
-function[row,col]=get_darkdets_rowcol(tod)
-darkname=guess_darkdets_name(tod);
+function[row,col]=get_darkdets_rowcol(tod,dirroot)
+if exist('dirroot')
+  darkname=guess_darkdets_name(tod,dirroot);
+else
+  darkname=guess_darkdets_name(tod);
+end
+
 if isempty(darkname)
   if class(tod)=='int64'
     todname=get_tod_name(tod);

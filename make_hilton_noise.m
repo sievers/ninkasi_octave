@@ -1,4 +1,8 @@
 function[newmat]=make_hilton_noise(mat,varargin)
+if (0)
+  newmat=mat;
+  return;
+end
 
 newmat=0;
 nmode=get_keyval_default('nmode',12,varargin{:});
@@ -9,7 +13,7 @@ if nmode>size(mat,2)
 end
 
 
-mywhites=omp_median(abs(fft_r2c(mat)),1)/sqrt(size(mat,1)/sqrt(2));
+mywhites=omp_median(abs(fft_r2c_octave(mat)),1)/sqrt(size(mat,1)/sqrt(2));
 
 if (0)
   if sum(sum(~isfinite(mywhites)))
@@ -43,11 +47,17 @@ if nmode>0
   end
   [v,e]=eig(mycorr);
   vv=v(:,end-nmode+1:end);
-  mymodes=mat*vv;
-  mymodes_ft=fft_r2c(mymodes);
+  mymodes=mat*vv;mymodes_old=mymodes;
+  mymodes_ft=fft_r2c_octave(mymodes);
   signvec=randn(size(mymodes_ft,1),1);signvec=2*(signvec>0)-1;
+  %newmat=mat;return;
+
   mymodes_ft=scale_rowcol_mat(real(mymodes_ft),signvec)+i*scale_rowcol_mat(imag(mymodes_ft),signvec);
   mymodes=fft_c2r(mymodes_ft,iseven(size(mat,1)));  %OK, got the phase-scattered modes.
+  if mean(mean(abs(mymodes)))<0.01*mean(mean(abs(mymodes_old))),
+    mymodes=mymodes*length(mymodes);
+    mdisp('rescaling in hilton_noise');
+  end
   newmat=scale_rowcol_mat(randn(size(mat)),mywhites)+mymodes*vv';
 else
   newmat=scale_rowcol_mat(randn(size(mat)),mywhites);

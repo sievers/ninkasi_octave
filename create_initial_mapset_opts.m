@@ -1,8 +1,10 @@
 function[mapset,medians,signal_mapset,data_from_map,data_org]=create_initial_mapset_opts(tods,mapset,mapset_in,myopts)
+
+
 myid=mpi_comm_rank+1;
 
 myopts=set_default_mapping_opts(myopts);
-
+debutter_octave=get_struct_mem(myopts,'debutter_octave');
 remove_common=get_struct_mem(myopts,'remove_common');
 add_noise=get_struct_mem(myopts,'add_noise');
 keep_data=get_struct_mem(myopts,'keep_data');
@@ -17,6 +19,7 @@ reverse_time=get_struct_mem(myopts,'reverse_time');
 hilton_noise=get_struct_mem(myopts,'hilton_noise');
 hilton_nmode=get_struct_mem(myopts,'hilton_nmode');
 dedark=get_struct_mem(myopts,'dedark');
+dark_dirroot=get_struct_mem(myopts,'dark_dirroot','');
 signal_only=get_struct_mem(myopts,'signal_only')
 do_gauss=get_struct_mem(myopts,'gaussian_noise');
 monitor_tods=get_struct_mem(myopts,'monitor_tods');
@@ -156,7 +159,6 @@ for j=1:length(tods),
     end
 
 
-
     if (reverse_time)
       disp('reversing time order of TOD');
       reverse_tod_uncut_regions_c(mytod);
@@ -174,7 +176,13 @@ for j=1:length(tods),
       mdisp('adding hilton noise');
       array_detrend(mytod);
       gapfill_data_c(mytod);
-      debutterworth_c(mytod);
+      if debutter
+        if debutter_octave
+          debutterworth_octave(mytod);
+        else
+          debutterworth_c(mytod);
+        end
+      end
       dat=get_tod_data(mytod);
       if (save_seeds)
         big_seeds(j)=round(1e9*rand);
@@ -190,11 +198,18 @@ for j=1:length(tods),
       push_tod_data(dat,mytod);
     end
 
-
     if (dedark)
       array_detrend(mytod);
-      gapfill_data_c(mytod);      
-      subtract_darks_from_tod_eig (mytod);
+      gapfill_data_c(mytod);
+      if ~isempty(dark_dirroot)
+        if iscell(dark_dirroot)
+          subtract_darks_from_tod_eig(mytod,'dark_dirroot',dark_dirroot{guess_tod_season(get_tod_name(mytod))});
+        else
+          subtract_darks_from_tod_eig(mytod,'dark_dirroot',dark_dirroot);
+        end
+      else
+        subtract_darks_from_tod_eig (mytod);
+      end
     end
     
     
@@ -205,7 +220,11 @@ for j=1:length(tods),
       assign_tod_value(mytod,0);
       mapset2tod_octave(mapset_in,mytod,j);
       if (debutter)
-        rebutterworth_c(mytod);
+        if debutter_octave
+          debutterworth_octave(mytod,false);
+        else
+          rebutterworth_c(mytod);
+        end
       end
       if (deconvolve_tau)
         reconvolve_tod_time_constants_c(mytod);
@@ -217,7 +236,6 @@ for j=1:length(tods),
     else
       mdisp('no input mapset');
     end
-
 
     gapfill_data_c(mytod);
 
@@ -267,7 +285,11 @@ for j=1:length(tods),
     
   if (debutter)
     mdisp('debutterworthing');
-    debutterworth_c(mytod);
+    if debutter_octave
+      debutterworth_octave(mytod);
+    else
+      debutterworth_c(mytod);
+    end
   end
   if (deconvolve_tau)
     mdisp('deconvolving time constants.');

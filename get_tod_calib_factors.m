@@ -6,6 +6,7 @@ flatfield_dir=get_keyval_default('flatfield_dir','/home/sievers/act/shared/flatF
 response_dir=get_keyval_default('response_dir','/home/sievers/act/responsivities/2008/',varargin{:});
 
 mdisp(['getting flatfields from ' flatfield_dir]);
+mdisp(['getting responsivities from ' response_dir]);
 
 curdir=pwd;
 if (fname(end-2:end)=='ar1'),
@@ -32,7 +33,9 @@ my_ff=zeros(length(myrows),1);
 [a,b,c]=fileparts(fname);
 
 try
-  responsivity=load([response_dir '/'  b  c]);
+  response_name=[response_dir '/'  b  c];
+  responsivity=load(response_name);
+  %responsivity=load([response_dir '/'  b  c]);
 
 
   for j=1:length(myrows),
@@ -50,6 +53,7 @@ catch
   my_ff(:)=nan;
 end
 
+mdisp(['Flatfield: ' flatfield_dir '  Responsivity: ' response_dir]);
 
 cal_facs=my_rr.*my_ff;
 if sum(isnan(cal_facs))>0,

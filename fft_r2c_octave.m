@@ -1,7 +1,8 @@
 function[mat]=fft_r2c_octave(mat)
-if (1)
+if (0)
   mat=fft_omp_r2c_many(mat);
 else
+  %disp('local');
   m=round(size(mat,2)/2);
 
   if iseven(size(mat,1))
