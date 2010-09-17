@@ -1,6 +1,7 @@
 function[new_mapset,tod_times,node_time]=mapset2mapset_corrnoise_octave(tods,mapset,varargin)
 
 do_noise=get_keyval_default('do_noise',false,varargin{:});
+window_symmetric=get_keyval_default('window_symmetric',false,varargin{:});
 
 new_mapset=clear_mapset(mapset,'true');
 
@@ -47,6 +48,9 @@ for j=1:length(tods),
   apply_tod_noise_model_c(mytod);
   t2b=now;
   mtoc
+  if (window_symmetric)
+    window_data(mytod);
+  end
   t3a=now;
   new_mapset=tod2mapset_octave(new_mapset,mytod,j);
   t3b=now;

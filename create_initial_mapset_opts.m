@@ -22,7 +22,7 @@ do_gauss=get_struct_mem(myopts,'gaussian_noise');
 monitor_tods=get_struct_mem(myopts,'monitor_tods');
 outroot=get_struct_mem(myopts,'outroot',datestr(now,30));
 write_cleaned_data=get_struct_mem(myopts,'write_cleaned_data');
-
+window_symmetric=get_struct_mem(myopts,'window_symmetric');
 
 if (do_gauss&hilton_noise)
   warning('requested both gaussian and Hilton noise.  Choosing Gaussian.');
@@ -393,6 +393,10 @@ for j=1:length(tods),
     %filter_tod_noise_c(mytod);
   end
   
+  if window_symmetric,
+    window_data(mytod);
+  end
+
   mdisp('tod2mapset');
   mapset=tod2mapset_octave(mapset,mytod,j);
 

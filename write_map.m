@@ -13,6 +13,9 @@ switch mytype
  case{'cea'}
   fname=postpend_tag(fname,'.fits');
   write_skymap_cea_fits(map,fname);
+ case{'tan'}
+  fname=postpend_tag(fname,'.fits');
+  write_skymap_tan_fits(map,fname);
  case{'radec'}  
   fname=postpend_tag(fname,'.map');
   write_simple_map_c(map,fname);

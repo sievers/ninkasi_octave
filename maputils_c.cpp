@@ -92,6 +92,9 @@ DEFUN_DLD (get_map_type_c, args, nargout, "Find out what kind of map we have.\n"
   case (NK_CEA):
     return octave_value("cea");
     break;
+  case (NK_TAN):
+    return octave_value("tan");
+    break;
   default:
     printf("unkown map type.\n");
     return octave_value_list();
@@ -194,17 +197,52 @@ DEFUN_DLD (get_pix_from_radec_c, args, nargout, "Say where ra/dec should be in p
   MAP  *map=(MAP *)get_pointer(args(0));
   actData ra=get_value(args(1));
   actData dec=get_value(args(2));
+
   int rapix,decpix;
-  radec2pix_cea(map,ra,dec,&rapix,&decpix);
+  double x,y;
   octave_value_list retval;
-  retval(0)=rapix;
-  retval(1)=decpix;
+
+  switch(map->projection->proj_type){
+  case (NK_CEA):
+    radec2pix_cea(map,ra,dec,&rapix,&decpix);
+    retval(0)=rapix;
+    retval(1)=decpix;
+    break;
+  case (NK_TAN):
+    radec2xy_tan(&x,&y,ra,dec,map->projection);
+    retval(0)=x;
+    retval(1)=y;
+  
+    break;
+  }
+
 
   return retval;
 
 }
 
 
+/*--------------------------------------------------------------------------------*/
+/*
+DEFUN_DLD (get_pix_from_radec_c, args, nargout, "Say what x/y coordinates an ra/dec location is in a map.")
+{
+
+  MAP  *map=(MAP *)get_pointer(args(0));
+  double ra=get_value(args(1));
+  double dec=get_value(args(2));
+  double x,y;
+  printf("calling radec2xy.\n");
+  radec2xy_tan(&x,&y,ra,dec,map->projection);
+
+  octave_value_list retval;
+  retval(0)=x;
+  retval(1)=y;
+
+  return retval;
+
+  
+}
+*/
 /*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (get_radec_from_pix_c, args, nargout, "Say what ra/dec a pixel is in a map.")
@@ -213,7 +251,15 @@ DEFUN_DLD (get_radec_from_pix_c, args, nargout, "Say what ra/dec a pixel is in a
   int rapix=get_value(args(1));
   int decpix=get_value(args(2));
   actData ra,dec;
-  pix2radec_cea(map,rapix,decpix,&ra,&dec);
+  switch(map->projection->proj_type) {
+  case (NK_CEA):
+    pix2radec_cea(map,rapix,decpix,&ra,&dec);
+    break;
+  case (NK_TAN):
+    printf("doing tangent\n");
+    pix2radec_tan(map,rapix,decpix,&ra,&dec);
+    break;
+  }
   octave_value_list retval;
   retval(0)=ra;
   retval(1)=dec;
@@ -252,6 +298,32 @@ DEFUN_DLD (set_skymap_cea_predef_c, args, nargout, "Dial in parameters for a CEA
 
 /*--------------------------------------------------------------------------------*/
 
+DEFUN_DLD (set_skymap_tan_predef_c, args, nargout, "Dial in parameters for a TAN map.  Args are (map,pixsize,rapix,decpix,ra_cent,dec_cent,nra,ndec\n")
+{
+  if (args.length()<8) {
+    printf("Need 8 argumetns in set_skymap_tan_predef_c.\n");
+    return octave_value_list();
+  }
+  MAP *map=(MAP *)get_pointer(args(0));
+  actData pixsize=get_value(args(1));
+
+  actData rapix=get_value(args(2));
+  actData decpix=get_value(args(3));
+
+  actData ra_cent=get_value(args(4));
+  actData dec_cent=get_value(args(5));
+
+  int nra=get_value(args(6));
+  int ndec=get_value(args(7));
+
+  set_map_projection_tan_predef(map,ra_cent,dec_cent,rapix,decpix,pixsize,nra,ndec);
+  printf("ra crap here is %14.4e %14.4e\n",map->projection->rapix,map->projection->ra_cent);
+  return octave_value_list();
+  
+}
+
+/*--------------------------------------------------------------------------------*/
+
 
 DEFUN_DLD (get_skymap_cea_params_c, args, nargout, "Return current cea params from a map.")
 {
@@ -271,6 +343,52 @@ DEFUN_DLD (get_skymap_cea_params_c, args, nargout, "Return current cea params fr
   retval(2)=map->projection->radelt;
   retval(3)=map->projection->decdelt;
   retval(4)=map->projection->pv;
+  return retval;
+  
+}
+
+
+/*--------------------------------------------------------------------------------*/
+
+
+DEFUN_DLD (get_skymap_rect_params_c, args, nargout, "Return current rectangular params from a map.")
+{
+  MAP *map=(MAP *)get_pointer(args(0));
+  
+  octave_value_list retval;
+  retval(0)=map->ramin;
+  retval(1)=map->ramax;
+  retval(2)=map->decmin;
+  retval(3)=map->decmax;
+  retval(4)=map->pixsize;
+  return retval;
+  
+}
+
+
+/*--------------------------------------------------------------------------------*/
+
+
+DEFUN_DLD (get_skymap_tan_params_c, args, nargout, "Return current tan params from a map.")
+{
+  MAP *map=(MAP *)get_pointer(args(0));
+  if (!map->projection) {
+    printf("Map doesn't have a projection.\n");
+    return octave_value_list();
+  }
+  if (map->projection->proj_type!=NK_TAN) {
+    printf("Map is not in TAN format.\n");
+    return octave_value_list();
+  }
+  
+  octave_value_list retval;
+  retval(0)=map->projection->rapix;
+  retval(1)=map->projection->decpix;
+  retval(2)=map->projection->radelt;
+  retval(3)=map->projection->decdelt;
+  retval(4)=map->projection->pv;
+  retval(5)=map->projection->ra_cent;
+  retval(6)=map->projection->dec_cent;
   return retval;
   
 }

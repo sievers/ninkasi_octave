@@ -1,12 +1,16 @@
-function[tod]=read_tod_mustang(fname)
+function[tod]=read_tod_mustang(fname,varargin)
+
+cut_global=get_keyval_default('cut_global',false,varargin{:});
+
+
 if iscell(fname)
 
   for j=1:length(fname)
     %tod(j)=read_tod_mustang(fname{j});
     if j>1
-      tod=[tod read_tod_mustang(fname{j})];
+      tod=[tod read_tod_mustang(fname{j},varargin{:})];
     else
-      tod=read_tod_mustang(fname{j});
+      tod=read_tod_mustang(fname{j},varargin{:});
     end
   end
   return
@@ -14,6 +18,7 @@ end
 
 
 [big_rows,big_cols,big_tt,big_errs,big_data,big_ra,big_dec]=convert_mustang_many_scan(fname);
+
 ntod=length(big_rows);
 tods=[];
 for j=1:ntod,
@@ -32,13 +37,25 @@ for j=1:ntod,
       ind(jj)=false;
     end
   end
+
   rows=rows(ind);
   cols=cols(ind);
   errs=errs(:,ind);
   data=data(:,ind);
   ra=ra(:,ind);
   dec=dec(:,ind);
-  
+  if cut_global,
+    ind=not(min(errs,[],2)>9.9e5);
+    disp(['cutting ' num2str(sum(ind==false)) ' global samples.']);
+    tt=tt(ind);
+    errs=errs(ind,:);
+    data=data(ind,:);
+    dec=dec(ind,:);
+    ra=ra(ind,:);
+  end
+
+
+
   
   dt=median(diff(tt));
   set_tod_dt_c (tod,dt);

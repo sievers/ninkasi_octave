@@ -318,6 +318,15 @@ DEFUN_DLD (print_tod_uncut_regions, args, nargout, "Print out the uncut regions 
   return octave_value(uncut);
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (set_tod_window_c, args, nargout, "Cut the ends of a TOD.  Arguments are (tod, cut_length (in seconds)).\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  actData tcut=get_value(args(1));
+  set_tod_window(mytod,tcut);
+  return octave_value(mytod->n_to_window);
+}
+/*--------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD (cut_tod_ends_c, args, nargout, "Cut the ends of a TOD.  Arguments are (tod, cut_length (in seconds)).\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
