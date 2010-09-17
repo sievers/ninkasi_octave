@@ -8,19 +8,25 @@ order=get_keyval_default('order',-1,varargin{:});
 freqs=get_keyval_default('freqs',[],varargin{:});
 do_detrend=get_keyval_default('do_detrend',true,varargin{:});
 
-if do_detrend
-  data_org=get_tod_data(tod);
-  gapfill_data_c(tod);
-  array_detrend(tod);
-  gapfill_data_c(tod);
-  window_data_c(tod);
-  data=get_tod_data(tod);
-  push_tod_data(data_org,tod);
-  clear data_org
+%be able to specify incoming data different from the TOD if you wish.
+%say, when modelling the correlated timestreams.
+data=get_keyval_default('data',[],varargin{:});
+if isempty(data)
+  if do_detrend    
+    data_org=get_tod_data(tod);
+    gapfill_data_c(tod);
+    array_detrend(tod);
+    gapfill_data_c(tod);
+    window_data_c(tod);
+    data=get_tod_data(tod);
+    push_tod_data(data_org,tod);
+    clear data_org
+  else
+    data=get_tod_data(tod);
+  end
 else
-  data=get_tod_data(tod);
+  disp('data coming in from outside')
 end
-
 
 tvec=get_tod_tvec(tod);
 tt=tvec-mean(tvec);
@@ -28,9 +34,10 @@ tt=tt/max(abs(tt));
 for j=0:order,
   vecs=[vecs tt.^j];
 end
-for j=1:length(freqs),
-  vecs=[vecs cos(2*pi*freqs*tvec) sin(2*pi*freqs*tvec)];
-end
+%for j=1:length(freqs),
+  %vecs=[vecs cos(2*pi*freqs*tvec) sin(2*pi*freqs*tvec)];
+  vecs=[vecs cos(2*pi*tvec*freqs) sin(2*pi*tvec*freqs)];
+%end
 if(do_cm)
   vecs=[vecs get_cleaned_cm(data)];
 end

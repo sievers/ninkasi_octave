@@ -44,6 +44,7 @@ myopts=set_struct_mem_default(myopts,'seed',0);
 myopts=set_struct_mem_default(myopts,'prior_fac',0);
 myopts=set_struct_mem_default(myopts,'gaussian_noise',false);
 myopts=set_struct_mem_default(myopts,'monitor_tods',false);
+myopts=set_struct_mem_default(myopts,'window_symmetric',false);
 
 signal_only=get_struct_mem(myopts,'signal_only',false);
 

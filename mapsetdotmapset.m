@@ -15,4 +15,7 @@ if isfield(a,'timestreams'),
 end
 
 
-val=val+sum(sum(a.skymap.map.*b.skymap.map));
+if isfield(a,'skymap')
+  val=val+sum(sum(a.skymap.map.*b.skymap.map));
+end
+

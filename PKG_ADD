@@ -19,6 +19,7 @@ autoload('copy_string',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_uti
 autoload('createFFTWplans_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('cut_detector_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('cut_tod_ends_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('set_tod_window_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('debutterworth_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('rebutterworth_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('deconvolve_tod_time_constants_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -50,6 +51,8 @@ autoload('get_pix_from_radec_c',fullfile(fileparts(mfilename("fullpath")),'maput
 autoload('get_radec_from_pix_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('get_simple_banded_noise_model_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_skymap_cea_params_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('get_skymap_tan_params_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('get_skymap_rect_params_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('get_tod_col_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_altaz',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -93,6 +96,7 @@ autoload('reverse_tod_uncut_regions_c',fullfile(fileparts(mfilename("fullpath"))
 autoload('rotate_tod_data_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('scale_tod_band_noise_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('set_skymap_cea_predef_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('set_skymap_tan_predef_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_cea_simple_c',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('set_tod_noise_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('skymap2octave',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
