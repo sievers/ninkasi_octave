@@ -90,6 +90,7 @@ autoload('print_tod_uncut_regions',fullfile(fileparts(mfilename("fullpath")),'to
 autoload('purge_cut_detectors',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('push_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('read_cuts_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('write_cuts_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('read_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('reverse_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('reverse_tod_uncut_regions_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -150,5 +151,3 @@ autoload('set_tod_radec_lims_c',fullfile(fileparts(mfilename("fullpath")),'creat
 autoload('cuts_extend_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 
 autoload('convert_fits_bintable',fullfile(fileparts(mfilename("fullpath")),'fits_utils.oct'));
-
-

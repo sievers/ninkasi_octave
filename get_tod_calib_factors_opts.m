@@ -3,6 +3,14 @@ function[cal_facs,my_rr,my_ff]=get_tod_calib_factors_opts(tod,opts)
 flatfield_dir=get_struct_mem(opts,'flatfield_dir','');
 response_dir=get_struct_mem(opts,'response_dir','');
 
+if iscell(flatfield_dir)
+  flatfield_dir=flatfield_dir{guess_tod_season(get_tod_name(tod))}
+end
+
+if iscell(response_dir)
+  response_dir=response_dir{guess_tod_season(get_tod_name(tod))}
+end
+
 
 
 fwee={};

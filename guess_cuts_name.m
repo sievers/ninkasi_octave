@@ -30,6 +30,14 @@ if (fid~=-1)
   return;
 end
 
+cutname=[dirroot '/' mydate '/' todname ext '_cuts.txt'];
+fid=fopen(cutname,'r');
+if (fid~=-1)
+  fclose(fid);
+  return;
+end
+
+
 mydate=date_from_ctime(tok+86400,'mmm_dd_yyyy');
 cutname=[dirroot '/' mydate '/' todname ext '/cuts.txt'];
 fid=fopen(cutname,'r');
@@ -39,6 +47,14 @@ if (fid~=-1)
 end
 
 
+
+cutname=[dirroot '/' mydate '/' todname ext '_cuts.txt'];
+fid=fopen(cutname,'r');
+if (fid~=-1)
+  fclose(fid);
+  return;
+end
+
 mydate=date_from_ctime(tok-86400,'mmm_dd_yyyy');
 cutname=[dirroot '/' mydate '/' todname ext '/cuts.txt'];
 fid=fopen(cutname,'r');
@@ -46,6 +62,15 @@ if (fid~=-1)
   fclose(fid);
   return;
 end
+
+
+cutname=[dirroot '/' mydate '/' todname ext '_cuts.txt'];
+fid=fopen(cutname,'r');
+if (fid~=-1)
+  fclose(fid);
+  return;
+end
+
 
 cutname='';  %we didn't find anything here.
 return

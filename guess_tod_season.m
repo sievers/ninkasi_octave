@@ -1,4 +1,12 @@
 function[seasons]=guess_tod_season(tod_names)
+
+if strcmp(class(tod_names),'int64')
+  for j=length(tod_names):-1:1,
+    crud(j)={get_tod_name(tod_names(j))};
+  end
+  tod_names=crud;
+end
+
 ctimes=get_tod_ctimes_from_names(tod_names);
 
 starting_ctimes=[0 1217478623 1240359480 1269310955];

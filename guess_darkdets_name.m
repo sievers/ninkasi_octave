@@ -26,8 +26,24 @@ if (fid~=-1)
   return;
 end
 
+darkname=[dirroot '/' mydate '/' todname ext '_darkDets.txt'];
+fid=fopen(darkname,'r');
+if (fid~=-1)
+  fclose(fid);
+  return;
+end
+
+
+
 mydate=date_from_ctime(tok+86400,'mmm_dd_yyyy');
 darkname=[dirroot '/' mydate '/' todname ext '/darkDets.txt'];
+fid=fopen(darkname,'r');
+if (fid~=-1)
+  fclose(fid);
+  return;
+end
+
+darkname=[dirroot '/' mydate '/' todname ext '_darkDets.txt'];
 fid=fopen(darkname,'r');
 if (fid~=-1)
   fclose(fid);
@@ -42,6 +58,14 @@ if (fid~=-1)
   fclose(fid);
   return;
 end
+
+darkname=[dirroot '/' mydate '/' todname ext '_darkDets.txt'];
+fid=fopen(darkname,'r');
+if (fid~=-1)
+  fclose(fid);
+  return;
+end
+
 
 darkname='';  %we didn't find anything here.
 return

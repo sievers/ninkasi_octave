@@ -14,8 +14,20 @@ if ~exist('pointing_name')
   pointing_name='';
 end
 
+
+
 point_tag=get_keyval_default('point_tag','2008',varargin{:});
 point_dir=get_keyval_default('point_dir','/home/sievers/act/pointing/v06/',varargin{:});
+
+if iscell(point_tag)
+  point_tag=point_tag{guess_tod_season(todname)};
+end
+
+if iscell(point_dir)
+  point_dir=point_dir{guess_tod_season(todname)};
+end
+
+
 
 if (isempty(pointing_name)),
   %pointing_name='/cita/d/raid-sievers/sievers/act/ninkasi/from_ishmael/pointing_offset_mbac145.txt';

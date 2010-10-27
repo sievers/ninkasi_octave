@@ -6,8 +6,8 @@ if ~exist('do_new')
   do_new=false;
 end
 
-if (0)  %do transform locally
-
+if (1)  %do transform locally
+  %disp('local');
   n=size(mat,1);
   m=round(size(mat,2)/2);
   %do things in half-blocks so that memory doesn't overflow
