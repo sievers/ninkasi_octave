@@ -592,6 +592,39 @@ DEFUN_DLD (assign_tod_value, args, nargout, "Assign a value to a tod.  Args are 
   assign_tod_value(mytod,val);
   return octave_value_list();  
 }
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (add_matrix_to_tod_data, args, nargout, "Adds a matrix to tod data.  Args are (tod,matrix,[value])\n")
+{
+
+  if (args.length()<2) {
+    fprintf(stderr,"Need at least 2 args to add_matrix_to_tod_data.\n");
+    return octave_value_list();
+  }
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
+  if (!mytod->have_data) {
+    fprintf(stderr,"Error in add_matrix_to_tod_data - data not allocated in tod.\n");
+    return octave_value_list();
+
+  }
+  Matrix mat=args(1).matrix_value();
+  dim_vector dm=mat.dims();
+  
+  double fac=1.0;
+  if (args.length()>2)
+    fac=get_value(args(2));
+  if ((dm(1)!=mytod->ndet)||(dm(0)!=mytod->ndata)) {
+    fprintf(stderr,"Error in add_matrix_to_tod_data - size mismatch.  Got %d %d, expected %d %d new\n",dm(0),dm(1),mytod->ndata,mytod->ndet);
+    return octave_value_list();
+  }
+
+  double *vec=mat.fortran_vec();
+  for (int i=0;i<mytod->ndet;i++)
+    for (int j=0;j<mytod->ndata;j++) {
+      mytod->data[i][j]+=fac*vec[i*mytod->ndata+j];
+    }
+  return octave_value_list();  
+}
 
 /*--------------------------------------------------------------------------------*/
 
@@ -778,7 +811,7 @@ DEFUN_DLD (assign_bad_timestreams, args, nargout, "Push a matrix of bad timestre
   mytod->bad_timestreams->nstream=dm(1);
   mytod->bad_timestreams->n=mytod->ndata;
   mytod->bad_timestreams->timestreams=matrix(dm(1),dm(0));
-  printf("nstream is %d\n",mytod->bad_timestreams->nstream);
+  //printf("nstream is %d\n",mytod->bad_timestreams->nstream);
   double *vec=dat.fortran_vec();
   memcpy(mytod->bad_timestreams->timestreams[0],vec,dm(1)*dm(0)*sizeof(double));
   

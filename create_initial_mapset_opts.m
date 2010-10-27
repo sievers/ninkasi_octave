@@ -23,6 +23,7 @@ monitor_tods=get_struct_mem(myopts,'monitor_tods');
 outroot=get_struct_mem(myopts,'outroot',datestr(now,30));
 write_cleaned_data=get_struct_mem(myopts,'write_cleaned_data');
 window_symmetric=get_struct_mem(myopts,'window_symmetric');
+remove_corrnoise=get_struct_mem(myopts,'remove_corrnoise');
 
 if (do_gauss&hilton_noise)
   warning('requested both gaussian and Hilton noise.  Choosing Gaussian.');
@@ -352,7 +353,27 @@ for j=1:length(tods),
 
   if (do_noise)
     mdisp('doing noise');
+    mdisp(['remove_corrnoise is ' num2str(remove_corrnoise)]);
 
+    use_current_data=false;
+    if remove_corrnoise,
+      if isfield(mapset,'corrnoise')
+        mapset_tmp.corrnoise=mapset.corrnoise(j);
+      end
+      if isfield(mapset,'timestreams')
+        mapset_tmp.timestreams=mapset.timestreams(j);
+      end
+      if exist('mapset_tmp')
+        tic
+        data_tmp=subtract_simple_guess_from_data(mytod,mapset_tmp,1);
+        toc
+        use_current_data=true;
+      else
+        warning('remove_corrnoise specified, but no valid fields found.');
+        remove_corrnoise=false; %don't have anything part of the guess to pull, so why keep checking
+      end
+    end
+    
     if (strcmp(noise_class,'banded'))
       allocate_tod_noise_bands_c(mytod,bands);
       get_simple_banded_noise_model_c(mytod,rots,noise_types);
@@ -361,10 +382,18 @@ for j=1:length(tods),
       end
     end      
     if strcmp(noise_class,'powlaw')
-      fitp=get_mustang_noise(mytod,'order',1,'freqs',1.411);
+      fitp=get_mustang_noise(mytod,'order',1,'freqs',1.411,'use_current_data',use_current_data);
       set_noise_powlaw_c(mytod,fitp(1,:)/get_tod_ndata(mytod),fitp(2,:),fitp(3,:));
     end
   end
+  
+  if remove_corrnoise,  %gotta put back original data now.
+    push_tod_data(data_tmp,mytod);
+    clear data_tmp;
+    clear mapset_tmp;
+    clear myguess;
+  end
+
 
   if (highpass_val>0)
     mdisp('highpassing');

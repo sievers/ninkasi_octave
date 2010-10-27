@@ -1,5 +1,11 @@
 function[data,vecs,fitp]=get_tod_data_cleaned(tod,varargin)
 
+use_current_data=get_keyval_default('use_current_data',false,varargin{:});
+if (use_current_data),
+  data=get_tod_data(tod);
+  return
+end
+
 vecs=get_keyval_default('vecs',[],varargin{:});
 do_cm=get_keyval_default('cm',true,varargin{:});
 imin=get_keyval_default('imin',1,varargin{:});
