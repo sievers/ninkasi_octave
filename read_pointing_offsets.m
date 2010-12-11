@@ -23,6 +23,16 @@ ncol=str2num(args{6});
 ll=fgetl(fid);
 args=line_to_argv(ll);
 fittype=str2num(args{3});
+if fittype==100
+  lines=read_text_file_comments(fid,'#');
+  fclose(fid);
+  poff=parse_pointing_offsets_type_100(lines);
+  poff.nrow=nrow;
+  poff.ncol=ncol;
+  return
+end
+
+
 vals=fscanf(fid,'%f',[2 inf]);
 fclose(fid);
 

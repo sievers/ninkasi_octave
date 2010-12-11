@@ -1,7 +1,5 @@
 function[tods,lims,all_lims,isrising]=read_all_tod_headers(todlist,decimate,varargin)
 
-
-
 if ~exist('todlist')
   todlist='';
 end

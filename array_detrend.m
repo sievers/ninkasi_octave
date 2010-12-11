@@ -7,12 +7,19 @@ dt=get_tod_dt(tod);
 nsamp=ceil(window_len/dt);
 data=get_tod_data(tod);
 %mdisp(['nsamp is ' num2str(nsamp)]);
+if (1)
+  mymed=omp_median(data,1);
+  data=data-repmat(mymed,[size(data,1) 1]);
+  left_val=median(omp_median(data(1:nsamp,:),1));
+  right_val=median(omp_median(data(end-nsamp+1:end,:),1));
+  %mdisp(['left/right vals are ' num2str([left_val right_val])]);
+else
+  mymed=median(data,1);
+  data=data-repmat(mymed,[size(data,1) 1]);
+  left_val=median(median(data(1:nsamp,:),1));
+  right_val=median(median(data(end-nsamp+1:end,:),1));
 
-mymed=omp_median(data,1);
-data=data-repmat(mymed,[size(data,1) 1]);
-left_val=median(omp_median(data(1:nsamp,:),1));
-right_val=median(omp_median(data(end-nsamp+1:end,:),1));
-%mdisp(['left/right vals are ' num2str([left_val right_val])]);
+end
 nn=size(data,1);
 ind=(1:nn)'-round(nsamp/2);ind=ind/(nn-nsamp);ind=ind-mean(ind);
 vec=ind*(right_val-left_val);

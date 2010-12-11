@@ -31,10 +31,11 @@ my_ff=zeros(length(myrows),1);
 
 
 [a,b,c]=fileparts(fname);
-
+response_name=[response_dir '/'  b  c];
 try
-  response_name=[response_dir '/'  b  c];
+
   responsivity=load(response_name);
+
   %responsivity=load([response_dir '/'  b  c]);
 
 
@@ -51,6 +52,7 @@ try
 catch
   my_rr(:)=nan;
   my_ff(:)=nan;
+  warning(['responsivity file ' response_name ' not found']);
 end
 
 mdisp(['Flatfield: ' flatfield_dir '  Responsivity: ' response_dir]);

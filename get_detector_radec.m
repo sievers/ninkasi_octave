@@ -12,7 +12,12 @@ else
   det=det-1;
 end
 
-if exist('exact')
+if ~exist('exact')
+  exact=false;
+end
+
+%if exist('exact')
+if exact
   radec=get_detector_radec_c(tod,det,true);
 else
   radec=get_detector_radec_c(tod,det);

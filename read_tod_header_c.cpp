@@ -112,6 +112,35 @@ DEFUN_DLD (alt_az_ctime2act_ra_dec_c, args, nargout, "Turn an alt, az, and ctime
   
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (read_tod_header_nopoint_c, args, nargout, "Read a TOD header, but w/out pointing.\n")
+{
+  int nargin = args.length();
+  if (nargin==0)
+    return octave_value_list();
+
+  char *myfroot=get_char_from_arg(args(0).char_matrix_value());
+  int decimate=0;
+  if (nargin>1) {
+    decimate=get_value(args(1));
+  }
+  mbTOD *mytod=read_dirfile_tod_header_decimate(myfroot,decimate);
+  mprintf(stdout,"file %s had %d detectors and %d data elements, rows and cols are %d %d.  dt=%12.4e\n",myfroot,mytod->ndet,mytod->ndata,mytod->nrow, mytod->ncol,mytod->deltat);
+  mytod->pointingOffset=NULL;
+  
+  mprintf(stdout,"allocating cuts.\n");
+  mytod->cuts=mbCutsAlloc(mytod->nrow,mytod->ncol);
+
+  int64NDArray myptr(1);
+  long mytod_asint=(long)mytod;
+  myptr(0)=mytod_asint;
+
+
+  octave_value_list retval;
+  retval(0)=myptr;
+  
+  return retval;
+}
+/*--------------------------------------------------------------------------------*/
 
 
 
@@ -276,3 +305,75 @@ char *get_char_from_arg(charMatrix ch)
 
   return octave_value(a);
 #endif
+
+/*--------------------------------------------------------------------------------*/
+template <typename T> ColumnVector vec2col(T *vec_in, int n)
+{
+  ColumnVector vec(n);
+  double *vv=vec.fortran_vec();
+  for (int i=0;i<n;i++)
+    vv[i]=(double)vec_in[i];
+
+  return vec;
+    
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (read_dirfile_channel, args, nargout, "Read a dirfile channel.  Allowable types are usUSfd\n")
+{
+
+  if (args.length()<3) {
+    fprintf(stderr,"Error - need at least three arguments (filename, fieldname, type) in read_dirfile_channel.\n");
+    return octave_value_list();
+  }
+
+  charMatrix filename=args(0).char_matrix_value();
+  char *fname=get_char_from_arg(filename);
+  //printf("Filename is .%s.\n",fname);
+
+  int n=0,status=0; 
+
+  charMatrix fieldname=args(1).char_matrix_value();
+  char *ffname=get_char_from_arg(fieldname);
+  charMatrix ntype=args(2).char_matrix_value();  
+  char mytype=ntype(0);
+  //printf("mytype is %c\n",mytype);
+  
+
+  void *data=dirfile_read_channel_direct(mytype,fname,ffname,&n);
+  free(ffname);
+  free(fname);
+  if (data==NULL) {
+    return octave_value_list();
+  }
+  
+  ColumnVector dd;
+  switch(mytype) {
+  case 's':
+    dd=vec2col((int16_t *)data,n);
+    break;
+  case 'u':
+    dd=vec2col((uint16_t *)data,n);
+    break;
+  case 'f':
+    dd=vec2col((float *)data,n);
+    break;
+  case 'd':
+    dd=vec2col((double *)data,n);
+    break;
+  case 'U':
+    dd=vec2col((uint32_t *)data,n);
+    break;
+  case 'S':
+    dd=vec2col((int32_t *)data,n);
+    break;
+    
+  default:
+    fprintf(stderr,"type not recognized in switch.  A bit odd...\n");
+  }
+
+  return octave_value(dd);
+  
+}
+
+/*--------------------------------------------------------------------------------*/
