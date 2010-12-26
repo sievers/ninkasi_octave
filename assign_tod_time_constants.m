@@ -6,7 +6,16 @@ if ~exist('taus')
   taus(f3db==0)=0;
   assert(sum(sum(isnan(taus)))==0);
   assert(sum(sum(isinf(taus)))==0);
+else
+  if ischar(taus)
+    f3db=load(taus);
+    taus=1./f3db/2/pi;
+    taus(f3db==0)=0;
+    assert(sum(sum(isnan(taus)))==0);
+    assert(sum(sum(isinf(taus)))==0);
+  end
 end
+
 
 for j=1:length(tods),
   assign_tod_time_constants_c(tods(j),taus);

@@ -1606,7 +1606,8 @@ DEFUN_DLD (get_simple_banded_noise_model_c, args, nargout, "Debutterworth the da
   }
   
   get_simple_banded_noise_model(mytod,do_rots,types);
-  
+  //get_simple_banded_noise_model_onerotmat(mytod,do_rots,types);
+
   dim_vector dm(mytod->ndet,1);
   Matrix facs(dm);
   for (int i=0;i<mytod->ndet;i++)

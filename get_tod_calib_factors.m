@@ -19,10 +19,15 @@ else
     flatFieldAR2;
     cd(curdir);
   else
-    error('can''t find flatfields.');
+    if (fname(end-2:end)=='ar3'),
+      cd(flatfield_dir);
+      flatFieldAR3;
+      cd(curdir);
+    else
+      error('can''t find flatfields.');
+    end
   end
 end
-
 
 
 [myrows,mycols]=get_tod_rowcol(tod);

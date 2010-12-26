@@ -12,7 +12,7 @@ if sum(enc_flags>0)==0  %nothing to see here, folks, move along.
   return;
 end
 
-alt=read_dirfile_channel(fname,'Enc_El_Deg','f');
+alt=read_dirfile_channel(fname,'Enc_El_Deg','f');alt_org=alt;
 az=read_dirfile_channel(fname,'Enc_Az_Deg','f');
 alt=alt*pi/180;
 az=(az+180)*pi/180;
@@ -48,6 +48,12 @@ while length(az)>nn
   az=decimate_vector(az);
   alt=decimate_vector(alt);
 end
+
+if length(az)~=nn,
+  error(['size mismatch ' num2str([length(az) nn length(alt_org)]) ' on ' get_tod_name(tod)]);
+end
+
+
 assert(length(az)==nn);
 push_tod_altaz(tod,alt,az);
 

@@ -22,13 +22,13 @@ else
   assert(ischar(pfiles));
   poffs=read_pointing_offsets(pfiles);
 end
-mdisp('starting tod header read');
+%mdisp('starting tod header read');
 for j=1:ntod,
   tod=read_tod_header_nopoint_c(todlist{j},decimate);
   if (fix_altaz)
     repair_tod_altaz(tod);
   end
-  mdisp('read raw header');
+  %mdisp('read raw header');
   
   if iscell(poffs),
     my_poff=poffs{guess_tod_season(todlist{j})};
@@ -36,9 +36,9 @@ for j=1:ntod,
     my_poff=poffs;
   end 
 
-  mdisp('setting pointing')
+  %mdisp('setting pointing')
   [mylims,myrising]=set_tod_pointing_100(tod,my_poff);
-  mdisp('read set pointing');
+  %mdisp('read set pointing');
   tods(j)=tod;
   isrising(j)=myrising;
   lims(j,:)=mylims';
