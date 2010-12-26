@@ -121,6 +121,19 @@ DEFUN_DLD (set_tod_pointing_saved, args, nargout, "Read a TOD header, including 
 
 /*--------------------------------------------------------------------------------*/
 
+DEFUN_DLD (free_tod_data_saved, args, nargout, "Read a TOD header, including pointing info etc.\n")
+{
+
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->data_saved) {
+    free(mytod->data_saved[0]);
+    free(mytod->data_saved);
+  }
+  return octave_value_list();
+
+}
+/*--------------------------------------------------------------------------------*/
+
 DEFUN_DLD (set_tod_data_saved, args, nargout, "Read a TOD header, including pointing info etc.\n")
 {
 

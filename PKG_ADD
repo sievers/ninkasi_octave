@@ -11,6 +11,7 @@ autoload('apply_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_
 autoload('assign_rotmat_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_time_constants_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_value',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('add_matrix_to_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('pull_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('check_data_fft_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -150,6 +151,7 @@ autoload('set_tod_ndata_c',fullfile(fileparts(mfilename("fullpath")),'create_tod
 autoload('set_tod_rowcol_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_pointing_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_data_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
+autoload('free_tod_data_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_radec_lims_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('cuts_extend_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 
