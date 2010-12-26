@@ -19,10 +19,15 @@ else
     flatFieldAR2;
     cd(curdir);
   else
-    error('can''t find flatfields.');
+    if (fname(end-2:end)=='ar3'),
+      cd(flatfield_dir);
+      flatFieldAR3;
+      cd(curdir);
+    else
+      error('can''t find flatfields.');
+    end
   end
 end
-
 
 
 [myrows,mycols]=get_tod_rowcol(tod);
@@ -31,10 +36,11 @@ my_ff=zeros(length(myrows),1);
 
 
 [a,b,c]=fileparts(fname);
-
+response_name=[response_dir '/'  b  c];
 try
-  response_name=[response_dir '/'  b  c];
+
   responsivity=load(response_name);
+
   %responsivity=load([response_dir '/'  b  c]);
 
 
@@ -51,6 +57,7 @@ try
 catch
   my_rr(:)=nan;
   my_ff(:)=nan;
+  warning(['responsivity file ' response_name ' not found']);
 end
 
 mdisp(['Flatfield: ' flatfield_dir '  Responsivity: ' response_dir]);

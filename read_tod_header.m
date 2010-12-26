@@ -1,6 +1,14 @@
 function[tod,lims,isrising]=read_tod_header(todname,pointing_name,decimate,varargin)
 %interface to the C tod reader.
 
+if ~exist('decimate')
+  decimate=0;
+end
+if isempty(decimate)
+  decimate=0;
+end
+
+
 assert(ischar(todname));
 assert(~isempty(todname));
 if ~isdir(todname)
@@ -18,6 +26,20 @@ end
 
 point_tag=get_keyval_default('point_tag','2008',varargin{:});
 point_dir=get_keyval_default('point_dir','/home/sievers/act/pointing/v06/',varargin{:});
+
+
+if iscell('pointing_name')
+  pointing_name=pointing_name{guess_tod_season(todname)};
+end
+
+if isstruct(pointing_name)
+  tod=read_tod_header_nopoint_c(todname);
+  myoffsets=get_tod_pointing_offsets_type_100(tod,pointing_name);
+  set_tod_pointing_c(tod,myoffsets);
+  
+  return
+end
+
 
 if iscell(point_tag)
   point_tag=point_tag{guess_tod_season(todname)};

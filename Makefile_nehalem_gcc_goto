@@ -14,7 +14,7 @@ IOMP=/opt/intel/Compiler/11.0/081/lib/intel64/
 
 ##NINKASI_INC=-I/cita/d/raid-sievers/sievers/act/ninkasi/include -I/cita/d/raid-sievers/sievers/tpb/libs/include/
 #NINKASI_INC=-I/home/sievers/local/include/ -I/home/sievers/local/src/ninkasi/include/ -I${MKL}/include/ -D_MKL 
-NINKASI_INC=-I/home/sievers/local/include/ -I/home/sievers/local/src/ninkasi_c/include/ -I${MKL}/include/ -D_MKL 
+NINKASI_INC=-I/home/sievers/local/include/ -I/home/sievers/local/src/ninkasi/include/ -I${MKL}/include/ -D_MKL 
 
 
 

@@ -15,7 +15,7 @@ for j=1:length(comment_str),
 end
 ind=true(size(lines));
 for j=1:length(lines),
-  if isempty(lines{j})
+  if isempty(strtrim(lines{j}))  %used to be just isempty - now blank lines w/spaces should get cut
     ind(j)=false;
   end
 end

@@ -72,5 +72,16 @@ if (fid~=-1)
 end
 
 
+%if we're here, it's probably 'cause we're season 1, missing ar1 in the cuts names, so deal with it.
+if strncmp(ext,'.ar',3)
+  cutname=guess_cuts_name([dr '/' todname],dirroot);
+  return;
+end
+
+
+
 cutname='';  %we didn't find anything here.
 return
+
+
+

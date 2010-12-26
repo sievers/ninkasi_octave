@@ -155,10 +155,16 @@ for j=1:length(tods),
       end	
     end
 
-    if (scale_fac~=1)
-      multiply_all_data(mytod,scale_fac);
+    if numel(scale_fac)>1,
+      fac_use=scale_fac(guess_tod_season(mytod));
+      if fac_use~=1,
+        multiply_all_data(mytod,fac_use);
+      end      
+    else
+      if (scale_fac~=1)
+        multiply_all_data(mytod,scale_fac);
+      end
     end
-
 
     if (reverse_time)
       disp('reversing time order of TOD');

@@ -847,6 +847,24 @@ DEFUN_DLD (pull_bad_timestreams, args, nargout, "Pull the bad timestreams out of
   
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (push_tod_altaz, args, nargout, "Push octave alt and az into a TOD.   Args are (data,alt,az)\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix alt_mat=args(1).matrix_value();
+  Matrix az_mat=args(2).matrix_value();
+  double *alt=alt_mat.fortran_vec();
+  double *az=az_mat.fortran_vec();
+
+  for (int i=0;i<mytod->ndata;i++) {
+    mytod->alt[i]=alt[i];
+    mytod->az[i]=az[i];
+  }
+  
+  
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (push_tod_data, args, nargout, "Push an octave matrix into a TOD.   Args are (data,tod)\n")
 {
@@ -1515,6 +1533,35 @@ DEFUN_DLD (get_data_fft_c, args, nargout, "Debutterworth the data.\n")
   return octave_value(datft);
 
 }
+
+/*--------------------------------------------------------------------------------*/
+
+
+DEFUN_DLD (push_data_fft_c, args, nargout, "Debutterworth the data.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  ComplexMatrix mat=args(1).complex_matrix_value();
+  
+  if (!mytod->have_data) {
+    fprintf(stderr,"allocating storage for TODs.\n");
+    allocate_tod_storage(mytod);
+  }
+  
+  actComplex *vec=(actComplex *)mat.fortran_vec();
+  dim_vector dm=mat.dims();
+  printf("dms are %d %d\n",dm(0),dm(1));
+  actComplex **mm=(actComplex **)malloc(sizeof(actComplex *)*dm(0));
+  int dd=dm(1);
+  int nd=dm(0);
+  for (int i=0;i<nd;i++) {
+    mm[i]=vec+dd*i;
+  }
+  ifft_all_data(mytod,mm);
+  free(mm);
+  return octave_value_list();
+
+}
+
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (check_data_fft_c, args, nargout, "Debutterworth the data.\n")
 {
@@ -1592,7 +1639,8 @@ DEFUN_DLD (get_simple_banded_noise_model_c, args, nargout, "Debutterworth the da
   }
   
   get_simple_banded_noise_model(mytod,do_rots,types);
-  
+  //get_simple_banded_noise_model_onerotmat(mytod,do_rots,types);
+
   dim_vector dm(mytod->ndet,1);
   Matrix facs(dm);
   for (int i=0;i<mytod->ndet;i++)
@@ -1868,6 +1916,7 @@ DEFUN_DLD (get_detector_radec_c, args, nargout, "Get RA/Dec of a detector.\n")
   if (do_exact)
     get_radec_from_altaz_exact_1det(tod,det,scratch);
   else {
+    printf("Getting detector fit coarse.\n");
     get_radec_from_altaz_fit_1det_coarse(tod,det,scratch);
   }  
 
@@ -2129,6 +2178,58 @@ DEFUN_DLD (get_median_altaz_c, args, nargout, "Get median alt/az of a tod name.\
 
 /*--------------------------------------------------------------------------------*/
 
+
+DEFUN_DLD (set_tod_pointing_c, args, nargout, "Set the pointing for a TOD.  Return TOD limits\n")
+{
+  int nargin = args.length();
+  if (nargin==0)
+    return octave_value_list();
+  
+  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  Matrix dalt=args(1).matrix_value();
+  Matrix daz=args(2).matrix_value();
+  dim_vector dm=dalt.dims();
+  mbPointingOffset *offset;
+  //printf("dimenstions are %d %d\n",dm(0),dm(1));
+  if (tod->pointingOffset)
+    offset=tod->pointingOffset; //assuming this has been allocated correctly
+  else {
+    offset = nkPointingOffsetAlloc(dm(0),dm(1),0);
+    tod->pointingOffset=offset; 
+  }
+  //printf("allocated.\n");
+  for (int i=0;i<dm(0);i++)
+    for (int j=0;j<dm(1);j++) {
+      offset->offsetAlt[i][j]=dalt(i,j);
+      offset->offsetAzCosAlt[i][j]=daz(i,j);      
+    }
+  //printf("assigned.\n");
+  //printf("Offsets of (0,0) are %14.7f %14.7f\n",offset->offsetAlt[0][0],offset->offsetAzCosAlt[0][0]);
+
+  cut_mispointed_detectors(tod);
+  //printf("cut mispointed detectors.\n");
+  assign_tod_ra_dec(tod);
+  //printf("assigned ra_dec.\n");
+  
+  //printf("Offsets of (0,0) are %14.7f %14.7f\n",offset->offsetAlt[0][0],offset->offsetAzCosAlt[0][0]);
+
+  find_pointing_pivots(tod,0.5);
+  //printf("Offsets of (0,0) are %14.7f %14.7f\n",offset->offsetAlt[0][0],offset->offsetAzCosAlt[0][0]);
+  find_tod_radec_lims(tod);
+  //printf("Offsets of (0,0) are %14.7f %14.7f\n",tod->pointingOffset->offsetAlt[0][0],tod->pointingOffset->offsetAzCosAlt[0][0]);
+
+  Matrix lims(4,1);
+  lims(0,0)=tod->ramin;
+  lims(1,0)=tod->ramax;
+  lims(2,0)=tod->decmin;
+  lims(3,0)=tod->decmax;
+
+  return octave_value(lims);
+   
+}
+
+/*--------------------------------------------------------------------------------*/
+
 DEFUN_DLD (get_tod_pointing_offsets_c, args, nargout, "Make a matrix of the TOD pointing offsets.\n")
 {
 
@@ -2137,6 +2238,7 @@ DEFUN_DLD (get_tod_pointing_offsets_c, args, nargout, "Make a matrix of the TOD 
     return octave_value_list();
   
   mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  printf("Offsets of (0,0) are %14.7f %14.7f\n",tod->pointingOffset->offsetAlt[0][0],tod->pointingOffset->offsetAzCosAlt[0][0]);
   Matrix dalt(33,32);
   Matrix daz(33,32);
   for (int i=0;i<33;i++)

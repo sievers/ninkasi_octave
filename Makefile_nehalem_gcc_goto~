@@ -12,8 +12,9 @@ IOMP=/opt/intel/Compiler/11.0/081/lib/intel64/
 
 
 
-#NINKASI_INC=-I/cita/d/raid-sievers/sievers/act/ninkasi/include -I/cita/d/raid-sievers/sievers/tpb/libs/include/
-NINKASI_INC=-I/home/sievers/local/include/ -I/home/sievers/local/src/ninkasi/include/ -I${MKL}/include/ -D_MKL 
+##NINKASI_INC=-I/cita/d/raid-sievers/sievers/act/ninkasi/include -I/cita/d/raid-sievers/sievers/tpb/libs/include/
+#NINKASI_INC=-I/home/sievers/local/include/ -I/home/sievers/local/src/ninkasi/include/ -I${MKL}/include/ -D_MKL 
+NINKASI_INC=-I/home/sievers/local/include/ -I/home/sievers/local/src/ninkasi_c/include/ -I${MKL}/include/ -D_MKL 
 
 
 
@@ -32,7 +33,7 @@ CXXFLAGS=-fopenmp  -D_MKL
 
 #CPROGS = double_vec test_ninkasi_lib todfun_c maputils_c omp_median_c read_tod_header_c skymap2ninkasi corrnoise_utils matutils fft_utils noise_fun mpi_init
 
-CPROGS =  todfun_c maputils_c omp_median_c read_tod_header_c skymap2ninkasi corrnoise_utils matutils fft_utils noise_fun mpi_init mpi_finalize mpi_comm_rank mpi_comm_size octave_mpi_utils double_vec test_ninkasi_lib
+CPROGS =  todfun_c maputils_c omp_median_c read_tod_header_c skymap2ninkasi corrnoise_utils matutils fft_utils noise_fun mpi_init mpi_finalize mpi_comm_rank mpi_comm_size octave_mpi_utils double_vec test_ninkasi_lib create_tod_from_octave fits_utils
 
 BINDIR=./
 
@@ -107,6 +108,10 @@ corrnoise_utils:corrnoise_utils.o
 
 read_tod_header_c:read_tod_header_c.o
 	$(CPP) $(CFLAGS) read_tod_header_c.o -o $(BINDIR)$@.oct  ${NINKASI_LIBS2}
+
+
+create_tod_from_octave:create_tod_from_octave.o
+	$(CPP) $(CFLAGS) create_tod_from_octave.o -o $(BINDIR)$@.oct  ${NINKASI_LIBS2}
 
 
 
