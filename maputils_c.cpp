@@ -297,8 +297,29 @@ DEFUN_DLD (set_skymap_cea_predef_c, args, nargout, "Dial in parameters for a CEA
 }
 
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (set_skymap_tan_explicit_c, args, nargout, "Dial FITS parameters for a TAN map.  Args are (map,rapix,decpix,radelt,decdelt,pv,ra_cent,dec_cent,nra,ndec)\n")
+{
+  if (args.length()<10) {
+    printf("Need 10 arguments in set_skymap_tan_explicit_c.\n");
+    return octave_value_list();
+  }
+  MAP *map=(MAP *)get_pointer(args(0));
+  actData rapix=get_value(args(1));
+  actData decpix=get_value(args(2));
+  actData radelt=get_value(args(3));
+  actData decdelt=get_value(args(4));
+  actData pv=get_value(args(5));
+  actData ra_cent=get_value(args(6));
+  actData dec_cent=get_value(args(7));
+  int nra=(int)get_value(args(8));
+  int ndec=(int)get_value(args(9));
+  printf("setting myself to tan now.\n");
+  set_map_projection_tan_explicit(map,rapix,decpix,radelt,decdelt,pv,ra_cent,dec_cent,nra,ndec);
+  return octave_value_list();
+}
 
-DEFUN_DLD (set_skymap_tan_predef_c, args, nargout, "Dial in parameters for a TAN map.  Args are (map,pixsize,rapix,decpix,ra_cent,dec_cent,nra,ndec\n")
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (set_skymap_tan_predef_c, args, nargout, "Dial in parameters for a TAN map.  Args are (map,pixsize,rapix,decpix,ra_cent,dec_cent,nra,ndec)\n")
 {
   if (args.length()<8) {
     printf("Need 8 argumetns in set_skymap_tan_predef_c.\n");

@@ -98,6 +98,7 @@ autoload('rotate_tod_data_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c
 autoload('scale_tod_band_noise_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('set_skymap_cea_predef_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_tan_predef_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('set_skymap_tan_explicit_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_cea_simple_c',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('set_tod_noise_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('skymap2octave',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
