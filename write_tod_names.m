@@ -4,7 +4,7 @@ function[value]=write_tod_names(tods,fname)
 
 nproc=mpi_comm_size;
 myid=mpi_comm_rank+1;
-
+tod_names={};
 for j=length(tods):-1:1,
   tod_names(j)={get_tod_name(tods(j))};
 end

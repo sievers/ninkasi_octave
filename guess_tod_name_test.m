@@ -48,8 +48,8 @@ if isempty(dirroot)
 end
 
 
-[dr,tt,ext]=fileparts(todname);
 
+[dr,tt,ext]=fileparts(todname);
 tok=strtok(tt,'.');
 
 tok_org=tok;

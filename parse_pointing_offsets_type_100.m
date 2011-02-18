@@ -53,11 +53,11 @@ nend=0;
 begin_ind=[];
 end_ind=[];
 for j=1:length(lines),
-  if strcmp(lines{j},'begin_match')
+  if strcmp(strtrim(lines{j}),'begin_match')
     nbegin=nbegin+1;
     begin_ind(nbegin)=j;
   end
-  if strcmp(lines{j},'end_match')
+  if strcmp(strtrim(lines{j}),'end_match')
     nend=nend+1;
     end_ind(nend)=j;
   end

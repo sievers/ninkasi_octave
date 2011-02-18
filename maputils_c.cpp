@@ -284,8 +284,8 @@ DEFUN_DLD (set_skymap_cea_predef_c, args, nargout, "Dial in parameters for a CEA
   actData radelt=get_value(args(1));
   actData decdelt=get_value(args(2));
 
-  int rapix=get_value(args(3));
-  int decpix=get_value(args(4));
+  actData rapix=get_value(args(3));
+  actData decpix=get_value(args(4));
 
   actData pv=get_value(args(5));
   int nra=get_value(args(6));

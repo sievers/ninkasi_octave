@@ -27,8 +27,19 @@ if isfield(pp,'apply_dy_ctime')
   offsets(2)=offsets(2)+polyval(flipud(pp.apply_dy_ctime(2:end)),dt);
 end
 
+%do a time-of-day correction
+if isfield(pp,'apply_dy_dtime')
+  myctime=get_tod_ctime_c(tod);
+  dt=rem((myctime-pp.apply_dy_dtime(1)),86400);
+  flipud(pp.apply_dy_ctime(2:end));
+  delta=polyval(flipud(pp.apply_dy_dtime(2:end)),dt);
+  mdisp(['dtime delta on ' get_tod_name(tod) ' is ' num2str(delta)]);
+  offsets(2)=offsets(2)+delta;
+end
+
+
 if isfield(pp,'apply_dx_ctime')
-  myctime=get_tod_ctime(tod);
+  myctime=get_tod_ctime_c(tod);
   dt=myctime-pp.apply_dx_ctime(1);
   offsets(1)=offsets(1)+polyval(flipud(pp.apply_dx_ctime(2:end)),dt);
 end
@@ -48,7 +59,7 @@ for j=1:length(pstructs)
   end
 end
 %pp=[];  %if here, it's 'cause we didn't match any of the candidate blocks
-error(['matching pointing block not found on ' get_tod_name(tod)]);
+error(['matching pointing block not found on ' get_tod_name(tod) ' with ' num2str([myctime myaz])]);
 return
 
 function[tf]=match_ctime(myctime,pp)

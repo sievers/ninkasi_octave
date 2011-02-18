@@ -3,6 +3,7 @@ function[x]=run_pcg_corrnoise_precon_octave(tods,x,b,precon,fun,priorfun,varargi
 
 %x is a mapset, could be clear
 myid=mpi_comm_rank+1;
+nproc=mpi_comm_size;
 
 maxiter=get_keyval_default('maxiter',50,varargin{:});
 tol=get_keyval_default('tol',1e-8,varargin{:});
@@ -10,6 +11,7 @@ save_interval=get_keyval_default('save_interval',1e-8,varargin{:});
 save_tag=get_keyval_default('save_tag','map_',varargin{:});
 dad_thresh=get_keyval_default('dad_thresh',1e3,varargin{:});
 write_times=get_keyval_default('write_times',false,varargin{:});
+profile=get_keyval_default('profile',false,varargin{:});
 
 if (myid==1)
   disp(['length of varargin is ' num2str(length(varargin))]);
@@ -116,12 +118,34 @@ best_rMr=r0sqr;
 
 last_failed=0;
 
+
+if (profile)
+  logid=fopen([save_tag '.profile.node_' num2str(myid)],'w');
+  for j=1:length(tods),
+    fprintf(logid,'%s\n',get_tod_name(tods(j)));
+  end
+  fflush(logid);
+end
+
+
 while ((rMr>r0sqr*tol)&(iter<maxiter)),
   %tic;
+  if (profile)  %if profiling, make sure we all start at the same time
+    mpi_barrier;  
+  end
     aa=now;
     %sz1=size(d.skymap.map);
-    Ad=mapset2mapset_corrnoise_octave(tods,d,varargin{:});
+    [Ad,tod_times,node_time,mpi_time]=mapset2mapset_corrnoise_octave(tods,d,varargin{:});
     cc=now;
+
+    slowest_time=mpi_allreduce(node_time,'max');
+    if node_time==slowest_time
+      bad_id=myid;
+    else
+      bad_id=0;
+    end
+    bad_node=mpi_allreduce(bad_id);
+    total_time=mpi_allreduce(node_time);
 
     %sz2=size(Ad.skymap.map); 
     %if min(sz1==sz2)==0, error(['spot 1 size mismatch: ' num2str(sz1) ' vs ' num2str(sz2)]);end;
@@ -166,10 +190,21 @@ while ((rMr>r0sqr*tol)&(iter<maxiter)),
       d=add_mapset(Mr,d,beta);
       clear Mr;
       iter=iter+1;
+      bb=now;
+
+      if (profile)
+        fprintf(logid,'%4d %3d %8.2f %8.2f %8.2f %8.2f ',iter,myid,node_time,86400*(cc-aa),86400*(bb-aa),mpi_time);
+        for jj=1:length(tods),
+          fprintf(logid,'%12.2f %6.2f %6.2f %6.2f %6.2f',tod_times(jj,1),sum(tod_times(jj,2:4)),tod_times(jj,2),tod_times(jj,3),tod_times(jj,4));
+        end
+        fprintf(logid,'\n');
+        fflush(logid);
+      end
+      
       if (myid==1)
         %disp([iter rMr dAd beta]);
-        bb=now;
-        printf('%4d %14.5g %14.5g %14.5g %9.2f %9.2f\n',iter,rMr,dAd,beta,86400*(bb-aa),86400*(cc-aa));
+
+        printf('%4d %14.5g %14.5g %14.5g %9.2f %9.2f %4d %9.2f %9.2f\n',iter,rMr,dAd,beta,86400*(bb-aa),86400*(cc-aa),bad_id,slowest_time,total_time/nproc);
         do_print=false;
         if length(save_interval)==1
           if save_interval>0,
@@ -197,4 +232,7 @@ while ((rMr>r0sqr*tol)&(iter<maxiter)),
     
     %toc
     
+end
+if (profile)
+  fclose(logid);
 end

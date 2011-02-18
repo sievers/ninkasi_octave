@@ -23,4 +23,18 @@ if strcmp(ar,'ar1equ')
   set_skymap_cea_predef_c(map,-0.0008334, 0.0008334,7584.0,323.0,1.0,28830,687);
   return
 end
+
+if strcmp(ar,'ar1equ_2010')
+  %set_skymap_cea_predef_c(map,-0.0083336141, 0.0083336141,8558.0,265.0,0.99993261,28672,644);
+  set_skymap_cea_predef_c(map,-0.008334, 0.008334,8558.0,265.0,1.0,28672,644);
+  return
+end
+
+if strcmp(ar,'allequ')  %Hasselfield's preferred header for all equatorial maps
+  %set_skymap_cea_predef_c(map,-0.0083336141, 0.0083336141,8558.0,265.0,0.99993261,28672,644);
+  set_skymap_cea_predef_c(map,-0.00825, 0.00825,7972.0,292.0,1.0,38275,611);
+  return
+end
+
+
 error(['error in set_act_cea - unrecognized array ' ar]);

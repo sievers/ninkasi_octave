@@ -1,7 +1,15 @@
-function[tod_times,myids,node_times]=load_balance_tods_from_file(tod_names,fname,nproc)
+function[tod_times,myids,node_times]=load_balance_tods_from_file(tod_names,fname,nproc,varargin)
+%how to assign TODs with missing time info.
+%options include mean, median, max,min,cut
+%default of min means the load balancing happens as normal,
+%then they will get dealt out at the end.
+do_missing=get_keyval_default('missing','min',varargin{:});
+
 tod_times=zeros(size(tod_names));
 
 [names_in,times_in]=read_tod_times(fname);
+
+
 names_in=get_tod_tags_from_names(names_in);
 tags=get_tod_tags_from_names(tod_names);
 
@@ -23,13 +31,41 @@ for j=1:ntag,
   end
 end
 
-myids=zeros(ntag);
+if sum(tod_times==0)>0,
+  mdisp(['warning - in load_balance_tods_from_file, have TODs with missing time info']);
+  switch(do_missing)
+   case{'min'}
+    tod_times(tod_times==0)=0.9999*min(tod_times(tod_times>0));
+   case{'mean'}
+    tod_times(tod_times==0)=mean(tod_times(tod_times>0));
+   case{'median'} 
+    tod_times(tod_times==0)=median(tod_times(tod_times>0));
+   case{'max'}
+    tod_times(tod_times==0)=max(tod_times(tod_times>0));
+   case{'cut'}
+    ;  %don't run TODs with no time info
+   case{'ignore'}
+    ;  
+   otherwise
+    mdisp(['unrecognized input ' do_missing ' for missing TOD time info in load_balance_tods_from_file.  Assuming cut.']);
+  end
+end
+
+
+
+myids=zeros(ntag,1);
 node_times=zeros(nproc,1);
 
 
 if (1)
   [times_use,ind_use]=sort(tod_times);
-  for j=ntag:-1:1,
+
+  if (min(times_use)==0)&(strcmp(do_missing,'ignore')==0)
+    imin=max(find(times_use==0))+1;
+  else
+    imin=1;
+  end
+  for j=ntag:-1:imin,
     ii=ind_use(j);
     assert(times_use(j)==tod_times(ii));
     [a,b]=min(node_times);

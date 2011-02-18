@@ -70,6 +70,20 @@ char *get_char_from_ov(octave_value cch)
 
 
 /*--------------------------------------------------------------------------------*/
+double **matrix2cmat(double *vec, dim_vector dm)
+
+{
+  //double *vec=mat.fortran_vec();
+  //dim_vector dm=mat.dims();
+  int ny=dm(0);
+  int nx=dm(1);
+  double **mm=(double **)malloc(sizeof(double *)*nx);
+  for (int i=0;i<nx;i++)
+    mm[i]=vec+i*ny;
+  return mm;
+
+}
+/*--------------------------------------------------------------------------------*/
 int matrix_nelem(Matrix mat)
 {
   dim_vector dm=mat.dims();
@@ -152,8 +166,10 @@ DEFUN_DLD (read_tod_data, args, nargout, "Read TOD data into memory.\n")
     allocate_tod_storage(mytod);
   if (mytod->data_saved) 
     memcpy(mytod->data[0],mytod->data_saved[0],mytod->ndet*mytod->ndata*sizeof(actData));
-  else
+  else {
+    printf("reading tod data.\n");
     read_tod_data(mytod);
+  }
   return octave_value_list();
 }
 /*--------------------------------------------------------------------------------*/
@@ -1530,6 +1546,9 @@ DEFUN_DLD (get_data_fft_c, args, nargout, "Debutterworth the data.\n")
   dim_vector dm(get_nn(mytod->ndata),mytod->ndet);
   ComplexMatrix datft(dm);
   memcpy(datft.fortran_vec(),data_fft[0],get_nn(mytod->ndata)*mytod->ndet*sizeof(actComplex));
+  free(data_fft[0]);
+  free(data_fft);
+
   return octave_value(datft);
 
 }
@@ -1916,7 +1935,7 @@ DEFUN_DLD (get_detector_radec_c, args, nargout, "Get RA/Dec of a detector.\n")
   if (do_exact)
     get_radec_from_altaz_exact_1det(tod,det,scratch);
   else {
-    printf("Getting detector fit coarse.\n");
+    //printf("Getting detector fit coarse.\n");
     get_radec_from_altaz_fit_1det_coarse(tod,det,scratch);
   }  
 
@@ -2315,3 +2334,137 @@ DEFUN_DLD (get_alldata_fft_plans_c, args, nargout, "Make FFTW plans for a TOD us
 }
 
 
+
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (simple_test_diag_proj_noise_inv, args, nargout, "Test some C-version noise inverses.\n")
+{
+  Matrix data=args(0).matrix_value();
+  Matrix noise=args(1).matrix_value();
+  Matrix vecs=args(2).matrix_value();
+
+
+
+  double **dataptr=matrix2cmat(data.fortran_vec(),data.dims());
+  dim_vector dm=data.dims();
+  Matrix dinv(dm);
+  double **dinvptr=matrix2cmat(dinv.fortran_vec(),dinv.dims());
+  double *noiseptr=noise.fortran_vec();
+  double *vecfptr=vecs.fortran_vec();
+  double **vecptr=matrix2cmat(vecfptr,vecs.dims());
+  
+  dim_vector vecs_dm=vecs.dims();
+
+  int ndata=dm(0);
+  int ndet=dm(1);
+  int nvecs=vecs_dm(1);  
+
+
+  if (args.length()>3) {
+    int imin=(int)get_value(args(3));
+    int imax=(int)get_value(args(4));
+    for (int i=0;i<ndet;i++)
+      noiseptr[i]=1.0/noiseptr[i];
+    apply_diag_proj_noise_inv_bands(dataptr,dinvptr,noiseptr,vecptr,ndata,ndet,nvecs,imin,imax);
+  }
+  else
+    simple_test_diag_proj_noise_inv(dataptr,dinvptr,noiseptr,vecptr,ndata,ndet,nvecs);
+
+
+  free(dataptr);
+  free(dinvptr);
+  free(vecptr);
+  return octave_value(dinv);
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (pull_oneband_tod_noise_banded_projvec,args,nargout,"Pull parameters for a single band in a TOD noise + projection vector model.\n")
+{
+  if (args.length()<2) {
+    printf("Error in pull_oneband_tod_noise_banded_projvec, need at least 4 arguments.\n");
+    return octave_value_list();
+  }
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (!mytod->band_vecs_noise) {
+    fprintf(stderr,"missing band_vecs_noise in tod.\n");
+    return octave_value_list();
+  }
+  int myband=(int)get_value(args(1))-1;
+  Matrix det_noise(mytod->ndet,1);
+  for (int i=0;i<mytod->ndet;i++)
+    det_noise(i,0)=mytod->band_vecs_noise->noises[myband][i];
+  Matrix vecs(mytod->band_vecs_noise->nvecs[myband],mytod->ndet);
+  for (int i=0;i<mytod->band_vecs_noise->nvecs[myband];i++)
+    for (int j=0;j<mytod->ndet;j++)
+      vecs(i,j)=mytod->band_vecs_noise->vecs[myband][i][j];
+  octave_value_list retval;
+  retval(0)=det_noise;
+  retval(1)=vecs;
+  return retval;
+
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (set_oneband_tod_noise_banded_projvec,args,nargout,"Set up a single band in a TOD noise + projection vector model.\n")
+{
+  if (args.length()<4) {
+    printf("Error in set_oneband_tod_noise_banded_projvec, need at least 4 arguments.\n");
+    return octave_value_list();
+  }
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  int myband=(int)get_value(args(1))-1;
+  Matrix noises=args(2).matrix_value();
+  Matrix vecs=args(3).matrix_value();
+  
+  dim_vector dm=vecs.dims();
+  //printf("dims are %d %d\n",dm(0),dm(1));
+  
+  actData *nvec=noises.fortran_vec();
+  for (int i=0;i<mytod->ndet;i++)
+    mytod->band_vecs_noise->noises[myband][i]=nvec[i];
+
+  double *vecptr=vecs.fortran_vec();
+  mytod->band_vecs_noise->nvecs[myband]=dm(1);
+
+  mytod->band_vecs_noise->vecs[myband]=matrix(mytod->band_vecs_noise->nvecs[myband],mytod->ndet);
+
+  
+  for (int i=0;i<mytod->band_vecs_noise->nvecs[myband];i++)
+    for (int j=0;j<mytod->ndet;j++)
+      mytod->band_vecs_noise->vecs[myband][i][j]=vecptr[i*mytod->ndet+j];
+  
+
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (allocate_tod_noise_banded_projvec,args,nargout,"Set the TOD noise model to be in bands with non-completely projected vectors.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  
+  Matrix bands=args(1).matrix_value();
+  dim_vector dm=bands.dims();
+  int nband=dm(0);
+  if (dm(1)>nband)
+    nband=dm(1);
+  nband--;
+
+  mytod->band_vecs_noise=(mbNoiseStructBandsVecs *)malloc(sizeof(mbNoiseStructBandsVecs));
+
+  mytod->band_vecs_noise->ndet=mytod->ndet;
+  mytod->band_vecs_noise->nband=nband;
+  mytod->band_vecs_noise->band_edges=(int *)malloc(sizeof(int)*(nband+1));
+  double *bb=bands.fortran_vec();
+  for (int i=0;i<nband+1;i++) {
+    mytod->band_vecs_noise->band_edges[i]=(int)bb[i];
+    //printf("assigned band edge %2d %5d\n",i,mytod->band_vecs_noise->band_edges[i]);
+  }
+  mytod->band_vecs_noise->nvecs=(int *)malloc(sizeof(int)*(nband));
+  
+
+  mytod->band_vecs_noise->noises=matrix(nband,mytod->ndet);
+  mytod->band_vecs_noise->vecs=(actData ***)malloc(sizeof(actData **)*nband);
+  
+  
+  return octave_value_list();
+
+}

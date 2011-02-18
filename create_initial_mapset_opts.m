@@ -20,7 +20,7 @@ hilton_noise=get_struct_mem(myopts,'hilton_noise');
 hilton_nmode=get_struct_mem(myopts,'hilton_nmode');
 dedark=get_struct_mem(myopts,'dedark');
 dark_dirroot=get_struct_mem(myopts,'dark_dirroot','');
-signal_only=get_struct_mem(myopts,'signal_only')
+signal_only=get_struct_mem(myopts,'signal_only');
 do_gauss=get_struct_mem(myopts,'gaussian_noise');
 monitor_tods=get_struct_mem(myopts,'monitor_tods');
 outroot=get_struct_mem(myopts,'outroot',datestr(now,30));
@@ -401,7 +401,10 @@ for j=1:length(tods),
         remove_corrnoise=false; %don't have anything part of the guess to pull, so why keep checking
       end
     end
-    
+  
+    if strcmp(noise_class,'banded_projvecs')
+      set_tod_noise_bands_projvecs(mytod,myopts);
+    end
     if (strcmp(noise_class,'banded'))
       allocate_tod_noise_bands_c(mytod,bands);
       get_simple_banded_noise_model_c(mytod,rots,noise_types);
@@ -502,6 +505,7 @@ for j=1:length(tods),
   
   
 end
+mdisp('master has finished his TODs');
 
 if isfield(mapset,'skymap')
   mapset.skymap.map=mpi_allreduce(mapset.skymap.map);
@@ -515,6 +519,7 @@ if (signal_only)
   end
 end
 
+mdisp('maps have been reduced');
 
 if (save_seeds)
   tod_names=cell(size(tods));

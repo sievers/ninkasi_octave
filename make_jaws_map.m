@@ -85,7 +85,6 @@ for tod_ind=1:length(tods),
     data=data-ts*vv_use';
     push_tod_data(data,mytod);
   end
-  
   tod2map(mytod,mapset.skymap.mapptr);
   assign_tod_value(mytod,1);
   tod2map(mytod,wtmap.skymap.mapptr);

@@ -22,6 +22,7 @@ for j=1:length(tods)
 
 
   if ~isempty(cutname),
+    mdisp(['reading cuts ' cutname ' on tod ' get_tod_name(tods(j))]);
     read_cuts_c(tods(j),cutname);
   else
     disp(['unable to find cuts on ' get_tod_name(tods(j))]);

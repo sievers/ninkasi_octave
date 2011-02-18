@@ -1,4 +1,4 @@
-function[new_mapset,tod_times,node_time]=mapset2mapset_corrnoise_octave(tods,mapset,varargin)
+function[new_mapset,tod_times,node_time,mpi_time]=mapset2mapset_corrnoise_octave(tods,mapset,varargin)
 
 do_noise=get_keyval_default('do_noise',false,varargin{:});
 window_symmetric=get_keyval_default('window_symmetric',false,varargin{:});
@@ -70,11 +70,20 @@ for j=1:length(tods),
 end
 node_time=86400*(now-node_start);
 
-
+mpi_time=0;
 %need to make sure we don't memory leak...
 if isfield(mapset,'skymap')
   new_mapset.skymap.map=skymap2octave(new_mapset.skymap.mapptr);
-  new_mapset.skymap.map=mpi_allreduce(new_mapset.skymap.map);
+  aa=now;
+
+  global weight_template
+  if ~isempty(weight_template)
+    fwee=mpi_allreduce(new_mapset.skymap.map(weight_template));
+    new_mapset.skymap.map(weight_template)=fwee;
+  else
+    new_mapset.skymap.map=mpi_allreduce(new_mapset.skymap.map);
+  end
+  mpi_time=86400*(now-aa);
   destroy_map(new_mapset.skymap.mapptr);
   new_mapset.skymap.mapptr=mapset.skymap.mapptr;
 end

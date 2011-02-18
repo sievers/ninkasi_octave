@@ -19,7 +19,13 @@ function[tag]=parse_tod_name(tod_name)
 if tod_name(end)=='/'
   tod_name=tod_name(1:end-1);
 end
-ind=max(find(tod_name=='/'));
-tag=tod_name(ind+1:end);
-fwee=min(find(tag=='.'));
-tag=str2num(tag(1:fwee-1));
+if (0)
+  ind=max(find(tod_name=='/'));
+  tag=tod_name(ind+1:end);
+  fwee=min(find(tag=='.'));
+
+else
+  [aa,tag,bb]=fileparts(tod_name);
+  fwee=min(find(tag=='.'));
+  tag=str2num(tag(1:fwee-1));
+end
