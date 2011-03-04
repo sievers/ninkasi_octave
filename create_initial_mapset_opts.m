@@ -56,6 +56,7 @@ do_calib=get_struct_mem(myopts,'do_calib');
 
 
 add_input_map=get_struct_mem(myopts,'add_input_map');
+restore_mapset=get_struct_mem(myopts,'restore_mapset');
 mdisp(['add_input_map is ' num2str(add_input_map)]);
 
 
@@ -425,6 +426,28 @@ for j=1:length(tods),
     clear myguess;
   end
 
+
+  if exist('mapset_in')&(add_input_map)
+    if restore_mapset
+      mdisp('restoring input mapset into data.');
+      dat=get_tod_data(mytod);
+      assign_tod_value(mytod,0);
+      mapset2tod_octave(mapset_in,mytod,j);
+      if (debutter)
+        if debutter_octave
+          debutterworth_octave(mytod,false);
+        else
+          rebutterworth_c(mytod);
+        end
+      end
+      if (deconvolve_tau)
+        reconvolve_tod_time_constants_c(mytod);
+      end
+      %data_from_map=get_tod_data(mytod);
+      dat=dat+get_tod_data(mytod);
+    end
+  end
+            
 
   if (highpass_val>0)
     mdisp('highpassing');
