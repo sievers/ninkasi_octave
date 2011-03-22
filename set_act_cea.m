@@ -37,4 +37,11 @@ if strcmp(ar,'allequ')  %Hasselfield's preferred header for all equatorial maps
 end
 
 
+if strcmp(ar,'allsouth')  %Hasselfield's preferred header for all equatorial maps
+  %set_skymap_cea_predef_c(map,-0.0083336141, 0.0083336141,8558.0,265.0,0.99993261,28672,644);
+  set_skymap_cea_predef_c(map,-0.0138696776687, 0.0138696776687,10582,9833,0.35381412,18787,1177);
+  return
+end
+
+
 error(['error in set_act_cea - unrecognized array ' ar]);

@@ -1,5 +1,5 @@
 function[tod_names,use_list]=remove_tods_from_blacklist(tod_names,blacklist)
-blacklist=read_text_file(blacklist);
+blacklist=read_text_file_comments(blacklist);
 tod_names_small=get_ctime_part(tod_names);
 blacklist=get_ctime_part(blacklist);
 

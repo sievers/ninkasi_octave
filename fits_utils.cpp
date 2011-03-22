@@ -48,7 +48,9 @@ double convert_val(const char *c, int fmt)
     ii[1]=c[0];
     val=(double)(*s);
     break;
-    
+  case 1:
+    val=(double)(*c);
+    break;
   }
 
   return val;
@@ -82,8 +84,13 @@ DEFUN_DLD (convert_fits_bintable, args, nargout, "Read TOD data into memory.\n")
 
   int *offset=(int *)malloc(sizeof(int)*ncol);
   offset[0]=0;
-  for (int i=1;i<ncol;i++)
-    offset[i]=offset[i-1]+fabs(ifmt[i-1]);
+  for (int i=1;i<ncol;i++) {
+    int doff=fabs(ifmt[i-1]);
+    if (doff>10),
+      doff-=10;
+    offset[i]=offset[i-1]+doff;
+    //offset[i]=offset[i-1]+fabs(ifmt[i-1]);
+  }
 
 #pragma omp parallel for shared(nrow,ncol,mm,c,nbyte,offset,ifmt) default(none)
   for (int i=0;i<nrow;i++) 
