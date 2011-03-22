@@ -17,6 +17,7 @@ myopts=set_struct_mem_default(myopts,'hilton_noise',false);
 myopts=set_struct_mem_default(myopts,'hilton_nmode',24);
 myopts=set_struct_mem_default(myopts,'dedark',false);
 myopts=set_struct_mem_default(myopts,'debutter_octave',false);
+myopts=set_struct_mem_default(myopts,'restore_mapset',false);
 
 
 myopts=set_struct_mem_default(myopts,'do_noise',false);
