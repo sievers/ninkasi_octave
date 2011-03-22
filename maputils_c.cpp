@@ -9,6 +9,13 @@ extern "C"
 #include <ninkasi_config.h>
 #include <ninkasi.h>
 #include <dirfile.h>
+#include <ninkasi_projection.h>
+#ifdef USE_HEALPIX
+#include <chealpix.h>
+#define PI_OVER_TWO 1.5707963267948966
+
+#endif
+
 #ifdef __cplusplus
 }  /* end extern "C" */
 #endif
@@ -94,6 +101,12 @@ DEFUN_DLD (get_map_type_c, args, nargout, "Find out what kind of map we have.\n"
     break;
   case (NK_TAN):
     return octave_value("tan");
+    break;
+  case (NK_HEALPIX_RING):
+    return octave_value("ring");
+    break;
+  case (NK_HEALPIX_NEST):
+    return octave_value("nest");
     break;
   default:
     printf("unkown map type.\n");
@@ -212,8 +225,22 @@ DEFUN_DLD (get_pix_from_radec_c, args, nargout, "Say where ra/dec should be in p
     radec2xy_tan(&x,&y,ra,dec,map->projection);
     retval(0)=x;
     retval(1)=y;
-  
     break;
+#ifdef USE_HEALPIX
+  case (NK_HEALPIX_RING):
+    long ipix_ring;
+    ang2pix_ring(map->projection->nside,PI_OVER_TWO-dec,ra, &ipix_ring);
+    retval(0)=ipix_ring;
+    retval(1)=0; //in case it's expected to have two outputs
+    break;
+  case (NK_HEALPIX_NEST):
+    long ipix_nest;
+    ang2pix_nest(map->projection->nside,PI_OVER_TWO-dec,ra, &ipix_nest);
+    retval(0)=ipix_nest;
+    retval(1)=0; //in case it's expected to have two outputs
+    break;
+#endif
+    
   }
 
 
@@ -259,6 +286,16 @@ DEFUN_DLD (get_radec_from_pix_c, args, nargout, "Say what ra/dec a pixel is in a
     printf("doing tangent\n");
     pix2radec_tan(map,rapix,decpix,&ra,&dec);
     break;
+#ifdef USE_HEALPIX
+  case (NK_HEALPIX_RING):
+    pix2ang_ring(map->projection->nside,rapix,&dec,&ra);
+    dec=PI_OVER_TWO-dec;
+    break;
+  case (NK_HEALPIX_NEST):
+    pix2ang_nest(map->projection->nside,rapix,&dec,&ra);
+    dec=PI_OVER_TWO-dec;
+    break;
+#endif
   }
   octave_value_list retval;
   retval(0)=ra;
@@ -270,6 +307,33 @@ DEFUN_DLD (get_radec_from_pix_c, args, nargout, "Say what ra/dec a pixel is in a
 
 
 
+
+/*--------------------------------------------------------------------------------*/
+#ifdef USE_HEALPIX
+DEFUN_DLD (set_skymap_healpix_ring_c, args, nargout, "Set map to be a healpix ring.  Args are (map, nside).\n")
+{
+  if (args.length()!=2) {
+    printf("Need exactly two arguments to set_skymap_healpix_ring_c.\n");
+    return octave_value_list();
+  }
+  MAP *map=(MAP *)get_pointer(args(0));
+  int nside=(int)get_value(args(1));
+  set_map_projection_healpix_ring(map,nside);
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (set_skymap_healpix_nest_c, args, nargout, "Set map to be a healpix nest.  Args are (map, nside).\n")
+{
+  if (args.length()!=2) {
+    printf("Need exactly two arguments to set_skymap_healpix_nest_c.\n");
+    return octave_value_list();
+  }
+  MAP *map=(MAP *)get_pointer(args(0));
+  int nside=(int)get_value(args(1));
+  set_map_projection_healpix_nest(map,nside);
+  return octave_value_list();
+}
+#endif //use_healpix
 
 /*--------------------------------------------------------------------------------*/
 

@@ -19,6 +19,15 @@ switch mytype
  case{'radec'}  
   fname=postpend_tag(fname,'.map');
   write_simple_map_c(map,fname);
+ case{'ring'}
+  fname=postpend_tag(fname,'.fits');
+  mm=skymap2octave(map);
+  simple_write_healpix(fname,mm,[],'ring');
+ case{'nest'}
+  fname=postpend_tag(fname,'.fits');
+  mm=skymap2octave(map);
+  simple_write_healpix(fname,mm,[],'nest');
+  
  otherwise
   disp('unrecognized type in write_map.');
 end

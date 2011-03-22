@@ -26,12 +26,35 @@ for j=1:length(rows),
   istart=find(crud==1);
   istop=find(crud==-1);
 
+    
+
   if ~isempty(istart)
-    if istop(1)<istart(1)
-      istart=[1 istart];
+    if isempty(istop)
+      istop=length(dist);
+    end
+
+    try
+      if istop(1)<istart(1)
+        istart=[1 istart];
+      end
+    catch
+      whos
+      istart
+      istop
+      error('screwed up again.')
     end
     if istop(end)<istart(end)
-      istop=[istop length(dist)];
+      try
+        %istop=[istop length(dist)];
+        istop(end+1)=length(dist);
+      catch
+        whos
+        istart
+        istop
+        error(['tod ' get_tod_name(tod) ' is screwed up.']);
+        
+        return
+      end
     end
     assert(length(istart)==length(istop));
     for k=1:length(istart),

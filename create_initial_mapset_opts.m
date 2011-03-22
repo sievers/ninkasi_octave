@@ -153,7 +153,12 @@ for j=1:length(tods),
       read_tod_data(mytod);
       if (myid==1)
         toc;
-      end	
+      end      
+      if (monitor_tods)    
+        fprintf(monitor_fid,'%s\n',monitor_tag);
+        fflush(monitor_fid);
+      end
+      
     end
 
     if numel(scale_fac)>1,
@@ -409,6 +414,12 @@ for j=1:length(tods),
     if (strcmp(noise_class,'banded'))
       allocate_tod_noise_bands_c(mytod,bands);
       get_simple_banded_noise_model_c(mytod,rots,noise_types);
+      %fixed, JLS, 15-mar-2011
+      ndata=get_tod_ndata(mytod);
+      for jj=1:length(bands)-1,
+        scale_tod_band_noise_c(mytod,jj-1,ndata);
+      end %end fix
+
       for jj=1:length(noise_scale_facs),
         scale_tod_band_noise_c(mytod,jj-1,noise_scale_facs(jj));
       end
