@@ -183,6 +183,7 @@ for j=1:length(tods),
       mdisp('calibrating');
       %calibrate_data(mytod);
       calibrate_data_opts(mytod,myopts);
+
     end
     
     if (hilton_noise)
@@ -212,6 +213,7 @@ for j=1:length(tods),
     end
 
     if (dedark)
+      mdisp('dedarking');
       array_detrend(mytod);
       gapfill_data_c(mytod);
       if ~isempty(dark_dirroot)
@@ -223,6 +225,7 @@ for j=1:length(tods),
       else
         subtract_darks_from_tod_eig (mytod);
       end
+      mdisp('finished');
     end
     
     

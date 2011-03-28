@@ -167,7 +167,7 @@ DEFUN_DLD (read_tod_data, args, nargout, "Read TOD data into memory.\n")
   if (mytod->data_saved) 
     memcpy(mytod->data[0],mytod->data_saved[0],mytod->ndet*mytod->ndata*sizeof(actData));
   else {
-    printf("reading tod data.\n");
+    //printf("reading tod data.\n");
     read_tod_data(mytod);
   }
   return octave_value_list();
