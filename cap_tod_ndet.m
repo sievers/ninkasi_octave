@@ -25,10 +25,23 @@ end
 ncut=0;
 if length(row)>ndet_max,
   ncut=length(row)-ndet_max;
-  for j=ndet_max+1:length(row),
-    cut_detector_c(tod,row(j),col(j));
+  if (1)  %going to cut the most-cut detectors
+    kept_fracs=cut_mostly_cut_detectors(tod,0.0);
+    tot=sum(kept_fracs);
+    new_tot=tot;
+    mdisp(['ncut is ' num2str(ncut)]);
+    for jj=1:ncut,
+      [aa,bb]=min(kept_fracs);
+      cut_detector_c(tod,row(bb),col(bb));
+      new_tot=new_tot-aa;
+      kept_fracs(bb)=1.1; %make sure we don't cut the same detector again.
+    end
+    disp(['too many dets on  ' get_tod_name(tod) ' cutting ' num2str(ncut) ', cut frac is ' num2str(100*(1-new_tot/tot)) '% of samples.']);    
+  else
+    for j=ndet_max+1:length(row),
+      cut_detector_c(tod,row(j),col(j));
+    end
+    disp(['had too many detectors on ' get_tod_name(tod) ' cutting ' num2str(ncut) ', trimming to ' num2str(ndet_max) '.']);
   end
-  disp(['had too many detectors on ' get_tod_name(tod) ' cutting ' num2str(ncut) ', trimming to ' num2str(ndet_max) '.']);
-
   purge_cut_detectors(tod);
 end

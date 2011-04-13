@@ -2,6 +2,8 @@ function[new_mapset,tod_times,node_time,mpi_time]=mapset2mapset_corrnoise_octave
 
 do_noise=get_keyval_default('do_noise',false,varargin{:});
 window_symmetric=get_keyval_default('window_symmetric',false,varargin{:});
+barriers=get_keyval_default('do_barriers',false,varargin{:});
+
 
 new_mapset=clear_mapset(mapset,'true');
 
@@ -12,6 +14,10 @@ end
 
 %tod_times=zeros(size(tods));
 tod_times=zeros(length(tods),4);
+
+if barriers,
+  min_ntod=mpi_allreduce(numel(tods),'min');
+end
 
 
 node_start=now;
@@ -28,6 +34,13 @@ for j=1:length(tods),
   t1b=now;
 
   mtoc
+  if (barriers)
+    if j<=min_ntod
+      mpi_barrier;
+      mdisp(['completed mapset2tod on ' num2str(j)]);
+    end
+  end
+
 
 
   if (0)
@@ -48,12 +61,27 @@ for j=1:length(tods),
   apply_tod_noise_model_c(mytod);
   t2b=now;
   mtoc
+  if (barriers)
+    if j<=min_ntod
+      mpi_barrier;
+      mdisp(['completed noise on ' num2str(j)]);
+    end
+  end
+
+
   if (window_symmetric)
     window_data(mytod);
   end
   t3a=now;
   new_mapset=tod2mapset_octave(new_mapset,mytod,j);
   t3b=now;
+  if (barriers)
+    if j<=min_ntod
+      mpi_barrier;
+      mdisp(['completed tod2mapset on ' num2str(j)]);
+    end
+  end
+
   %mtoc
   if (length(tods>1))
     free_tod_storage(mytod);

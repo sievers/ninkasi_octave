@@ -104,6 +104,7 @@ end
 d=Mr;
 
 
+
 rMr=mapsetdotmapset(r,d);
 r0sqr=rMr;
 iter=1;

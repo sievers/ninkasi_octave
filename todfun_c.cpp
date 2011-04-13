@@ -618,6 +618,27 @@ DEFUN_DLD (assign_tod_value, args, nargout, "Assign a value to a tod.  Args are 
 }
 /*--------------------------------------------------------------------------------*/
 
+DEFUN_DLD (add_src2tod, args, nargout, "Add a source into a tod.  Args are (tod,ra,dec,amp,beam vector, dtheta)\n")
+//void add_src2tod(mbTOD *tod, actData ra, actData dec, actData src_amp, const actData *beam, actData dtheta, int nbeam, int oversamp)
+
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
+  actData ra=get_value(args(1));
+  actData dec=get_value(args(2));
+  actData amp=get_value(args(3));
+  Matrix beam=args(4).matrix_value();
+  actData dtheta=get_value(args(5));
+  dim_vector dm=beam.dims();
+  int nbeam=dm(0)*dm(1);
+  actData *beamvec=beam.fortran_vec();
+  int oversamp=1;
+  if (args.length()>6)
+    oversamp=(int)get_value(args(6));
+  add_src2tod(mytod,ra,dec,amp,beamvec,dtheta,nbeam,oversamp);
+  return octave_value_list();  
+}
+/*--------------------------------------------------------------------------------*/
+
 DEFUN_DLD (add_matrix_to_tod_data, args, nargout, "Adds a matrix to tod data.  Args are (tod,matrix,[value])\n")
 {
 
