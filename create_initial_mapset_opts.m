@@ -27,6 +27,8 @@ outroot=get_struct_mem(myopts,'outroot',datestr(now,30));
 write_cleaned_data=get_struct_mem(myopts,'write_cleaned_data');
 window_symmetric=get_struct_mem(myopts,'window_symmetric');
 remove_corrnoise=get_struct_mem(myopts,'remove_corrnoise');
+srccat=get_struct_mem(myopts,'srccat',[]);
+
 
 if (do_gauss&hilton_noise)
   warning('requested both gaussian and Hilton noise.  Choosing Gaussian.');
@@ -247,12 +249,24 @@ for j=1:length(tods),
       end
       %data_from_map=get_tod_data(mytod);
       dat=dat-get_tod_data(mytod);
-      push_tod_data(dat,mytod);
-      
+      push_tod_data(dat,mytod);      
     else
       mdisp('no input mapset');
     end
 
+    if ~isempty(srccat)
+      inject_sources=true;
+      if isfield(srccat,'inject_sources')
+        if srccat.inject_sources==false,
+          inject_sources=false;
+        end
+      end
+      if inject_sources,
+        mdisp('adding sources into data');
+        add_srccat2tod(mytod,srccat);
+      end
+    end
+    
     gapfill_data_c(mytod);
 
     if (remove_common)
@@ -438,6 +452,18 @@ for j=1:length(tods),
     clear data_tmp;
     clear mapset_tmp;
     clear myguess;
+  end
+  if ~isempty(srccat)
+    mdisp('checking source restore');
+    if isfield(srccat,'restore_sources')
+      mdisp('flag exists');
+      if srccat.restore_sources,
+        mdisp('restoring sources.');
+        tmpcat=srccat;
+        tmpcat.amps=-1*srccat.amps;
+        add_srccat2tod(mytod,tmpcat);
+      end
+    end
   end
 
 

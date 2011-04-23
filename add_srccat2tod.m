@@ -5,7 +5,11 @@ if isfield(srccat,'oversamp')
 else
   oversamp=0;
 end
-
-for j=1:nsrc,
-  add_src2tod(tod,srccat.ra(j),srccat.dec(j),srccat.amps(j),srccat.beam,srccat.dx*pi/180,oversamp);
+if (1)
+  add_srcvec2tod(tod,srccat.ra,srccat.dec,srccat.amps,srccat.beam,srccat.dx*pi/180,oversamp);
+else
+  for j=1:nsrc,
+    %mdisp(['src stuff is: ' num2str([srccat.ra(j) srccat.dec(j) srccat.amps(j) oversamp srccat.dx])]);
+    add_src2tod(tod,srccat.ra(j),srccat.dec(j),srccat.amps(j),srccat.beam,srccat.dx*pi/180,oversamp);
+  end
 end

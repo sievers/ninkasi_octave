@@ -16,6 +16,7 @@ autoload('assign_rotmat_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.o
 autoload('assign_tod_time_constants_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_value',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_src2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('add_srcvec2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_matrix_to_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('pull_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
