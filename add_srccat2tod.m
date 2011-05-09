@@ -1,4 +1,11 @@
 function[value]=add_srccat2tod(tod,srccat)
+if iscell(srccat)
+  for j=1:numel(srccat),
+    add_srccat2tod(tod,srccat{j});
+  end
+  return
+end
+
 nsrc=numel(srccat.ra);
 if isfield(srccat,'oversamp')
   oversamp=srccat.oversamp;

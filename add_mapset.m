@@ -21,3 +21,7 @@ if (isfield(a,'timestreams')),
     end
 end
 
+if isfield(a,'srccat'),
+  a.srccat.amps=a.srccat.amps+fac*b.srccat.amps;
+end
+

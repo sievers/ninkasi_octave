@@ -29,3 +29,13 @@ if isfield(mapset,'timestreams')
     mapset.timestreams(j).map=0*mapset.timestreams(j).map;
   end
 end
+
+if isfield(mapset,'srccat')
+  if iscell(mapset.srccat),
+    for ss=1:numel(mapset.srccat),
+      mapset.srccat{ss}.amps=0*mapset.srccat{ss}.amps;
+    end
+  else
+    mapset.srccat.amps=0*mapset.srccat.amps;
+  end
+end

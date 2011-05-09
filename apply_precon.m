@@ -1,8 +1,11 @@
 function[mapset]=apply_precon(mapset,precon)
-if isfield(precon,'skymap'),  %apply a Jacoby preconditioner to the sky
+if isfield(mapset,'skymap')
+  if isfield(precon,'skymap'),  %apply a Jacoby preconditioner to the sky
     mapset.skymap.map(precon.skymap.map>0)=mapset.skymap.map(precon.skymap.map>0)./precon.skymap.map(precon.skymap.map>0);    
     %mapset.skymap.map=mapset.skymap.map.*precon.skymap.map;
+  end
 end
+
 return
 
 if isfield(precon,'corrnoise')

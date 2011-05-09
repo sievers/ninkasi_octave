@@ -3,7 +3,8 @@ function[new_mapset,tod_times,node_time,mpi_time]=mapset2mapset_corrnoise_octave
 do_noise=get_keyval_default('do_noise',false,varargin{:});
 window_symmetric=get_keyval_default('window_symmetric',false,varargin{:});
 barriers=get_keyval_default('do_barriers',false,varargin{:});
-
+skip_mpi=get_keyval_default('skip_mpi',false,varargin{:});  %for some things, we can do reduces later, particularly useful when doing source fits.
+check_empty=get_keyval_default('check_empty',false,varargin{:});  %in some cases, it may be worth seeing if the TOD is empty before applying noise
 
 new_mapset=clear_mapset(mapset,'true');
 
@@ -31,7 +32,9 @@ for j=1:length(tods),
   %mtoc
   t1a=now;
   mapset2tod_octave(mapset,mytod,j);
+
   t1b=now;
+  
 
   mtoc
   if (barriers)
@@ -58,7 +61,16 @@ for j=1:length(tods),
   %if (do_noise)
   %apply_banded_noise_model_c(mytod);
   %end	
-  apply_tod_noise_model_c(mytod);
+  
+  skip_noise=false;
+  if check_empty,
+    skip_noise=(sum_tod_data(mytod)==0);
+  end
+  if ~skip_noise,
+    apply_tod_noise_model_c(mytod);
+  end
+
+
   t2b=now;
   mtoc
   if (barriers)
@@ -104,17 +116,32 @@ if isfield(mapset,'skymap')
   new_mapset.skymap.map=skymap2octave(new_mapset.skymap.mapptr);
   aa=now;
 
-  global weight_template
-  if ~isempty(weight_template)
-    fwee=mpi_allreduce(new_mapset.skymap.map(weight_template));
-    new_mapset.skymap.map(weight_template)=fwee;
-  else
-    new_mapset.skymap.map=mpi_allreduce(new_mapset.skymap.map);
+  if (~skip_mpi)
+    global weight_template
+    if ~isempty(weight_template)
+      fwee=mpi_allreduce(new_mapset.skymap.map(weight_template));
+      new_mapset.skymap.map(weight_template)=fwee;
+    else
+      new_mapset.skymap.map=mpi_allreduce(new_mapset.skymap.map);
+    end
   end
   mpi_time=86400*(now-aa);
   destroy_map(new_mapset.skymap.mapptr);
   new_mapset.skymap.mapptr=mapset.skymap.mapptr;
 end
+
+if isfield(mapset,'srccat')
+  if ~skip_mpi
+    if iscell(new_mapset.srccat)
+      for ss=1:numel(new_mapset.srccat)
+        new_mapset.srccat{ss}.amps=mpi_allreduce(new_mapset.srccat{ss}.amps);
+      end
+    else
+      new_mapset.srccat.amps=mpi_allreduce(new_mapset.srccat.amps);
+    end
+  end
+end
+
 
 
 

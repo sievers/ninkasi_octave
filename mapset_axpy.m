@@ -19,3 +19,13 @@ if isfield(x,'corrnoise'),
     x.corrnoise(j).map=x.corrnoise(j).map+a*y.corrnoise(j).map;
   end
 end
+
+if isfield(x,'srccat')
+  if iscell(x.srccat),
+    for ss=1:numel(x.srccat),
+      x.srccat{ss}.amps=x.srccat{ss}.amps+a*y.srccat{ss}.amps;
+    end
+  else
+    x.srccat.amps=x.srccat.amps+a*y.srccat.amps;
+  end
+end

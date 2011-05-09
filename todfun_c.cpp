@@ -617,6 +617,19 @@ DEFUN_DLD (assign_tod_value, args, nargout, "Assign a value to a tod.  Args are 
   return octave_value_list();  
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (tod_hits_source_c, args, nargout, "Check to see if a tod might hit a source Args are (ra,dec,dist,tod)\n")
+{
+  actData ra=get_value(args(0));
+  actData dec=get_value(args(1));
+  actData r=get_value(args(2));
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(3));
+  
+  int val=tod_hits_source(ra,dec,r,mytod);
+  return octave_value(val);
+
+}
+
+/*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (add_src2tod, args, nargout, "Add a source into a tod.  Args are (tod,ra,dec,amp,beam vector, dtheta)\n")
 //void add_src2tod(mbTOD *tod, actData ra, actData dec, actData src_amp, const actData *beam, actData dtheta, int nbeam, int oversamp)
@@ -664,6 +677,34 @@ DEFUN_DLD (add_srcvec2tod, args, nargout, "Add a source into a tod.  Args are (t
     oversamp=(int)get_value(args(6));
   add_srcvec2tod(mytod,ra,dec,amp,nsrc,beamvec,dtheta,nbeam,oversamp);
   return octave_value_list();  
+}
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (tod2srcvec, args, nargout, "Project a tod into source vecs.  Args are (tod,ra,dec,beam vector, dtheta,[oversamp])\n")
+//void add_src2tod(mbTOD *tod, actData ra, actData dec, actData src_amp, const actData *beam, actData dtheta, int nbeam, int oversamp)
+
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
+  Matrix ram=args(1).matrix_value();
+  Matrix decm=args(2).matrix_value();
+  Matrix beam=args(3).matrix_value();
+  actData *ra=ram.fortran_vec();
+  actData *dec=decm.fortran_vec();
+  dim_vector srcdm=ram.dims();
+  int nsrc=srcdm(0)*srcdm(1);
+
+  actData dtheta=get_value(args(4));
+  dim_vector dm=beam.dims();
+  int nbeam=dm(0)*dm(1);
+  actData *beamvec=beam.fortran_vec();
+  int oversamp=1;
+  if (args.length()>5)
+    oversamp=(int)get_value(args(5));
+  
+  Matrix amps(srcdm);
+  memset(amps.fortran_vec(),0,sizeof(double)*nsrc);
+  tod2srcvec(amps.fortran_vec(),mytod,ra,dec,nsrc,beamvec,dtheta,nbeam,oversamp);
+  return octave_value(amps);  
 }
 /*--------------------------------------------------------------------------------*/
 

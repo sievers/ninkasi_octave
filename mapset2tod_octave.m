@@ -33,3 +33,14 @@ if isfield(mapset,'timestreams')
     timestreams2tod_blas(tod,timestreams.map)
 end
 
+if isfield(mapset,'srccat')
+  if iscell(mapset.srccat),
+    for ss=1:numel(mapset.srccat)
+      add_srccat2tod(tod,mapset.srccat{j});
+    end
+  else
+    add_srccat2tod(tod,mapset.srccat);
+  end
+end
+
+

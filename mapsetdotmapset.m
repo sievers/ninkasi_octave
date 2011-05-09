@@ -19,3 +19,13 @@ if isfield(a,'skymap')
   val=val+sum(sum(a.skymap.map.*b.skymap.map));
 end
 
+if isfield(a,'srccat')
+  if iscell(a.srccat),
+    for ss=1:numel(a.srccat),
+      val=val+sum(a.srccat{ss}.amps.*b.srccat{ss}.amps);
+    end
+  else
+    val=val+sum(a.srccat.amps.*b.srccat.amps);
+  end
+end
+

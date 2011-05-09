@@ -575,10 +575,24 @@ if isfield(mapset,'skymap')
   octave2skymap(mapset.skymap);
 end
 
+if isfield(mapset,'srccat')
+  if iscell(mapset.srccat)
+    for ss=1:numel(mapset.srccat),
+      mapset.srccat{ss}.amps=mpi_allreduce(mapset.srccat{ss}.amps);
+    end
+  else
+    mapset.srccat.amps=mpi_allreduce(mapset.srccat.amps);
+  end
+end
+
+
 if (signal_only)
   if isfield(mapset,'skyamp')
     signal_mapset.skymap.map=mpi_allreduce(signal_mapset.skymap.map);
     octave2skymap(signal_mapset.skymap);
+  end
+  if isfield(mapset,'srccat')
+    signal_mapset.srccat.amps=mpi_allreduce(signal_mapset.srccat.amps);
   end
 end
 
