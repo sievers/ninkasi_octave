@@ -17,6 +17,16 @@ if isfield(mapset,'skymap')
 end
 
 
+if isfield(mapset,'cutvecs')
+  if iscell(mapset.cutvecs)
+    for j=1:numel(mapset.cutvecs),
+      mapset.cutvecs(j)={0*mapset.cutvecs{j}};
+    end
+  else
+    mapset.cutvecs=0*mapset.cutvecs;
+  end
+end
+
 
 if isfield(mapset,'corrnoise'),
     for j=1:length(mapset.corrnoise),

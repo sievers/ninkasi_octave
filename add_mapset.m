@@ -7,6 +7,17 @@ if isfield(a,'skymap')
   a.skymap.map=a.skymap.map+fac*b.skymap.map;
 end
 
+if isfield(a,'cutvecs')
+  if iscell(a.cutvecs)
+    for j=1:numel(a.cutvecs),
+      a.cutvecs(j)={a.cutvecs{j}+fac*b.cutvecs{j}};
+    end
+  else
+    a.cutvecs=a.cutvecs+b.cutvecs*fac;
+  end
+end
+
+
 
 if (isfield(a,'corrnoise')),
     for j=1:length(a.corrnoise),

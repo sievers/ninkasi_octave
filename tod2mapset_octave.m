@@ -6,6 +6,15 @@ if isfield(mapset,'skymap')
   mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
 end
 
+if isfield(mapset,'cutvecs')
+  if iscell(mapset.cutvecs),
+    mapset.cutvecs(which_tod)={tod2cutvec_c(tod)};
+  else
+    mapset.cutvecs=tod2cutvec_c(tod);
+  end
+end
+
+
 if isfield(mapset,'corrnoise'),
 
   if (1)

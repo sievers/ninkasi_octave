@@ -319,6 +319,8 @@ DEFUN_DLD (merge_cuts_c, args, nargout, "Merge cuts, write 'em to disk.\n")
   return octave_value_list();
 
 }
+
+
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (print_tod_uncut_regions, args, nargout, "Print out the uncut regions of a detector in a tod.\n")
 {
@@ -330,12 +332,48 @@ DEFUN_DLD (print_tod_uncut_regions, args, nargout, "Print out the uncut regions 
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   int myrow=(int)get_value(args(1));
   int mycol=(int)get_value(args(2));
+  int do_cuts=0;
+  if (args.length()>3)
+    do_cuts=(int)get_value(args(3));
+  
   if (mbCutsIsAlwaysCut(mytod->cuts,myrow,mycol)) {
     printf("detector %d %d is completely cut.\n",myrow,mycol);
     return octave_value_list();
   }
+  
+#if 1
+  mbUncut *uncuts=NULL;
+  if (do_cuts==1) {
+    if (mytod->cuts_as_uncuts==NULL) {
+      fprintf(stderr,"Do not have cuts_as_uncuts filled in print_tod_uncut_regions.\n");
+      return octave_value_list();
+    }    
+    uncuts=mytod->cuts_as_uncuts[myrow][mycol];
+  }
+  if (do_cuts==2) {
+    if (mytod->cuts_as_vec==NULL) {
+      fprintf(stderr,"Do not have cuts_as_uncuts filled in print_tod_uncut_regions.\n");
+      return octave_value_list();
+    }    
+    uncuts=mytod->cuts_as_vec[myrow][mycol];
+  }
+  if (do_cuts==0)
+    uncuts=mytod->uncuts[myrow][mycol];
+  if (uncuts==NULL) {
+    printf("do_cuts value not recognized in print_tod_uncut_regions, value is %d\n",do_cuts);
+    return octave_value_list();
+  }
 
-
+  if (nargout==0)
+    printf("Have %d regions.\n",uncuts->nregions);
+  Matrix uncut(uncuts->nregions,2);
+  for (int i=0;i<uncuts->nregions;i++) {
+    if (nargout==0)
+      printf("using %5d to %5d.\n",uncuts->indexFirst[i],uncuts->indexLast[i]);
+    uncut(i,0)=uncuts->indexFirst[i];
+    uncut(i,1)=uncuts->indexLast[i];
+  }  
+#else
   if (nargout==0)
     printf("Have %d regions.\n",mytod->uncuts[myrow][mycol]->nregions);
   Matrix uncut(mytod->uncuts[myrow][mycol]->nregions,2);
@@ -345,7 +383,7 @@ DEFUN_DLD (print_tod_uncut_regions, args, nargout, "Print out the uncut regions 
     uncut(i,0)=mytod->uncuts[myrow][mycol]->indexFirst[i];
     uncut(i,1)=mytod->uncuts[myrow][mycol]->indexLast[i];
   }
-  
+#endif  
   return octave_value(uncut);
 }
 /*--------------------------------------------------------------------------------*/
@@ -443,6 +481,66 @@ DEFUN_DLD (cut_tod_global_c, args, nargout, "Do a global cut on a TOD.  Args are
 
   mbCutsExtendGlobal(mytod->cuts,first,last);
 
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_numel_cut_c, args, nargout, "Find out how many elements have been cut from a TOD.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  int ncut=get_numel_cut(mytod);
+  return octave_value(ncut);
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (tod2cutvec_c, args, nargout, "Put cut data from a TOD into a vector.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  int ncut=get_numel_cut(mytod);
+  Matrix vec(ncut,1);
+
+  if (tod2cutvec(mytod,vec.fortran_vec())) {
+    printf("had a problem in tod2cutvec.\n");
+    return octave_value_list();
+  }
+  return octave_value(vec);
+
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (cutvec2tod_c, args, nargout, "Put cut data into a TOD.\n")
+{
+  if (args.length()<2) {
+    printf("error - need at least two inputs to cutvec2tod_c.\n");
+    return octave_value_list();
+  }
+  
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix vec=args(1).matrix_value();  
+
+  dim_vector dm=vec.dims();
+  int ncut=get_numel_cut(mytod);
+  if (dm(1)*dm(0)<ncut) {
+    fprintf(stderr,"Error - not enough elements in cutvec2tod_c.  Expected at least %d, got %d\n",ncut, dm(1)*dm(2));
+    return octave_value_list();
+  }
+  
+  if (cutvec2tod(mytod,vec.fortran_vec())) {
+    printf("had a problem in tod2cutvec.\n");
+  }
+  return octave_value_list();
+  
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (set_tod_cuts_global_indices_c, args, nargout, "Set up the global indexing to the cut regions in a tod.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  set_global_indexed_cuts(mytod);
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_tod_cut_regions_c, args, nargout, "Set up the cut regions in a tod like the uncuts.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  get_tod_cut_regions(mytod);
   return octave_value_list();
 }
 /*--------------------------------------------------------------------------------*/

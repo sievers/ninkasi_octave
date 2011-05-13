@@ -522,7 +522,7 @@ for j=1:length(tods),
 
   mdisp('tod2mapset');
   mapset=tod2mapset_octave(mapset,mytod,j);
-
+  mdisp('finished');
 
 
   if (signal_only)

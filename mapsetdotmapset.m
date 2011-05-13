@@ -19,6 +19,18 @@ if isfield(a,'skymap')
   val=val+sum(sum(a.skymap.map.*b.skymap.map));
 end
 
+
+if isfield(a,'cutvecs')
+  if iscell(a.cutvecs)
+    for j=1:numel(a.cutvecs),
+      val=val+sum( (a.cutvecs{j}).*(b.cutvecs{j}));
+    end
+  else
+    val=val+sum(a.cutvecs.*b.cutvecs);
+  end
+end
+
+
 if isfield(a,'srccat')
   if iscell(a.srccat),
     for ss=1:numel(a.srccat),

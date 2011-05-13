@@ -75,6 +75,11 @@ autoload('get_tod_name',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'
 autoload('get_tod_ndata',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_row_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('cut_tod_global_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('set_tod_cuts_global_indices_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('tod2cutvec_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('cutvec2tod_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('get_numel_cut_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('get_tod_cut_regions_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_uncut_regions_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_kept_regions_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('highpass_tod_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
