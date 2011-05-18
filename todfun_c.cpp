@@ -432,7 +432,13 @@ DEFUN_DLD (write_tod_data_c, args, nargout, "Write out the data in a TOD. \n")
 DEFUN_DLD (window_data_c, args, nargout, "Window the ends of a TOD. \n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
-  window_data(mytod);
+  int unwindow=0;
+  if (args.length()>1)
+    unwindow=(int)get_value(args(1));
+  if (unwindow)
+    unwindow_data(mytod);
+  else
+    window_data(mytod);
   return octave_value_list();
 
 }

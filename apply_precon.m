@@ -6,6 +6,23 @@ if isfield(mapset,'skymap')
   end
 end
 
+
+%since we often cut windows, then use a preconditioner for the cut section.
+if isfield(mapset,'cutvecs')
+  if isfield(precon,'cutvecs')
+    %mdisp('applying cutvecs preconditioner')
+    if iscell(mapset.cutvecs)
+      for j=1:numel(mapset.cutvecs),
+        mapset.cutvecs(j)={mapset.cutvecs{j}./precon.cutvecs{j}};
+      end
+    else
+      mapset.cutvecs=mapset.cutvecs./precon.cutvecs;
+    end
+  end
+end
+
+                      
+
 return
 
 if isfield(precon,'corrnoise')

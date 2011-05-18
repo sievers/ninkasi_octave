@@ -2,6 +2,7 @@ function[new_mapset,tod_times,node_time,mpi_time]=mapset2mapset_corrnoise_octave
 
 do_noise=get_keyval_default('do_noise',false,varargin{:});
 window_symmetric=get_keyval_default('window_symmetric',false,varargin{:});
+skip_window=get_keyval_default('skip_window',false,varargin{:});  %don't window at all (e.g. if there's no noise)
 barriers=get_keyval_default('do_barriers',false,varargin{:});
 skip_mpi=get_keyval_default('skip_mpi',false,varargin{:});  %for some things, we can do reduces later, particularly useful when doing source fits.
 check_empty=get_keyval_default('check_empty',false,varargin{:});  %in some cases, it may be worth seeing if the TOD is empty before applying noise
@@ -52,7 +53,10 @@ for j=1:length(tods),
     clear crap
   end
 
-  window_data(mytod);
+  if (~skip_window)
+    window_data(mytod);
+  end
+
 
 
   %mtoc

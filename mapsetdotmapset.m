@@ -8,10 +8,11 @@ if isfield(a,'corrnoise'),
 end
 
 if isfield(a,'timestreams'),
-    for j=1:length(a.timestreams),
-        val=val+sum(sum(a.timestreams(j).map.*b.timestreams(j).map));
-    end
-    val=mpi_allreduce(val);
+  tot=0;
+  for j=1:length(a.timestreams),
+    tot=tot+sum(sum(a.timestreams(j).map.*b.timestreams(j).map));
+  end
+  val=val+mpi_allreduce(tot);
 end
 
 
@@ -21,23 +22,27 @@ end
 
 
 if isfield(a,'cutvecs')
+  tot=0;
   if iscell(a.cutvecs)
     for j=1:numel(a.cutvecs),
-      val=val+sum( (a.cutvecs{j}).*(b.cutvecs{j}));
+      tot=tot+sum( (a.cutvecs{j}).*(b.cutvecs{j}));
     end
   else
-    val=val+sum(a.cutvecs.*b.cutvecs);
+    tot=tot+sum(a.cutvecs.*b.cutvecs);
   end
+  val=val+mpi_allreduce(tot);
 end
 
 
 if isfield(a,'srccat')
+  tot=0;
   if iscell(a.srccat),
     for ss=1:numel(a.srccat),
-      val=val+sum(a.srccat{ss}.amps.*b.srccat{ss}.amps);
+      tot=tot+sum(a.srccat{ss}.amps.*b.srccat{ss}.amps);
     end
   else
-    val=val+sum(a.srccat.amps.*b.srccat.amps);
+    tot=tot+sum(a.srccat.amps.*b.srccat.amps);
   end
+  val=val+mpi_allreduce(tot);
 end
 
