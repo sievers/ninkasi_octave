@@ -32,7 +32,15 @@ for j=1:length(rows),
     if isempty(istop)
       istop=length(dist);
     end
-
+    %JLS - fixing corner case where istop(1)==1 - 26May 2011
+    if istop(1)<istart(1);
+      if numel(istop)>1
+        istop=istop(2:end)
+      else
+        istop=length(dist); %import empty case from above
+      end      
+    end
+    %End mod
     try
       if istop(1)<istart(1)
         istart=[1 istart];
@@ -41,7 +49,8 @@ for j=1:length(rows),
       whos
       istart
       istop
-      error('screwed up again.')
+      disp(['screwed up again. on ' get_tod_name(tod)]);
+      error(['screwed up again. on ' get_tod_name(tod)]);
     end
     if istop(end)<istart(end)
       try

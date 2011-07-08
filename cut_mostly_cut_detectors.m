@@ -1,4 +1,4 @@
-function[kept_fracs]=cut_mostly_cut_detectors(tods,fac)
+function[kept_fracs]=cut_mostly_cut_detectors(tods,fac,nreg_thresh)
 if length(tods)>1,
   kept_fracs={};
    for j=1:length(tods),
@@ -14,7 +14,10 @@ nn=get_tod_ndata(tods);
 if ~exist('fac')
   fac=0.5;
 end
-nreg_thresh=6;
+if ~exist('nreg_thresh')
+  nreg_thresh=6;
+end
+
 kept_fracs=0*rows;
 for j=1:length(rows),
     crud=print_tod_uncut_regions(tods,rows(j),cols(j));

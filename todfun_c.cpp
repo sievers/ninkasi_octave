@@ -594,16 +594,33 @@ DEFUN_DLD (tod2map, args, nargout, "Project tod into a map.  Args are (tod,map)\
   return octave_value_list();  
 }
 
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (tod_times_map, args, nargout, "Multiply and sum a tod by a map.  Args are (tod,map)\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  MAP *mymap=(MAP *)get_pointer(args(1));
+
+  //omp_set_num_threads(8); 
+  
+  return octave_value(tod_times_map(mymap,mytod,NULL));
+
+}
+
 
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (map2tod, args, nargout, "Project map into a tod.  Args are (map,tod)\n")
+DEFUN_DLD (map2tod, args, nargout, "Project map into a tod.  Args are (map,tod).  Optionally, scale factor\n")
 {
   MAP *mymap=(MAP *)get_pointer(args(0));
   mbTOD  *mytod=(mbTOD *)get_pointer(args(1));
-  
-  //tod2map(mymap,mytod,NULL);
-  map2tod(mymap,mytod,NULL);
+  if (args.length()>2) {
+    actData scale_fac=get_value(args(2));
+    
+    map2tod(mymap,mytod,(PARAMS *)&scale_fac);
+  }
+  else
+    map2tod(mymap,mytod,NULL);
   return octave_value_list();  
 }
 

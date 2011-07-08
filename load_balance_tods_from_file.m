@@ -12,7 +12,6 @@ tod_times=zeros(size(tod_names));
 
 names_in=get_tod_tags_from_names(names_in);
 tags=get_tod_tags_from_names(tod_names);
-
 tt(length(tags),length(tags{1}))=' ';
 for j=1:length(tags),
   tt(j,:)=tags{j};
@@ -30,6 +29,16 @@ for j=1:ntag,
     tod_times(j)=times_in(ind);
   end
 end
+
+if sum(tod_times>0)==0,
+  warning('did not find any tods with time information.')
+  tod_times=ones(size(tod_names));
+  myids=(1:numel(tod_names))';
+  myids=rem(myids-1,nproc)+1;
+  node_times=ones(size(tod_names));
+  return
+end
+
 
 if sum(tod_times==0)>0,
   mdisp(['warning - in load_balance_tods_from_file, have TODs with missing time info']);

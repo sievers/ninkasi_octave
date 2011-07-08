@@ -1,5 +1,8 @@
 function[tod_names,use_list]=keep_tods_in_whitelist(tod_names,blacklist)
-blacklist=read_text_file(blacklist);
+if ~iscell(blacklist)
+  blacklist=read_text_file(blacklist);
+end
+
 
 if (1)
   tod_names_small=get_ctime_part(tod_names);
