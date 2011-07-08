@@ -167,7 +167,7 @@ DEFUN_DLD (read_tod_data, args, nargout, "Read TOD data into memory.\n")
   if (mytod->data_saved) 
     memcpy(mytod->data[0],mytod->data_saved[0],mytod->ndet*mytod->ndata*sizeof(actData));
   else {
-    printf("reading tod data.\n");
+    //printf("reading tod data.\n");
     read_tod_data(mytod);
   }
   return octave_value_list();
@@ -319,6 +319,8 @@ DEFUN_DLD (merge_cuts_c, args, nargout, "Merge cuts, write 'em to disk.\n")
   return octave_value_list();
 
 }
+
+
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (print_tod_uncut_regions, args, nargout, "Print out the uncut regions of a detector in a tod.\n")
 {
@@ -330,12 +332,48 @@ DEFUN_DLD (print_tod_uncut_regions, args, nargout, "Print out the uncut regions 
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   int myrow=(int)get_value(args(1));
   int mycol=(int)get_value(args(2));
+  int do_cuts=0;
+  if (args.length()>3)
+    do_cuts=(int)get_value(args(3));
+  
   if (mbCutsIsAlwaysCut(mytod->cuts,myrow,mycol)) {
     printf("detector %d %d is completely cut.\n",myrow,mycol);
     return octave_value_list();
   }
+  
+#if 1
+  mbUncut *uncuts=NULL;
+  if (do_cuts==1) {
+    if (mytod->cuts_as_uncuts==NULL) {
+      fprintf(stderr,"Do not have cuts_as_uncuts filled in print_tod_uncut_regions.\n");
+      return octave_value_list();
+    }    
+    uncuts=mytod->cuts_as_uncuts[myrow][mycol];
+  }
+  if (do_cuts==2) {
+    if (mytod->cuts_as_vec==NULL) {
+      fprintf(stderr,"Do not have cuts_as_uncuts filled in print_tod_uncut_regions.\n");
+      return octave_value_list();
+    }    
+    uncuts=mytod->cuts_as_vec[myrow][mycol];
+  }
+  if (do_cuts==0)
+    uncuts=mytod->uncuts[myrow][mycol];
+  if (uncuts==NULL) {
+    printf("do_cuts value not recognized in print_tod_uncut_regions, value is %d\n",do_cuts);
+    return octave_value_list();
+  }
 
-
+  if (nargout==0)
+    printf("Have %d regions.\n",uncuts->nregions);
+  Matrix uncut(uncuts->nregions,2);
+  for (int i=0;i<uncuts->nregions;i++) {
+    if (nargout==0)
+      printf("using %5d to %5d.\n",uncuts->indexFirst[i],uncuts->indexLast[i]);
+    uncut(i,0)=uncuts->indexFirst[i];
+    uncut(i,1)=uncuts->indexLast[i];
+  }  
+#else
   if (nargout==0)
     printf("Have %d regions.\n",mytod->uncuts[myrow][mycol]->nregions);
   Matrix uncut(mytod->uncuts[myrow][mycol]->nregions,2);
@@ -345,7 +383,7 @@ DEFUN_DLD (print_tod_uncut_regions, args, nargout, "Print out the uncut regions 
     uncut(i,0)=mytod->uncuts[myrow][mycol]->indexFirst[i];
     uncut(i,1)=mytod->uncuts[myrow][mycol]->indexLast[i];
   }
-  
+#endif  
   return octave_value(uncut);
 }
 /*--------------------------------------------------------------------------------*/
@@ -394,7 +432,13 @@ DEFUN_DLD (write_tod_data_c, args, nargout, "Write out the data in a TOD. \n")
 DEFUN_DLD (window_data_c, args, nargout, "Window the ends of a TOD. \n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
-  window_data(mytod);
+  int unwindow=0;
+  if (args.length()>1)
+    unwindow=(int)get_value(args(1));
+  if (unwindow)
+    unwindow_data(mytod);
+  else
+    window_data(mytod);
   return octave_value_list();
 
 }
@@ -443,6 +487,66 @@ DEFUN_DLD (cut_tod_global_c, args, nargout, "Do a global cut on a TOD.  Args are
 
   mbCutsExtendGlobal(mytod->cuts,first,last);
 
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_numel_cut_c, args, nargout, "Find out how many elements have been cut from a TOD.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  int ncut=get_numel_cut(mytod);
+  return octave_value(ncut);
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (tod2cutvec_c, args, nargout, "Put cut data from a TOD into a vector.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  int ncut=get_numel_cut(mytod);
+  Matrix vec(ncut,1);
+
+  if (tod2cutvec(mytod,vec.fortran_vec())) {
+    printf("had a problem in tod2cutvec.\n");
+    return octave_value_list();
+  }
+  return octave_value(vec);
+
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (cutvec2tod_c, args, nargout, "Put cut data into a TOD.\n")
+{
+  if (args.length()<2) {
+    printf("error - need at least two inputs to cutvec2tod_c.\n");
+    return octave_value_list();
+  }
+  
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix vec=args(1).matrix_value();  
+
+  dim_vector dm=vec.dims();
+  int ncut=get_numel_cut(mytod);
+  if (dm(1)*dm(0)<ncut) {
+    fprintf(stderr,"Error - not enough elements in cutvec2tod_c.  Expected at least %d, got %d\n",ncut, dm(1)*dm(2));
+    return octave_value_list();
+  }
+  
+  if (cutvec2tod(mytod,vec.fortran_vec())) {
+    printf("had a problem in tod2cutvec.\n");
+  }
+  return octave_value_list();
+  
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (set_tod_cuts_global_indices_c, args, nargout, "Set up the global indexing to the cut regions in a tod.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  set_global_indexed_cuts(mytod);
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_tod_cut_regions_c, args, nargout, "Set up the cut regions in a tod like the uncuts.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  get_tod_cut_regions(mytod);
   return octave_value_list();
 }
 /*--------------------------------------------------------------------------------*/
@@ -615,6 +719,96 @@ DEFUN_DLD (assign_tod_value, args, nargout, "Assign a value to a tod.  Args are 
   actData val=vv(0,0);
   assign_tod_value(mytod,val);
   return octave_value_list();  
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (tod_hits_source_c, args, nargout, "Check to see if a tod might hit a source Args are (ra,dec,dist,tod)\n")
+{
+  actData ra=get_value(args(0));
+  actData dec=get_value(args(1));
+  actData r=get_value(args(2));
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(3));
+  
+  int val=tod_hits_source(ra,dec,r,mytod);
+  return octave_value(val);
+
+}
+
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (add_src2tod, args, nargout, "Add a source into a tod.  Args are (tod,ra,dec,amp,beam vector, dtheta)\n")
+//void add_src2tod(mbTOD *tod, actData ra, actData dec, actData src_amp, const actData *beam, actData dtheta, int nbeam, int oversamp)
+
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
+  actData ra=get_value(args(1));
+  actData dec=get_value(args(2));
+  actData amp=get_value(args(3));
+  Matrix beam=args(4).matrix_value();
+  actData dtheta=get_value(args(5));
+  dim_vector dm=beam.dims();
+  int nbeam=dm(0)*dm(1);
+  actData *beamvec=beam.fortran_vec();
+  int oversamp=1;
+  if (args.length()>6)
+    oversamp=(int)get_value(args(6));
+  add_src2tod(mytod,ra,dec,amp,beamvec,dtheta,nbeam,oversamp);
+  return octave_value_list();  
+}
+
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (add_srcvec2tod, args, nargout, "Add a source into a tod.  Args are (tod,ra,dec,amp,beam vector, dtheta)\n")
+//void add_src2tod(mbTOD *tod, actData ra, actData dec, actData src_amp, const actData *beam, actData dtheta, int nbeam, int oversamp)
+
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
+  Matrix ram=args(1).matrix_value();
+  Matrix decm=args(2).matrix_value();
+  Matrix ampm=args(3).matrix_value();
+  Matrix beam=args(4).matrix_value();
+  actData *ra=ram.fortran_vec();
+  actData *dec=decm.fortran_vec();
+  actData *amp=ampm.fortran_vec();
+  dim_vector srcdm=ram.dims();
+  int nsrc=srcdm(0)*srcdm(1);
+
+  actData dtheta=get_value(args(5));
+  dim_vector dm=beam.dims();
+  int nbeam=dm(0)*dm(1);
+  actData *beamvec=beam.fortran_vec();
+  int oversamp=1;
+  if (args.length()>6)
+    oversamp=(int)get_value(args(6));
+  add_srcvec2tod(mytod,ra,dec,amp,nsrc,beamvec,dtheta,nbeam,oversamp);
+  return octave_value_list();  
+}
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (tod2srcvec, args, nargout, "Project a tod into source vecs.  Args are (tod,ra,dec,beam vector, dtheta,[oversamp])\n")
+//void add_src2tod(mbTOD *tod, actData ra, actData dec, actData src_amp, const actData *beam, actData dtheta, int nbeam, int oversamp)
+
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
+  Matrix ram=args(1).matrix_value();
+  Matrix decm=args(2).matrix_value();
+  Matrix beam=args(3).matrix_value();
+  actData *ra=ram.fortran_vec();
+  actData *dec=decm.fortran_vec();
+  dim_vector srcdm=ram.dims();
+  int nsrc=srcdm(0)*srcdm(1);
+
+  actData dtheta=get_value(args(4));
+  dim_vector dm=beam.dims();
+  int nbeam=dm(0)*dm(1);
+  actData *beamvec=beam.fortran_vec();
+  int oversamp=1;
+  if (args.length()>5)
+    oversamp=(int)get_value(args(5));
+  
+  Matrix amps(srcdm);
+  memset(amps.fortran_vec(),0,sizeof(double)*nsrc);
+  tod2srcvec(amps.fortran_vec(),mytod,ra,dec,nsrc,beamvec,dtheta,nbeam,oversamp);
+  return octave_value(amps);  
 }
 /*--------------------------------------------------------------------------------*/
 

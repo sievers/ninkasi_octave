@@ -104,6 +104,7 @@ end
 d=Mr;
 
 
+
 rMr=mapsetdotmapset(r,d);
 r0sqr=rMr;
 iter=1;
@@ -223,6 +224,10 @@ while ((rMr>r0sqr*tol)&(iter<maxiter)),
             write_map(x.skymap.mapptr,[save_tag num2str(iter)]);
             %write_simple_map_c(x.skymap.mapptr,[save_tag num2str(iter) '.map']);          
           end
+          if isfield(x,'srccat')
+            write_srccat_mapset(x.srccat,[save_tag num2str(iter) '_srccat.txt']);
+          end
+
         end
       end
       old_dAd=dAd;

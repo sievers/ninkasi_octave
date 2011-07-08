@@ -15,6 +15,10 @@ autoload('apply_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_
 autoload('assign_rotmat_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_time_constants_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_value',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('tod_hits_source_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('add_src2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('add_srcvec2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('tod2srcvec',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_matrix_to_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('pull_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -71,6 +75,11 @@ autoload('get_tod_name',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'
 autoload('get_tod_ndata',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_row_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('cut_tod_global_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('set_tod_cuts_global_indices_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('tod2cutvec_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('cutvec2tod_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('get_numel_cut_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('get_tod_cut_regions_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_uncut_regions_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_kept_regions_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('highpass_tod_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));

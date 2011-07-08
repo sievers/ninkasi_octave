@@ -86,7 +86,7 @@ DEFUN_DLD (convert_fits_bintable, args, nargout, "Read TOD data into memory.\n")
   offset[0]=0;
   for (int i=1;i<ncol;i++) {
     int doff=fabs(ifmt[i-1]);
-    if (doff>10),
+    if (doff>10)
       doff-=10;
     offset[i]=offset[i-1]+doff;
     //offset[i]=offset[i-1]+fabs(ifmt[i-1]);

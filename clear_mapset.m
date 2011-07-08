@@ -17,6 +17,16 @@ if isfield(mapset,'skymap')
 end
 
 
+if isfield(mapset,'cutvecs')
+  if iscell(mapset.cutvecs)
+    for j=1:numel(mapset.cutvecs),
+      mapset.cutvecs(j)={0*mapset.cutvecs{j}};
+    end
+  else
+    mapset.cutvecs=0*mapset.cutvecs;
+  end
+end
+
 
 if isfield(mapset,'corrnoise'),
     for j=1:length(mapset.corrnoise),
@@ -27,5 +37,15 @@ end
 if isfield(mapset,'timestreams')
   for j=1:length(mapset.timestreams),
     mapset.timestreams(j).map=0*mapset.timestreams(j).map;
+  end
+end
+
+if isfield(mapset,'srccat')
+  if iscell(mapset.srccat),
+    for ss=1:numel(mapset.srccat),
+      mapset.srccat{ss}.amps=0*mapset.srccat{ss}.amps;
+    end
+  else
+    mapset.srccat.amps=0*mapset.srccat.amps;
   end
 end

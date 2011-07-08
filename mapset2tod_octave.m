@@ -8,6 +8,15 @@ if isfield(mapset,'skymap')
   map2tod(mapset.skymap.mapptr,tod);
 end
 
+if isfield(mapset,'cutvecs')
+  if iscell(mapset.cutvecs),
+    cutvec2tod_c(tod,mapset.cutvecs{which_tod});
+  else
+    cutvec2tod_c(tod,mapset.cutvecs);
+  end
+end
+
+
 if isfield(mapset,'corrnoise')
     corrnoise=mapset.corrnoise(which_tod);
 
@@ -32,4 +41,15 @@ if isfield(mapset,'timestreams')
     timestreams=mapset.timestreams(which_tod);
     timestreams2tod_blas(tod,timestreams.map)
 end
+
+if isfield(mapset,'srccat')
+  if iscell(mapset.srccat),
+    for ss=1:numel(mapset.srccat)
+      add_srccat2tod(tod,mapset.srccat{j});
+    end
+  else
+    add_srccat2tod(tod,mapset.srccat);
+  end
+end
+
 

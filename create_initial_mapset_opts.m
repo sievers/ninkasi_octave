@@ -27,6 +27,8 @@ outroot=get_struct_mem(myopts,'outroot',datestr(now,30));
 write_cleaned_data=get_struct_mem(myopts,'write_cleaned_data');
 window_symmetric=get_struct_mem(myopts,'window_symmetric');
 remove_corrnoise=get_struct_mem(myopts,'remove_corrnoise');
+srccat=get_struct_mem(myopts,'srccat',[]);
+
 
 if (do_gauss&hilton_noise)
   warning('requested both gaussian and Hilton noise.  Choosing Gaussian.');
@@ -183,6 +185,7 @@ for j=1:length(tods),
       mdisp('calibrating');
       %calibrate_data(mytod);
       calibrate_data_opts(mytod,myopts);
+
     end
     
     if (hilton_noise)
@@ -212,6 +215,7 @@ for j=1:length(tods),
     end
 
     if (dedark)
+      mdisp('dedarking');
       array_detrend(mytod);
       gapfill_data_c(mytod);
       if ~isempty(dark_dirroot)
@@ -223,6 +227,7 @@ for j=1:length(tods),
       else
         subtract_darks_from_tod_eig (mytod);
       end
+      mdisp('finished');
     end
     
     
@@ -244,12 +249,24 @@ for j=1:length(tods),
       end
       %data_from_map=get_tod_data(mytod);
       dat=dat-get_tod_data(mytod);
-      push_tod_data(dat,mytod);
-      
+      push_tod_data(dat,mytod);      
     else
       mdisp('no input mapset');
     end
 
+    if ~isempty(srccat)
+      inject_sources=true;
+      if isfield(srccat,'inject_sources')
+        if srccat.inject_sources==false,
+          inject_sources=false;
+        end
+      end
+      if inject_sources,
+        mdisp('adding sources into data');
+        add_srccat2tod(mytod,srccat);
+      end
+    end
+    
     gapfill_data_c(mytod);
 
     if (remove_common)
@@ -436,6 +453,18 @@ for j=1:length(tods),
     clear mapset_tmp;
     clear myguess;
   end
+  if ~isempty(srccat)
+    mdisp('checking source restore');
+    if isfield(srccat,'restore_sources')
+      mdisp('flag exists');
+      if srccat.restore_sources,
+        mdisp('restoring sources.');
+        tmpcat=srccat;
+        tmpcat.amps=-1*srccat.amps;
+        add_srccat2tod(mytod,tmpcat);
+      end
+    end
+  end
 
 
   if exist('mapset_in')&(add_input_map)
@@ -493,7 +522,7 @@ for j=1:length(tods),
 
   mdisp('tod2mapset');
   mapset=tod2mapset_octave(mapset,mytod,j);
-
+  mdisp('finished');
 
 
   if (signal_only)
@@ -546,10 +575,24 @@ if isfield(mapset,'skymap')
   octave2skymap(mapset.skymap);
 end
 
+if isfield(mapset,'srccat')
+  if iscell(mapset.srccat)
+    for ss=1:numel(mapset.srccat),
+      mapset.srccat{ss}.amps=mpi_allreduce(mapset.srccat{ss}.amps);
+    end
+  else
+    mapset.srccat.amps=mpi_allreduce(mapset.srccat.amps);
+  end
+end
+
+
 if (signal_only)
   if isfield(mapset,'skyamp')
     signal_mapset.skymap.map=mpi_allreduce(signal_mapset.skymap.map);
     octave2skymap(signal_mapset.skymap);
+  end
+  if isfield(mapset,'srccat')
+    signal_mapset.srccat.amps=mpi_allreduce(signal_mapset.srccat.amps);
   end
 end
 
