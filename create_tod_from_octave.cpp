@@ -281,3 +281,18 @@ DEFUN_DLD (cuts_extend_c, args, nargout, "Extend a cut.  args are (tod,start,sto
   return octave_value_list();
 }
 
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (set_tod_altaz_c, args, nargout, "Write alt/az into a TOD.  args are (tod,alt,az).\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix alt=args(1).matrix_value();
+  Matrix az=args(2).matrix_value();
+  mytod->alt=(actData *)malloc(sizeof(actData)*mytod->ndata);
+  mytod->az=(actData *)malloc(sizeof(actData)*mytod->ndata);
+
+  memcpy(mytod->alt,alt.fortran_vec(),mytod->ndata*sizeof(actData));
+  memcpy(mytod->az,az.fortran_vec(),mytod->ndata*sizeof(actData));
+
+  return octave_value_list();
+}
