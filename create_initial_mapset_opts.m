@@ -58,6 +58,7 @@ do_calib=get_struct_mem(myopts,'do_calib');
 
 
 add_input_map=get_struct_mem(myopts,'add_input_map');
+input_scale_fac=get_struct_mem(myopts,'input_scale_fac');
 restore_mapset=get_struct_mem(myopts,'restore_mapset');
 mdisp(['add_input_map is ' num2str(add_input_map)]);
 
@@ -244,11 +245,12 @@ for j=1:length(tods),
           rebutterworth_c(mytod);
         end
       end
+      
       if (deconvolve_tau)
         reconvolve_tod_time_constants_c(mytod);
       end
       %data_from_map=get_tod_data(mytod);
-      dat=dat-get_tod_data(mytod);
+      dat=dat+input_scale_fac*get_tod_data(mytod);
       push_tod_data(dat,mytod);      
     else
       mdisp('no input mapset');

@@ -11,7 +11,7 @@ switch(params.fittype)
   case {'cea'}
    pix1=ra/params.radelt+params.raoff;
    ind=pix1<0;
-   disp(['correcting ' num2str(sum(ind)) ' sources.']);
+   %disp(['correcting ' num2str(sum(ind)) ' sources.']);
    pix1(ind)=(ra(ind)-360)/params.radelt+params.raoff;
    pix2=params.decoff+sin(dec*pi/180)*180/pi/params.pv/params.decdelt;
  case {'tan'}

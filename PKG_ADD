@@ -126,6 +126,7 @@ autoload('test_eig_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'))
 autoload('test_omp_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('test_solve_posdef',fullfile(fileparts(mfilename("fullpath")),'corrnoise_utils.oct'));
 autoload('tod2map',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('tod_times_map',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod2vecs',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod2vecs_blas',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod2timestreams_blas',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
