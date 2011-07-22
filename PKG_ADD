@@ -1,5 +1,5 @@
 autoload('read_dirfile_tod_data_from_rowcol_list_c',fullfile (fileparts (mfilename ("fullpath")),'todfun_c.oct'));
-autoload('simple_test_diag_proj_noise_inv',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+%autoload('simple_test_diag_proj_noise_inv',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_noise_to_tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_noise_to_tod_gaussian',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('allocate_ninkasi_skymap',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));

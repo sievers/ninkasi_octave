@@ -2547,7 +2547,7 @@ DEFUN_DLD (get_alldata_fft_plans_c, args, nargout, "Make FFTW plans for a TOD us
 
 
 /*--------------------------------------------------------------------------------*/
-
+#if 0
 DEFUN_DLD (simple_test_diag_proj_noise_inv, args, nargout, "Test some C-version noise inverses.\n")
 {
   Matrix data=args(0).matrix_value();
@@ -2587,7 +2587,7 @@ DEFUN_DLD (simple_test_diag_proj_noise_inv, args, nargout, "Test some C-version 
   free(vecptr);
   return octave_value(dinv);
 }
-
+#endif
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (pull_oneband_tod_noise_banded_projvec,args,nargout,"Pull parameters for a single band in a TOD noise + projection vector model.\n")
 {
