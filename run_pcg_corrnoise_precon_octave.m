@@ -128,7 +128,7 @@ if (profile)
   fflush(logid);
 end
 
-
+%need d,rMr,x,r
 while ((rMr>r0sqr*tol)&(iter<maxiter)),
   %tic;
   if (profile)  %if profiling, make sure we all start at the same time

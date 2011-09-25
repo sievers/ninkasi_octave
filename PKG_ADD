@@ -9,6 +9,8 @@ autoload('apply_tod_noise_model_c',fullfile(fileparts(mfilename("fullpath")),'to
 autoload('apply_banded_noise_model_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('set_noise_powlaw_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('allocate_tod_noise_banded_projvec',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('read_tod_noise_banded_projvec',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('save_tod_noise_banded_projvec',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('set_oneband_tod_noise_banded_projvec',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('pull_oneband_tod_noise_banded_projvec',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('apply_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));

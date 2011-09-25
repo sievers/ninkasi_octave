@@ -7,9 +7,28 @@ lims=zeros(ntod,4);
 tod_ok=true(size(todlist));
 isrising=false(size(todlist));
 
+
+
 decimate=get_keyval_default('decimate',0,varargin{:});
 pfiles=get_keyval_default('pointing',{},varargin{:});
 fix_altaz=get_keyval_default('fix_altaz',true,varargin{:});
+tau_files=get_keyval_default('tau_files',[],varargin{:});
+isf3db=get_keyval_default('is3db',true,varargin{:});
+if iscell(tau_files),
+  for j=1:length(tau_files),
+    if ~isempty(tau_files{j})
+      tmp=load(tau_files{j});
+      if (~isf3db)
+        tmp(tmp>0)=1.0./(2*pi*tmp(tmp>0));
+      end
+      %tau_files(j)={load(tau_files{j})};
+      tau_files(j)={tmp};
+
+    end
+  end
+end
+
+
 assert(~isempty(pfiles));
 if iscell(pfiles),
   poffs=cell(size(pfiles));
@@ -43,8 +62,14 @@ for j=1:ntod,
   isrising(j)=myrising;
   lims(j,:)=mylims';
 end
-assign_tod_time_constants(tods);
-mdisp('set time constants');
+
+if isempty(tau_files)
+  assign_tod_time_constants(tods);
+else
+  assign_tod_time_constants(tods,tau_files);
+end
+
+%mdisp('set time constants');
 all_lims=lims;
 lims=[min(lims(:,1)) max(lims(:,2)) min(lims(:,3)) max(lims(:,4))];
 

@@ -1,7 +1,19 @@
 function[cal_facs,my_rr,my_ff]=get_tod_calib_factors_opts(tod,opts)
 
+calib_dir=get_struct_mem(opts,'calib_dir','');
+if ~isempty(calib_dir)
+  if iscell(calib_dir)
+    calib_dir=calib_dir{guess_tod_season(get_tod_name(tod))};
+  end
+  cal_facs=get_tod_calib_factors_onefile(tod,calib_dir,opts);
+  return
+end
+
+
 flatfield_dir=get_struct_mem(opts,'flatfield_dir','');
 response_dir=get_struct_mem(opts,'response_dir','');
+
+
 
 if iscell(flatfield_dir)
   flatfield_dir=flatfield_dir{guess_tod_season(get_tod_name(tod))};
@@ -10,6 +22,9 @@ end
 if iscell(response_dir)
   response_dir=response_dir{guess_tod_season(get_tod_name(tod))};
 end
+
+
+
 
 
 

@@ -1,9 +1,13 @@
 function[mycat]=pull_planet_pos_from_cat(tod,cat)
-if class(tod)=='int64'
-  todname=get_tod_name(tod);
-else
-  todname=tod;
+todname=tod;
+if numel(tod)==1
+  if class(tod)=='int64'
+    todname=get_tod_name(tod);
+  end
 end
+% else
+%  todname=tod;
+%end
 
 nn=length(cat.todname);
 fwee=strsplit(todname,'/',true);

@@ -13,6 +13,19 @@ else
     taus(f3db==0)=0;
     assert(sum(sum(isnan(taus)))==0);
     assert(sum(sum(isinf(taus)))==0);
+  else
+    if iscell(taus)
+      mdisp('assigning time constants from cell.');
+      for j=1:length(tods),
+        f3db=taus{guess_tod_season(tods(j))};
+        mytau=1./f3db/2/pi;
+        mytau(f3db==0)=0;
+        assert(sum(sum(isnan(mytau)))==0);
+        assert(sum(sum(isinf(mytau)))==0);
+        assign_tod_time_constants_c(tods(j),mytau);
+      end
+      return;
+    end
   end
 end
 

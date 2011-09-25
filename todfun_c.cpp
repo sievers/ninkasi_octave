@@ -2648,6 +2648,78 @@ DEFUN_DLD (set_oneband_tod_noise_banded_projvec,args,nargout,"Set up a single ba
 }
 
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (save_tod_noise_banded_projvec,args,nargout,"Save the banded_projvec noise from a TOD.  Args are (tod,filename).\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  char *fname=get_char_from_arg(args(1).char_matrix_value());
+  FILE *outfile=fopen(fname,"w");
+  if (!outfile) {
+    fprintf(stderr,"Unable to open %s for writing in save_tod_noise_banded_projvec.\n",fname);
+    return octave_value_list();
+  }
+  mbNoiseStructBandsVecs *noise=mytod->band_vecs_noise;
+  fwrite(&(noise->ndet),sizeof(noise->ndet),1,outfile);
+  fwrite(&(noise->nband),sizeof(noise->nband),1,outfile);
+  fwrite((noise->band_edges),sizeof(*(noise->band_edges)),1+noise->nband,outfile);
+  fwrite(noise->nvecs,sizeof(*(noise->nvecs)),noise->nband,outfile);
+  fwrite(noise->noises[0],sizeof(actData),noise->nband*noise->ndet,outfile);
+  for (int i=0;i<noise->nband;i++) {
+    fwrite(noise->vecs[i][0],sizeof(actData),noise->nvecs[i]*noise->ndet,outfile);
+  }
+  
+  //mytod->band_vecs_noise->noises=matrix(nband,mytod->ndet);
+  //mytod->band_vecs_noise->vecs=(actData ***)malloc(sizeof(actData **)*nband);
+  
+  
+  fclose(outfile);
+  return octave_value_list();
+  
+
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (read_tod_noise_banded_projvec,args,nargout,"Read the banded_projvec noise into a TOD.  Args are (tod,filename).\n")
+{
+  fprintf(stderr,"hello!\n");
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  fprintf(stderr,"god tod pointer.\n");
+  char *fname=get_char_from_arg(args(1).char_matrix_value());
+  fprintf(stderr,"fname is %s\n",fname);
+  FILE *infile=fopen(fname,"r");
+  fprintf(stderr,"opened infile.\n");
+  if (!infile) {
+    fprintf(stderr,"Could not find file %s for reading in read_tod_noise_banded_projvec\n",fname);
+    return octave_value_list();
+  }
+    
+  mbNoiseStructBandsVecs *noise=(mbNoiseStructBandsVecs *)malloc(sizeof(mbNoiseStructBandsVecs));
+  printf("here 1.\n");
+  fread(&(noise->ndet),sizeof(int),1,infile);
+  fread(&(noise->nband),sizeof(int),1,infile);
+  printf("ndet and nband are %d %d\n",noise->ndet,noise->nband);
+  noise->band_edges=(int *)malloc(sizeof(int)*(1+noise->nband));
+  fread((noise->band_edges),sizeof(*(noise->band_edges)),1+noise->nband,infile);
+  printf("read edges.\n");
+
+  noise->nvecs=(int *)malloc(sizeof(int)*noise->nband);
+  fread(noise->nvecs,sizeof(*(noise->nvecs)),noise->nband,infile);
+  printf("read nvecs.\n");
+
+  noise->noises=matrix(noise->nband,noise->ndet);
+  fread(noise->noises[0],sizeof(actData),noise->nband*noise->ndet,infile);
+  printf("read detector noises.\n");
+  
+  noise->vecs=(actData ***)malloc(sizeof(actData **)*noise->nband);
+  for (int i=0;i<noise->nband;i++) {
+    noise->vecs[i]=matrix(noise->nvecs[i],noise->ndet);
+    fread(noise->vecs[i][0],sizeof(actData),noise->nvecs[i]*noise->ndet,infile);
+  }
+  printf("read vecs.\n");
+  fclose(infile);
+  mytod->band_vecs_noise=noise;
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD (allocate_tod_noise_banded_projvec,args,nargout,"Set the TOD noise model to be in bands with non-completely projected vectors.\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
