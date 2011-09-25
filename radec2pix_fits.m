@@ -14,7 +14,19 @@ switch(params.fittype)
    %disp(['correcting ' num2str(sum(ind)) ' sources.']);
    pix1(ind)=(ra(ind)-360)/params.radelt+params.raoff;
    pix2=params.decoff+sin(dec*pi/180)*180/pi/params.pv/params.decdelt;
-  otherwise
-   error(['Unsupported projection type ' params.fittype ' in radec2pix_fits']);
+ case {'tan'}
+  dec0=params.deccent*pi/180;
+  ra0=params.racent*pi/180;
+  ra=ra*pi/180;
+  dec=dec*pi/180;
+  cosc=sin(dec0)*sin(dec)+cos(dec0)*cos(dec).*cos(ra-ra0);
+  x=cos(dec).*sin(ra-ra0)./cosc;
+  
+  y=(cos(dec0)*sin(dec)-sin(dec0)*cos(dec).*cos(ra-ra0))./cosc;
+  pix1=params.raoff+x/params.radelt*180/pi;
+  pix2=params.decoff+y/params.decdelt*180/pi;
+  
+ otherwise
+  error(['Unsupported projection type ' params.fittype ' in radec2pix_fits']);
 end
 

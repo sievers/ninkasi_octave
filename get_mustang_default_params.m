@@ -1,0 +1,40 @@
+function[myopts]=get_mustang_default_params()
+myopts.remove_corrnoise=true;
+myopts.window_symmetric=true;
+myopts.seed=mpi_setup_seeds;
+myopts.scale_factor=1.0;
+myopts.find_modes=true;
+myopts.hilton_noise=false;simmap='lenssim';
+myopts.do_calib=false;
+myopts.dedark=false;
+myopts.deconvolve_tau=false;
+myopts.do_input_mapset=false;
+myopts.nbadmode=1;
+myopts.mode_thresh=[-1 5.5^2];
+myopts.find_modes_new=false;
+%myopts.mode_thresh=[-2 5^2];
+myopts.detrend=false;
+myopts.detrend_array=true;
+myopts.do_noise=true;
+myopts.add_input_map=true;
+myopts.restore_mapset=true;
+myopts.debutter=false;
+myopts.highpass=0.0;
+myopts.noise_class='powlaw'; 
+%myopts.bands=[-1 0.25 0.35 0.5 0.7 0.85 1 1.2 1.4 1.7 2 2.4 2.8 3.4 4 4.8  5.6 7 8 9 10 11 12 13 14 15 16 18 20 22 24 26 28 30 32 35 38 41 45 50 55 60 65 70 80 90 1000];
+myopts.bands=[-1 0.15 0.3 0.5  1 1.5 2 3 4 6 1000];
+%myopts.bands=[-1 0.15  0.6  1.5  1000];
+%myopts.noise_scale_facs=[0 0.5 1.0 ];
+myopts.noise_scale_facs=[ 0.1 0.25 0.5 1.0 ];
+rots=zeros(size(myopts.bands));noise_types=zeros(size(myopts.bands));
+myopts.rots=rots(1:end-1);
+myopts.noise_types=noise_types(1:end-1);
+myopts.cut_magic_carpets=false;
+myopts.do_precon=false;
+
+myopts.keep_data=false;
+myopts.prior_fac=0;
+myopts.end_cut=3;
+myopts.pixsize=2*pi/180/3600;
+myopts.pad=1e-4;
+

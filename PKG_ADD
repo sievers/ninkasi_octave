@@ -1,5 +1,5 @@
 autoload('read_dirfile_tod_data_from_rowcol_list_c',fullfile (fileparts (mfilename ("fullpath")),'todfun_c.oct'));
-autoload('simple_test_diag_proj_noise_inv',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+%autoload('simple_test_diag_proj_noise_inv',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_noise_to_tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_noise_to_tod_gaussian',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('allocate_ninkasi_skymap',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
@@ -168,6 +168,7 @@ autoload('set_tod_dt_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_fr
 autoload('set_tod_timevec_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_ndata_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_rowcol_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
+autoload('set_tod_altaz_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_pointing_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_data_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('free_tod_data_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));

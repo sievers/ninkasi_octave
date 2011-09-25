@@ -19,7 +19,7 @@ set_tod_timevec_c(tod,tt);
 set_tod_rowcol_c(tod,rows,cols);
 set_cuts_mustang(tod,flags*1e6,rows,cols);
 set_tod_pointing_saved(tod,ra*15*pi/180,dec*pi/180);
-
+set_tod_altaz_c(tod,el*pi/180,0*el);
 set_tod_data_saved(tod,data);
 set_tod_radec_lims_c (tod);
 tod=int64(tod);
