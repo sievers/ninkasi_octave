@@ -12,6 +12,8 @@ save_tag=get_keyval_default('save_tag','map_',varargin{:});
 dad_thresh=get_keyval_default('dad_thresh',1e3,varargin{:});
 write_times=get_keyval_default('write_times',false,varargin{:});
 profile=get_keyval_default('profile',false,varargin{:});
+cache_iter=get_keyval_default('cache_iter',0,varargin{:});
+restart=get_keyval_default('restart',false,varargin{:});
 
 if (myid==1)
   disp(['length of varargin is ' num2str(length(varargin))]);
@@ -128,15 +130,133 @@ if (profile)
   fflush(logid);
 end
 
-%need d,rMr,x,r
+
+if (cache_iter>0)
+  cache_tails={'tic','toc'};
+  cache_tag=[save_tag '.cache'];
+  cache_raw={[cache_tag '.' cache_tails{1}],[cache_tag '.' cache_tails{2}]};
+
+  aa=find(cache_raw{1}=='/');
+  fwee=cache_raw{1};
+  cache_link={fwee(aa(end)+1:end)};
+  aa=find(cache_raw{2}=='/');
+  fwee=cache_raw{2};
+  cache_link(end+1)={fwee(aa(end)+1:end)};
+
+  if (myid==1)
+    cache_raw
+    cache_link
+    system(['mkdir ' cache_raw{1}]);
+    system(['mkdir ' cache_raw{2}]);
+  end
+end
+
+
+%need d,rMr,x,r, old_dAd
+just_read=false;
+if restart,
+  just_read=true;
+  %cache_tag=[save_tag '.cache/'];
+
+  try
+    iter1=load([cache_raw{1} '/iter'])*load([cache_raw{1} '/completed']);
+  catch
+    iter1=0;
+  end
+  try
+    iter2=load([cache_raw{2} '/iter'])*load([cache_raw{2} '/completed']);
+  catch
+    iter2=0;
+  end
+  if (iter1>iter2)
+    cache_tag=cache_raw{1};
+    iter=iter1;
+  else
+    cache_tag=cache_raw{2};
+    iter=iter2;
+  end
+  cache_tag(end+1)='/';
+  %iter=load([cache_tag 'iter']);
+  mdisp(['restarting on iteration ' num2str(iter) ' using tag ' cache_tag]);
+
+  fid=fopen([cache_tag 'rMr']);
+  rMr=fread(fid,1,'double');
+  fclose(fid);
+
+  fid=fopen([cache_tag 'old_dAd']);
+  old_dAd=fread(fid,1,'double');
+  fclose(fid);
+
+  x=read_mapset(tods,[cache_tag 'x']);
+  d=read_mapset(tods,[cache_tag 'd']);
+  r=read_mapset(tods,[cache_tag 'r']);
+
+  if isfield(b,'skymap')
+    d.skymap.mapptr=make_map_copy(b.skymap.mapptr);
+    x.skymap.mapptr=d.skymap.mapptr;
+    %make_map_copy(b.skymap.mapptr);
+    r.skymap.mapptr=d.skymap.mapptr;
+    %make_map_copy(b.skymap.mapptr);
+    %octave2skymap(d.skymap);
+    %octave2skymap(r.skymap);
+    %octave2skymap(x.skymap);
+  end
+  mdisp(['old_dAd and rMr are ' num2str([old_dAd rMr])]);
+end
+
+
+
+old_cache_tag=cache_tag;
+if old_cache_tag(end)=='/',
+  old_cache_tag=old_cache_tag(1:end-1);
+end
+
 while ((rMr>r0sqr*tol)&(iter<maxiter)),
   %tic;
+  
   if (profile)  %if profiling, make sure we all start at the same time
     mpi_barrier;  
   end
+  if (cache_iter>0)&(rem(iter,cache_iter)==0)&(just_read==false)
+    mdisp(['Caching map stuff at iteration ' num2str(iter)]);
+    ii=1+iseven(iter/cache_iter);
+    cache_tag=[cache_raw{ii} '/'];
+    if (myid==1)
+      cache_tag
+      %system(['mkdir ' cache_tag ' >& /dev/null']);
+      system(['echo 0 > ' cache_tag 'completed']);
+    end
+    mpi_barrier; %make sure the directory exists before proceeding.
+    cache_start=now;
+    if (myid==1)
+      fid=fopen([cache_tag 'rMr'],'w');
+      fwrite(fid,rMr,'double');
+      fclose(fid);
+      fid=fopen([cache_tag 'old_dAd'],'w');
+      fwrite(fid,old_dAd,'double');
+      fclose(fid);
+      system(['echo ' num2str(iter) ' > ' cache_tag 'iter']);
+    end
+    save_mapset(x,tods,[cache_tag 'x']);
+    save_mapset(d,tods,[cache_tag 'd']);
+    save_mapset(r,tods,[cache_tag 'r']);
+    mpi_barrier;
+    cache_stop=now;
+    if (myid==1)
+      system(['echo 1 > ' cache_tag 'completed']);
+      system(['rm ' old_cache_tag ' >& /dev/null']);
+      system(['ln -s ' cache_raw{ii} ' ' old_cache_tag]);
+      %disp(['ln -s ' cache_raw{ii} ' ' old_cache_tag]);
+
+      disp(['took ' num2str(86400*(cache_stop-cache_start)) ' to write cache.']);
+    end
+  end
+  just_read=false;
+
     aa=now;
     %sz1=size(d.skymap.map);
     [Ad,tod_times,node_time,mpi_time]=mapset2mapset_corrnoise_octave(tods,d,varargin{:});
+    %mdisp(['Ad^2 is ' num2str(mapsetdotmapset(Ad,Ad))]);
     cc=now;
 
     slowest_time=mpi_allreduce(node_time,'max');

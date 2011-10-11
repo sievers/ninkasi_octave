@@ -1,13 +1,14 @@
 function[value]=save_mapset(mapset,tods,dirname)
 myid=mpi_comm_rank+1;
 if (myid==1)
-  system(['mkdir ' dirname]);
+  system(['mkdir ' dirname ' >& /dev/null']);
 end
 dirname(end+1)='/';
 mpi_barrier;  %make sure everyone waits for mkdir to succees
 if (myid==1)
   if isfield(mapset,'skymap')
-      write_map(mapset.skymap.mapptr,[dirname 'skymap']);
+    octave2skymap(mapset.skymap);
+    write_map(mapset.skymap.mapptr,[dirname 'skymap']);
   end
 end
 if isfield(mapset,'cutvecs')  
