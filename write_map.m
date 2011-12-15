@@ -40,7 +40,7 @@ function[fname]=postpend_tag(fname,tag)
 if isempty(c)
   fname=[fname tag];
 else
-  if (length(c)>5)|(isdigit(c(1)))
+  if (length(c)>5)|(isdigit(c(1))),
     fname=[fname tag];
   end
 end

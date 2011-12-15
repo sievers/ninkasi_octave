@@ -1,9 +1,17 @@
 function[mapset]=tod2mapset_octave(mapset,tod,which_tod)
 
+[myptr,mytype]=get_generic_tod_pointer(tod);
 
 if isfield(mapset,'skymap')
-  tod2map(tod,mapset.skymap.mapptr);
-  mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
+  if (mytype==0)
+    tod2map(tod,mapset.skymap.mapptr);
+    mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
+  end
+  if (mytype==1)
+    map_to_vis_transpose(myptr,mapset.skymap.mapptr);
+    mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
+    
+  end
 end
 
 if isfield(mapset,'cutvecs')

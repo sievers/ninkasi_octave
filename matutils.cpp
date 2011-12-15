@@ -356,3 +356,36 @@ DEFUN_DLD (test_complex, args, nargout, "Test complex stuff.\n")
   return octave_value(mat);
 }
 
+
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (colmult, args, nargout, "Multiply columns of a matrix by a row vector.\n")
+{
+  if (args.length()<2) {
+    printf("Need at least two arguments to colmult.\n");
+    return octave_value_list();
+  }
+  Matrix mat=args(0).matrix_value();
+  dim_vector dm=mat.dims();
+  Matrix vec=args(1).matrix_value();
+  dim_vector dv=vec.dims();
+
+  int nrow=dm(0);
+  int ncol=dm(1);
+  int nelem=dv(0)*dv(1);
+  if (nelem!=nrow) {
+    printf("size mismatch in colmult: %d %d\n",nrow,nelem);
+    return octave_value_list();
+  }
+  int i,j;
+  double *matptr=mat.fortran_vec();
+  double *vecptr=vec.fortran_vec();
+  //#pragma omp parallel for shared(matptr,vecptr,nrow,ncol) private(j) default(none)
+  for (i=0;i<ncol;i++)
+    for (j=0;j<nrow;j++)
+      matptr[i*nrow+j]*=vecptr[i];
+
+  return octave_value(mat);
+  
+
+}

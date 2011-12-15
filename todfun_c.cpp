@@ -705,7 +705,7 @@ DEFUN_DLD (sum_tod_data, args, nargout, "Sum up total abs(data).  Arg is (tod)\n
 
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (allocate_tod_storage, args, nargout, "Allocate storage for a tod.  Arg is (tod)\n")
+DEFUN_DLD (allocate_tod_storage_c, args, nargout, "Allocate storage for a tod.  Arg is (tod)\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
   allocate_tod_storage(mytod);
@@ -716,7 +716,7 @@ DEFUN_DLD (allocate_tod_storage, args, nargout, "Allocate storage for a tod.  Ar
 
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (free_tod_storage, args, nargout, "Free storage for a tod.  Arg is (tod)\n")
+DEFUN_DLD (free_tod_storage_c, args, nargout, "Free storage for a tod.  Arg is (tod)\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
   if (mytod->have_data)
@@ -729,7 +729,7 @@ DEFUN_DLD (free_tod_storage, args, nargout, "Free storage for a tod.  Arg is (to
 
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (assign_tod_value, args, nargout, "Assign a value to a tod.  Args are (tod,value)\n")
+DEFUN_DLD (assign_tod_value_c, args, nargout, "Assign a value to a tod.  Args are (tod,value)\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
   NDArray vv=args(1).array_value();
@@ -2751,3 +2751,39 @@ DEFUN_DLD (allocate_tod_noise_banded_projvec,args,nargout,"Set the TOD noise mod
   return octave_value_list();
 
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (query_tod_type,args,nargout,"Query what type of TOD you have.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  return octave_value(mytod->todtype);
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (insert_dataset_into_tod,args,nargout,"Put a pointer into a TOD structure.  Args are (structure, todtype, tod)\n")
+{
+  void  *myptr=(void *)get_pointer(args(0));
+  int mytype=get_value(args(1));
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(2));
+  mytod->todtype=mytype;
+  mytod->generic=myptr;
+
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (get_generic_tod_pointer,args,nargout,"Pull the generic pointer out of a TOD structure.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+
+  int64NDArray myptr(1);
+  long myptr_asint=(long)mytod->generic;
+  myptr(0)=myptr_asint;
+
+  octave_value_list retval;
+  retval(0)=myptr;
+  retval(1)=mytod->todtype;
+
+  return retval;
+}
+

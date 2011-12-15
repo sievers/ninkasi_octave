@@ -120,6 +120,23 @@ DEFUN_DLD (set_tod_pointing_saved, args, nargout, "Read a TOD header, including 
 }
 
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (free_tod_pointing_saved, args, nargout, "Read a TOD header, including pointing info etc.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->ra_saved) {
+    free(mytod->ra_saved[0]);
+    free(mytod->ra_saved);
+    mytod->ra_saved=NULL;
+  }
+  if (mytod->dec_saved) {
+    free(mytod->dec_saved[0]);
+    free(mytod->dec_saved);
+    mytod->dec_saved=NULL;
+  }
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (free_tod_data_saved, args, nargout, "Read a TOD header, including pointing info etc.\n")
 {
@@ -128,6 +145,7 @@ DEFUN_DLD (free_tod_data_saved, args, nargout, "Read a TOD header, including poi
   if (mytod->data_saved) {
     free(mytod->data_saved[0]);
     free(mytod->data_saved);
+    mytod->data_saved=NULL;
   }
   return octave_value_list();
 
@@ -144,6 +162,25 @@ DEFUN_DLD (set_tod_data_saved, args, nargout, "Read a TOD header, including poin
 
 
   mytod->data_saved=matrix(mytod->ndet,mytod->ndata);
+
+  memcpy(mytod->data_saved[0],data.fortran_vec(),mytod->ndet*mytod->ndata*sizeof(actData));
+
+  return octave_value_list();
+
+}
+
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (update_tod_data_saved, args, nargout, "Read a TOD header, including pointing info etc.\n")
+{
+
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix data=args(1).matrix_value();
+  
+  dim_vector dm=data.dims();
+
+
+  //mytod->data_saved=matrix(mytod->ndet,mytod->ndata);
 
   memcpy(mytod->data_saved[0],data.fortran_vec(),mytod->ndet*mytod->ndata*sizeof(actData));
 

@@ -4,7 +4,7 @@ autoload('add_noise_to_tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.
 autoload('add_noise_to_tod_gaussian',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('allocate_ninkasi_skymap',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('allocate_tod_noise_bands_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
-autoload('allocate_tod_storage',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('allocate_tod_storage_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('apply_tod_noise_model_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('apply_banded_noise_model_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('set_noise_powlaw_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -16,7 +16,7 @@ autoload('pull_oneband_tod_noise_banded_projvec',fullfile(fileparts(mfilename("f
 autoload('apply_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_rotmat_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_time_constants_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
-autoload('assign_tod_value',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('assign_tod_value_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod_hits_source_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_src2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_srcvec2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -38,6 +38,7 @@ autoload('reconvolve_tod_time_constants_c',fullfile(fileparts(mfilename("fullpat
 autoload('destroy_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('detrend_data_c_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('scale_rowcol_mat',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
+autoload('colmult',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('dpotrs',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('dsyrk',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('dsyrk2',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
@@ -48,7 +49,7 @@ autoload('fft_c2r_c',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'))
 autoload('fftw_init_threaded',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'));
 autoload('filter_tod_noise_c',fullfile(fileparts(mfilename("fullpath")),'noise_fun.oct'));
 autoload('fit_tod_noise_c',fullfile(fileparts(mfilename("fullpath")),'noise_fun.oct'));
-autoload('free_tod_storage',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('free_tod_storage_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('erase_tod_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('gapfill_data_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('clear_cut_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -161,6 +162,9 @@ autoload('get_tod_coarse_ind_c',fullfile(fileparts(mfilename("fullpath")),'todfu
 autoload('get_all_detector_radec_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_pointing_offsets_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_alldata_fft_plans_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('query_tod_type',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('insert_dataset_into_tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('get_generic_tod_pointer',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 
 autoload('allocate_tod_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('alloc_tod_cuts_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));

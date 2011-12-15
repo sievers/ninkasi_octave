@@ -51,7 +51,6 @@ if isempty(b)
 end
 
 
-
 [ax,tod_times,node_times]=mapset2mapset_corrnoise_octave(tods,x,varargin{:});
 if myid==1
   if isfield(ax,'skymap')
@@ -206,49 +205,52 @@ end
 
 
 
-old_cache_tag=cache_tag;
-if old_cache_tag(end)=='/',
-  old_cache_tag=old_cache_tag(1:end-1);
+if exist('cache_tag')
+  old_cache_tag=cache_tag;
+  if old_cache_tag(end)=='/',
+    old_cache_tag=old_cache_tag(1:end-1);
+  end
 end
 
 while ((rMr>r0sqr*tol)&(iter<maxiter)),
   %tic;
-  
   if (profile)  %if profiling, make sure we all start at the same time
     mpi_barrier;  
   end
-  if (cache_iter>0)&(rem(iter,cache_iter)==0)&(just_read==false)
-    mdisp(['Caching map stuff at iteration ' num2str(iter)]);
-    ii=1+iseven(iter/cache_iter);
-    cache_tag=[cache_raw{ii} '/'];
-    if (myid==1)
-      cache_tag
-      %system(['mkdir ' cache_tag ' >& /dev/null']);
-      system(['echo 0 > ' cache_tag 'completed']);
-    end
-    mpi_barrier; %make sure the directory exists before proceeding.
-    cache_start=now;
-    if (myid==1)
-      fid=fopen([cache_tag 'rMr'],'w');
-      fwrite(fid,rMr,'double');
-      fclose(fid);
-      fid=fopen([cache_tag 'old_dAd'],'w');
-      fwrite(fid,old_dAd,'double');
-      fclose(fid);
-      system(['echo ' num2str(iter) ' > ' cache_tag 'iter']);
-    end
-    save_mapset(x,tods,[cache_tag 'x']);
-    save_mapset(d,tods,[cache_tag 'd']);
-    save_mapset(r,tods,[cache_tag 'r']);
-    mpi_barrier;
-    cache_stop=now;
-    if (myid==1)
-      system(['echo 1 > ' cache_tag 'completed']);
-      system(['rm ' old_cache_tag ' >& /dev/null']);
-      system(['ln -s ' cache_raw{ii} ' ' old_cache_tag]);
-      %disp(['ln -s ' cache_raw{ii} ' ' old_cache_tag]);
-
-      disp(['took ' num2str(86400*(cache_stop-cache_start)) ' to write cache.']);
+  if (cache_iter>0)
+    if ((rem(iter,cache_iter)==0)||(iter==3))&(just_read==false) %write early on just in case we have a crash.
+      mdisp(['Caching map stuff at iteration ' num2str(iter)]);
+      ii=1+iseven(round(iter/cache_iter));
+      cache_tag=[cache_raw{ii} '/'];
+      if (myid==1)
+        cache_tag
+        %system(['mkdir ' cache_tag ' >& /dev/null']);
+        system(['echo 0 > ' cache_tag 'completed']);
+      end
+      mpi_barrier; %make sure the directory exists before proceeding.
+      cache_start=now;
+      if (myid==1)
+        fid=fopen([cache_tag 'rMr'],'w');
+        fwrite(fid,rMr,'double');
+        fclose(fid);
+        fid=fopen([cache_tag 'old_dAd'],'w');
+        fwrite(fid,old_dAd,'double');
+        fclose(fid);
+        system(['echo ' num2str(iter) ' > ' cache_tag 'iter']);
+      end
+      save_mapset(x,tods,[cache_tag 'x']);
+      save_mapset(d,tods,[cache_tag 'd']);
+      save_mapset(r,tods,[cache_tag 'r']);
+      mpi_barrier;
+      cache_stop=now;
+      if (myid==1)
+        system(['echo 1 > ' cache_tag 'completed']);
+        system(['rm ' old_cache_tag ' >& /dev/null']);
+        %system(['ln -s ' cache_raw{ii} ' ' old_cache_tag]);
+        %disp(['ln -s ' cache_raw{ii} ' ' old_cache_tag]);
+        
+        disp(['took ' num2str(86400*(cache_stop-cache_start)) ' to write cache.']);
+      end
     end
   end
   just_read=false;
@@ -321,7 +323,6 @@ while ((rMr>r0sqr*tol)&(iter<maxiter)),
         fprintf(logid,'\n');
         fflush(logid);
       end
-      
       if (myid==1)
         %disp([iter rMr dAd beta]);
 
@@ -353,7 +354,6 @@ while ((rMr>r0sqr*tol)&(iter<maxiter)),
       old_dAd=dAd;
       
     end
-    
     
     %toc
     

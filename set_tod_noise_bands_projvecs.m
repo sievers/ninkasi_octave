@@ -15,6 +15,7 @@ if (find_modes_new)
   vecs=find_bad_modes_opts(tod,myopts);
   nvecs=size(vecs,2);
   dataft=get_data_fft_c(tod);
+  %whos vecs
 else
   nvecs=get_struct_mem(myopts,'nbadmode',10);
   dataft=get_data_fft_c(tod);
@@ -35,7 +36,7 @@ ibands(1)=1;
 
 allocate_tod_noise_banded_projvec(tod,ibands);
 
-
+%nband
 for j=nband:-1:1,
   myblock=dataft(ibands(j)+1:ibands(j+1),:);
   block_amps=myblock*vecs;

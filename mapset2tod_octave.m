@@ -4,22 +4,33 @@ function[data]=mapset2tod_octave(mapset,tod,which_tod)
 %because that contains the pointing info.
 
 
-if isfield(mapset,'skymap')
-  map2tod(mapset.skymap.mapptr,tod);
-end
 
-if isfield(mapset,'cutvecs')
-  if iscell(mapset.cutvecs),
-    cutvec2tod_c(tod,mapset.cutvecs{which_tod});
-  else
-    cutvec2tod_c(tod,mapset.cutvecs);
+[myptr,mytype]=get_generic_tod_pointer(tod);
+
+if isfield(mapset,'skymap')
+  if (mytype==0)
+    map2tod(mapset.skymap.mapptr,tod);
+  end
+  if (mytype==1)
+    map_to_vis(myptr,mapset.skymap.mapptr);
   end
 end
 
 
-if isfield(mapset,'corrnoise')
-    corrnoise=mapset.corrnoise(which_tod);
+if (mytype==0)
+  if isfield(mapset,'cutvecs')
+    if iscell(mapset.cutvecs),    
+      cutvec2tod_c(tod,mapset.cutvecs{which_tod});
+    else
+      cutvec2tod_c(tod,mapset.cutvecs);
+    end
+  end
+end
 
+if (mytype==0)
+  if isfield(mapset,'corrnoise')
+    corrnoise=mapset.corrnoise(which_tod);
+    
     if (1)
       if (0)
         for j=1:size(corrnoise.vecs,1),
@@ -34,21 +45,30 @@ if isfield(mapset,'corrnoise')
       data=data+corrnoise2tod(corrnoise);
       push_tod_data(data,tod);
     end
+  end
 end
 
-
-if isfield(mapset,'timestreams')
+if mytype==0
+  if isfield(mapset,'timestreams')
     timestreams=mapset.timestreams(which_tod);
     timestreams2tod_blas(tod,timestreams.map)
+  end
 end
 
+
+
+
 if isfield(mapset,'srccat')
-  if iscell(mapset.srccat),
-    for ss=1:numel(mapset.srccat)
-      add_srccat2tod(tod,mapset.srccat{j});
+  if (mytype==0)   
+    if iscell(mapset.srccat),
+      for ss=1:numel(mapset.srccat)
+        add_srccat2tod(tod,mapset.srccat{j});
+      end
+    else
+      add_srccat2tod(tod,mapset.srccat);
     end
   else
-    add_srccat2tod(tod,mapset.srccat);
+    warning(['sources being ignored on tod type ' num2str(mytype)])
   end
 end
 

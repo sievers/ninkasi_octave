@@ -1,4 +1,4 @@
-addpath /home/sievers/matlab
+#addpath /home/sievers/matlab
 
 more off
 crash_dumps_octave_core(false);

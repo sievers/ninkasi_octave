@@ -71,7 +71,8 @@ for j=1:length(tods),
     skip_noise=(sum_tod_data(mytod)==0);
   end
   if ~skip_noise,
-    apply_tod_noise_model_c(mytod);
+    %apply_tod_noise_model_c(mytod);
+    apply_tod_noise_model(mytod);
   end
 
 

@@ -43,6 +43,7 @@ else
 end
 %mdisp('starting tod header read');
 for j=1:ntod,
+  
   tod=read_tod_header_nopoint_c(todlist{j},decimate);
   if (fix_altaz)
     repair_tod_altaz(tod);
@@ -57,6 +58,7 @@ for j=1:ntod,
 
   %mdisp('setting pointing')
   [mylims,myrising]=set_tod_pointing_100(tod,my_poff);
+
   %mdisp('read set pointing');
   tods(j)=tod;
   isrising(j)=myrising;
