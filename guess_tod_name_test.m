@@ -37,14 +37,14 @@ if nargin<2
 
 
   %dirroot='/project/nolta/act/data/season2/merlin/';
-  dirroot=['/project/rbond/act/data/season' num2str(guess_tod_season(todname))  '/merlin/'];
+  dirroot=['/project/r/rbond/act/data/season' num2str(guess_tod_season(todname))  '/merlin/'];
   
 end
 if isempty(dirroot)
   %%dirroot='/scratch/sievers/act/data/season2/merlin/';
   %dirroot='/scratch/nolta/act/data/season2/merlin/';  %was this
   %dirroot='/project/nolta/act/data/season2/merlin/';
-  dirroot=['/project/rbond/act/data/season' num2str(guess_tod_season(todname))  '/merlin/'];
+  dirroot=['/project/r/rbond/act/data/season' num2str(guess_tod_season(todname))  '/merlin/'];
 end
 
 

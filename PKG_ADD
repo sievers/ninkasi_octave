@@ -165,6 +165,12 @@ autoload('get_alldata_fft_plans_c',fullfile(fileparts(mfilename("fullpath")),'to
 autoload('query_tod_type',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('insert_dataset_into_tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_generic_tod_pointer',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('test_legendre_fit',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('setup_cut_fit_params',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('get_cuts_statistics',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('are_cutvecs_fitparams',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('initialize_cutvecs_fitparams_precon',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('apply_cutvecs_fitparams_precon',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 
 autoload('allocate_tod_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('alloc_tod_cuts_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));

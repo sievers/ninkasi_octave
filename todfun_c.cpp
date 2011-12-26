@@ -490,6 +490,60 @@ DEFUN_DLD (cut_tod_global_c, args, nargout, "Do a global cut on a TOD.  Args are
   return octave_value_list();
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (setup_cut_fit_params, args, nargout, "Initialize storage for cuts parameterized with polynomials.\n")
+{
+  if (args.length()<2) {
+    printf("need two arguments in setup_cut_fit_params - (tod,map of gap length to # of parameters)\n");
+    return octave_value_list();
+  }
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix vec=args(1).matrix_value();
+  double *vv=vec.fortran_vec();
+  dim_vector dm=vec.dims();
+  int nelem=dm(0)*dm(1);
+  int *ivec=(int *)malloc(sizeof(int)*nelem);
+  for (int i=0;i<nelem;i++)
+    ivec[i]=vv[i];
+  mytod->cuts_fit_params=setup_cut_fit_params(mytod,ivec);
+  free(ivec);
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (are_cutvecs_fitparams, args, nargout, "See if cutvecs are fit params.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->cuts_fit_params)
+    return octave_value(true);
+  else
+    return octave_value(false);
+  
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (initialize_cutvecs_fitparams_precon, args, nargout, "Setup fitparams preconditionerss.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  setup_cutsfits_precon(mytod);
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (apply_cutvecs_fitparams_precon, args, nargout, "Setup fitparams preconditionerss.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix vec_in=args(1).matrix_value();
+  dim_vector dm=vec_in.dims();
+  //printf("have %d elements in cutvecs params.\n",dm(0)*dm(1));
+  //printf("tod has %d detectors.\n",mytod->ndet);
+  Matrix vec_out(dm);
+  actData *vv_in=vec_in.fortran_vec();
+  actData *vv_out=vec_out.fortran_vec();
+  memset(vv_out,0,sizeof(actData)*dm(0)*dm(1));
+  apply_cutfits_precon(mytod,vv_in,vv_out);
+
+  return octave_value(vec_out);
+}
+
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD (get_numel_cut_c, args, nargout, "Find out how many elements have been cut from a TOD.\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
@@ -497,11 +551,41 @@ DEFUN_DLD (get_numel_cut_c, args, nargout, "Find out how many elements have been
   return octave_value(ncut);
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_cuts_statistics, args, nargout,"Find statistics of cuts lengths in a TOD.\n")
+{
+  mbTOD *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->cuts_as_uncuts==NULL) {
+    fprintf(stderr,"cuts_as_uncut not set on in get_cuts_statistics.\n");
+    return octave_value_list();    
+  }
+  Matrix vec(mytod->ndata,1);
+  actData *vv=vec.fortran_vec();
+  memset(vv,0,mytod->ndata*sizeof(actData));
+  for (int det=0;det<mytod->ndet;det++) {
+    if (mytod->cuts_fit_params) {
+      mbCutFitParams *cut=mytod->cuts_fit_params[mytod->rows[det]][mytod->cols[det]];
+      for (int i=0;i<cut->nregions;i++) {
+	vv[cut->nparams[i]-1]++;
+      }
+    }
+    else {
+      mbUncut *cut=mytod->cuts_as_uncuts[mytod->rows[det]][mytod->cols[det]];
+      for (int i=0;i<cut->nregions;i++) {
+	int nelem=cut->indexLast[i]-cut->indexFirst[i];
+	assert(nelem>0);
+	vv[nelem-1]++;
+      }
+    }
+  }
+  return octave_value(vec);
+}
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD (tod2cutvec_c, args, nargout, "Put cut data from a TOD into a vector.\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   int ncut=get_numel_cut(mytod);
   Matrix vec(ncut,1);
+  memset(vec.fortran_vec(),0,sizeof(actData)*ncut);
 
   if (tod2cutvec(mytod,vec.fortran_vec())) {
     printf("had a problem in tod2cutvec.\n");
@@ -524,7 +608,7 @@ DEFUN_DLD (cutvec2tod_c, args, nargout, "Put cut data into a TOD.\n")
   dim_vector dm=vec.dims();
   int ncut=get_numel_cut(mytod);
   if (dm(1)*dm(0)<ncut) {
-    fprintf(stderr,"Error - not enough elements in cutvec2tod_c.  Expected at least %d, got %d\n",ncut, dm(1)*dm(2));
+    fprintf(stderr,"Error - not enough elements in cutvec2tod_c.  Expected at least %d, got %d on tod %s\n",ncut, dm(1)*dm(2),mytod->dirfile);
     return octave_value_list();
   }
   
@@ -556,6 +640,25 @@ DEFUN_DLD (get_tod_uncut_regions_c, args, nargout, "Set up the uncut regions in 
   get_tod_uncut_regions(mytod);
   return octave_value_list();
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (initialize_tod_cut_params_c, args, nargout, "Set up the legendre fit parameters for gap filling.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix mat=args(1).matrix_value();
+  actData *vec=mat.fortran_vec();
+  dim_vector dm=mat.dims();
+  if (dm(0)*dm(1)<mytod->ndata) {
+    printf("Binning vector is not long enough in initialize_tod_cut_params_c.  Make sure it's the length of a timestream.\n");
+    return octave_value_list();
+  }
+  int *ivec=(int *)malloc(sizeof(int)*mytod->ndata);
+  for (int i=0;i<mytod->ndata;i++)
+    ivec[i]=vec[i];
+  mytod->cuts_fit_params=setup_cut_fit_params(mytod,ivec);
+  free(ivec);
+  return octave_value_list();
+}
+
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (get_tod_kept_regions_c, args, nargout, "Set up the kept regions in a tod.\n")
 {
@@ -2787,3 +2890,31 @@ DEFUN_DLD (get_generic_tod_pointer,args,nargout,"Pull the generic pointer out of
   return retval;
 }
 
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (test_legendre_fit,args,nargout,"Do a Legendre polynomial fit from ninkasi.  args are (vec,order)")
+{
+  Matrix data=args(0).matrix_value();
+  dim_vector dm=data.dims();
+  int order=get_value(args(1));
+  Matrix fitp(order,1);
+  Matrix projp(order,1);
+  int ndata=dm(0)*dm(1);
+  actData *tmp=legendre_fit(data.fortran_vec(),ndata,order);
+#if 0
+  int i;
+  for (i=0;i<order;i++)
+    tmp[i]=0;
+  tmp[1]=1;
+#endif
+  memcpy(fitp.fortran_vec(),tmp,order*sizeof(actData));
+  free(tmp);
+  Matrix fitdata(dm(0),dm(1));
+  legendre_eval(fitdata.fortran_vec(),ndata,fitp.fortran_vec(),order);
+  memset(projp.fortran_vec(),0,sizeof(double)*order);
+  legendre_project(fitdata.fortran_vec(),ndata,projp.fortran_vec(),order);
+  octave_value_list retval;
+  retval(0)=octave_value(fitp);
+  retval(1)=octave_value(fitdata);
+  retval(2)=octave_value(projp);
+  return retval;
+}
