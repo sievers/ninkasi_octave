@@ -89,12 +89,15 @@ autoload('highpass_tod_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oc
 autoload('how_many_dets_are_kept',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('is_det_always_cut',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('make_map_copy',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('deres_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('upres_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('make_weightmap_ninkasi',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('map2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('map_axpy',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('map_times_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('merge_cuts_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('mpi_allreduce',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
+autoload('mpi_allgather_c',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
 autoload('mpi_barrier',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
 autoload('mpi_bcast_string',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
 autoload('multiply_all_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -143,6 +146,7 @@ autoload('write_simple_map_c',fullfile(fileparts(mfilename("fullpath")),'maputil
 autoload('write_tod_data_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('alt_az_ctime2act_ra_dec_c',fullfile(fileparts(mfilename("fullpath")),'read_tod_header_c.oct'));
 autoload('read_tod_header_nopoint_c',fullfile(fileparts(mfilename("fullpath")),'read_tod_header_c.oct'));
+autoload('read_tod_header_abs_nopoint_c',fullfile(fileparts(mfilename("fullpath")),'read_tod_header_c.oct'));
 autoload('read_dirfile_channel',fullfile(fileparts(mfilename("fullpath")),'read_tod_header_c.oct'));
 
 autoload('mpi_bcast_array',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));

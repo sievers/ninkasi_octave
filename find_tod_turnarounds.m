@@ -1,8 +1,9 @@
 function[turns]=find_tod_turnarounds(tod)
 [alt,az]=get_tod_altaz(tod);
-az_smooth=smooth_data_fft(az,30);
+az_smooth=real(smooth_data_fft(az,30));
 
 crap1=diff(az_smooth(1:end-1));crap2=diff(az_smooth(2:end));crud=crap1.*crap2;
+
 ind=1:length(crud);fwee=crud<0;
 tol=0.01;
 fwee=fwee&((az(2:end-1)>max(az)-tol)|(az(2:end-1)<min(az)+tol));

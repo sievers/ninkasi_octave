@@ -9,6 +9,7 @@ extern "C"
 #include <ninkasi_config.h>
 #include <ninkasi.h>
 #include <dirfile.h>
+#include <readtod.h>
 #include <ninkasi_projection.h>
 #ifdef USE_HEALPIX
 #include <chealpix.h>
@@ -406,7 +407,42 @@ DEFUN_DLD (set_skymap_tan_predef_c, args, nargout, "Dial in parameters for a TAN
   return octave_value_list();
   
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (deres_map,args,nargout,"Reduce the resolution of a map by a factor of 2.")
+{
+  MAP *map=(MAP *)get_pointer(args(0));
 
+
+  if (!map->projection) {
+    printf("Map doesn't have a projection.\n");
+    return octave_value_list();
+  }
+  MAP *map2=deres_map(map);
+
+  int64NDArray myptr(1);
+  myptr(0)=(long)map2;
+
+
+  return octave_value(myptr);
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (upres_map,args,nargout,"Increase the resolution of a map by a factor of 2.")
+{
+  MAP *map=(MAP *)get_pointer(args(0));
+
+
+  if (!map->projection) {
+    printf("Map doesn't have a projection.\n");
+    return octave_value_list();
+  }
+  MAP *map2=upres_map(map);
+
+  int64NDArray myptr(1);
+  myptr(0)=(long)map2;
+
+
+  return octave_value(myptr);
+}
 /*--------------------------------------------------------------------------------*/
 
 

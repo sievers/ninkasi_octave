@@ -12,6 +12,7 @@ extern "C"
 #include <ninkasi_mathutils.h>
 #include <noise.h>
 #include <dirfile.h>
+#include <readtod.h>
 #include <math.h>
 #ifdef _MKL
 #include <mkl.h>

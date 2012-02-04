@@ -33,7 +33,6 @@ nuvec=nuvec/(dt*n);
 ibands=round(bands*dt*n);
 ibands(end)=size(dataft,1);  %make sure noise bands go exactly to the end of the data
 ibands(1)=1;
-
 allocate_tod_noise_banded_projvec(tod,ibands);
 
 %nband

@@ -1,4 +1,4 @@
-function[mapset,medians,signal_mapset,data_from_map,data_org]=create_initial_mapset_opts_test(tods,mapset,mapset_in,myopts)
+function[mapset,medians,signal_mapset,data_from_map,data_org]=create_initial_mapset_opts(tods,mapset,mapset_in,myopts)
 
 
 myid=mpi_comm_rank+1;

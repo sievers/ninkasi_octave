@@ -233,3 +233,38 @@ DEFUN_DLD (mpi_bcast_array, args, nargout, "Broadcast .\n")
   }
   return octave_value_list(); //never get here;
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (mpi_allgather_c, args, nargout, "Allgather(v).  Note that this will turn everything into a column vector.\n")
+{
+  Matrix mat=args(0).matrix_value();
+  dim_vector dm=mat.dims();
+
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+  int nproc;
+  MPI_Comm_size(MPI_COMM_WORLD,&nproc);
+  int nelem=dm(0)*dm(1);
+  int *all_nelem=(int *)malloc(sizeof(int)*nproc);
+  int *displs=(int *)malloc(sizeof(int)*nproc);
+  displs[0]=0;
+  memset(all_nelem,0,sizeof(int)*nproc);
+  MPI_Allgather(&nelem,1,MPI_INT,all_nelem,1,MPI_INT,MPI_COMM_WORLD);
+  int nelem_tot=0;
+  for (int i=0;i<nproc;i++) {
+    nelem_tot+=all_nelem[i];
+    if (i>0)
+      displs[i]=displs[i-1]+all_nelem[i-1];
+  }
+
+  Matrix allmat(nelem_tot,1);
+  dim_vector dd=allmat.dims();
+  double *allptr=allmat.fortran_vec();
+  double *ptr=mat.fortran_vec();
+
+  MPI_Allgatherv(ptr,nelem,MPI_DOUBLE,allptr,all_nelem,displs,MPI_DOUBLE,MPI_COMM_WORLD);
+		 
+  free(all_nelem);
+  free(displs);
+  return octave_value(allmat);
+}
+

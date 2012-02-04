@@ -14,6 +14,7 @@ extern "C"
 #include <ninkasi_mathutils.h>
 #include <noise.h>
 #include <dirfile.h>
+#include <readtod.h>
 #include <math.h>
 #ifdef _MKL
 #include <mkl.h>
@@ -637,7 +638,16 @@ DEFUN_DLD (get_tod_cut_regions_c, args, nargout, "Set up the cut regions in a to
 DEFUN_DLD (get_tod_uncut_regions_c, args, nargout, "Set up the uncut regions in a tod.\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  int do_cached=0;
+  if (args.length()>1)
+    do_cached=(int)get_value(args(1));
+  mbUncut ***tmp=mytod->uncuts;
+  
   get_tod_uncut_regions(mytod);
+  if (do_cached) {
+    mytod->uncuts_for_interp=mytod->uncuts;
+    mytod->uncuts=tmp;
+  }
   return octave_value_list();
 }
 /*--------------------------------------------------------------------------------*/

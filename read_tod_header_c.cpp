@@ -13,6 +13,7 @@ extern "C"
 #include <ninkasi_config.h>
 #include <ninkasi.h>
 #include <dirfile.h>
+#include <readtod.h>
 #include <slalib.h>
 #ifdef __cplusplus
 }  /* end extern "C" */
@@ -124,6 +125,36 @@ DEFUN_DLD (read_tod_header_nopoint_c, args, nargout, "Read a TOD header, but w/o
     decimate=get_value(args(1));
   }
   mbTOD *mytod=read_dirfile_tod_header_decimate(myfroot,decimate);
+  mprintf(stdout,"file %s had %d detectors and %d data elements, rows and cols are %d %d.  dt=%12.4e\n",myfroot,mytod->ndet,mytod->ndata,mytod->nrow, mytod->ncol,mytod->deltat);
+  mytod->pointingOffset=NULL;
+  
+  mprintf(stdout,"allocating cuts.\n");
+  mytod->cuts=mbCutsAlloc(mytod->nrow,mytod->ncol);
+
+  int64NDArray myptr(1);
+  long mytod_asint=(long)mytod;
+  myptr(0)=mytod_asint;
+
+
+  octave_value_list retval;
+  retval(0)=myptr;
+  
+  return retval;
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (read_tod_header_abs_nopoint_c, args, nargout, "Read a TOD header, but w/out pointing.\n")
+{
+  int nargin = args.length();
+  if (nargin==0)
+    return octave_value_list();
+
+  char *myfroot=get_char_from_arg(args(0).char_matrix_value());
+  int decimate=0;
+  if (nargin>1) {
+    decimate=get_value(args(1));
+  }
+  mbTOD *mytod=read_dirfile_tod_header_abs(myfroot);
   mprintf(stdout,"file %s had %d detectors and %d data elements, rows and cols are %d %d.  dt=%12.4e\n",myfroot,mytod->ndet,mytod->ndata,mytod->nrow, mytod->ncol,mytod->deltat);
   mytod->pointingOffset=NULL;
   

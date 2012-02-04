@@ -1,13 +1,38 @@
 function[new_mapset,tod_times,node_time,mpi_time]=mapset2mapset_corrnoise_octave(tods,mapset,varargin)
 
-do_noise=get_keyval_default('do_noise',false,varargin{:});
-window_symmetric=get_keyval_default('window_symmetric',false,varargin{:});
-skip_window=get_keyval_default('skip_window',false,varargin{:});  %don't window at all (e.g. if there's no noise)
-barriers=get_keyval_default('do_barriers',false,varargin{:});
-skip_mpi=get_keyval_default('skip_mpi',false,varargin{:});  %for some things, we can do reduces later, particularly useful when doing source fits.
-check_empty=get_keyval_default('check_empty',false,varargin{:});  %in some cases, it may be worth seeing if the TOD is empty before applying noise
+if (1)
+  if numel(varargin)>1,
+    clear myopts;
+    for j=1:2:numel(varargin)
+      eval(['myopts.' varargin{j} ' = varargin{j+1};']);
+    end
+  else
+    myopts=varargin{1};
+  end
+
+  do_noise=get_struct_mem(myopts,'do_noise',false);
+  window_symmetric=get_struct_mem(myopts,'window_symmetric',false);
+  skip_window=get_struct_mem(myopts,'skip_window',false);
+  barriers=get_struct_mem(myopts,'do_barriers',false);
+  skip_mpi=get_struct_mem(myopts,'skip_mpi',false);
+  check_empty=get_struct_mem(myopts,'check_empty',false);
+  new_mapptr=get_struct_mem(myopts,'new_mapptr',[]);
+else
+  
+  do_noise=get_keyval_default('do_noise',false,varargin{:});
+  window_symmetric=get_keyval_default('window_symmetric',false,varargin{:});
+  skip_window=get_keyval_default('skip_window',false,varargin{:});  %don't window at all (e.g. if there's no noise)
+  barriers=get_keyval_default('do_barriers',false,varargin{:});
+  skip_mpi=get_keyval_default('skip_mpi',false,varargin{:});  %for some things, we can do reduces later, particularly useful when doing source fits.
+  check_empty=get_keyval_default('check_empty',false,varargin{:});  %in some cases, it may be worth seeing if the TOD is empty before applying noise
+end
 
 new_mapset=clear_mapset(mapset,'true');
+if ~isempty(new_mapptr)
+  new_mapset.skymap.mapptr=make_map_copy(new_mapptr);
+  clear_map(new_mapset.skymap.mapptr);
+  new_mapset.skymap.map=skymap2octave(new_mapset.skymap.mapptr);
+end
 
 if isfield(mapset,'skymap')
   octave2skymap(mapset.skymap);
@@ -131,8 +156,12 @@ if isfield(mapset,'skymap')
     end
   end
   mpi_time=86400*(now-aa);
-  destroy_map(new_mapset.skymap.mapptr);
-  new_mapset.skymap.mapptr=mapset.skymap.mapptr;
+
+  %if we are projecting into a new map pointer, don't free stuff
+  if isempty(new_mapptr)
+    destroy_map(new_mapset.skymap.mapptr);
+    new_mapset.skymap.mapptr=mapset.skymap.mapptr;
+  end
 end
 
 if isfield(mapset,'srccat')

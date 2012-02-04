@@ -5,15 +5,39 @@ function[x]=run_pcg_corrnoise_precon_octave(tods,x,b,precon,fun,priorfun,varargi
 myid=mpi_comm_rank+1;
 nproc=mpi_comm_size;
 
-maxiter=get_keyval_default('maxiter',50,varargin{:});
-tol=get_keyval_default('tol',1e-8,varargin{:});
-save_interval=get_keyval_default('save_interval',1e-8,varargin{:});
-save_tag=get_keyval_default('save_tag','map_',varargin{:});
-dad_thresh=get_keyval_default('dad_thresh',1e3,varargin{:});
-write_times=get_keyval_default('write_times',false,varargin{:});
-profile=get_keyval_default('profile',false,varargin{:});
-cache_iter=get_keyval_default('cache_iter',0,varargin{:});
-restart=get_keyval_default('restart',false,varargin{:});
+if (1)
+  if numel(varargin)>1,
+    clear myopts;
+    for j=1:2:numel(varargin)
+      eval(['myopts.' varargin{j} ' = varargin{j+1};']);
+    end
+  else
+    myopts=varargin{1};
+  end
+
+  maxiter=get_struct_mem(myopts,'maxiter',50);
+  tol=get_struct_mem(myopts,'tol',1e-8);
+  save_interval=get_struct_mem(myopts,'save_interval',1e-8);
+  save_tag=get_struct_mem(myopts,'save_tag','map_');
+  dad_thresh=get_struct_mem(myopts,'dad_thresh',1e3);
+  write_times=get_struct_mem(myopts,'write_times',false);
+  profile=get_struct_mem(myopts,'profile',false);
+  cache_iter=get_struct_mem(myopts,'cache_iter',0);
+  restart=get_struct_mem(myopts,'restart',false);
+  
+else
+  maxiter=get_keyval_default('maxiter',50,varargin{:});
+  tol=get_keyval_default('tol',1e-8,varargin{:});
+  save_interval=get_keyval_default('save_interval',1e-8,varargin{:});
+  save_tag=get_keyval_default('save_tag','map_',varargin{:});
+  dad_thresh=get_keyval_default('dad_thresh',1e3,varargin{:});
+  write_times=get_keyval_default('write_times',false,varargin{:});
+  profile=get_keyval_default('profile',false,varargin{:});
+  cache_iter=get_keyval_default('cache_iter',0,varargin{:});
+  restart=get_keyval_default('restart',false,varargin{:});
+end
+
+
 
 if (myid==1)
   disp(['length of varargin is ' num2str(length(varargin))]);
@@ -134,7 +158,7 @@ if (cache_iter>0)
   cache_tails={'tic','toc'};
   cache_tag=[save_tag '.cache'];
   cache_raw={[cache_tag '.' cache_tails{1}],[cache_tag '.' cache_tails{2}]};
-
+  
   aa=find(cache_raw{1}=='/');
   fwee=cache_raw{1};
   cache_link={fwee(aa(end)+1:end)};
@@ -143,8 +167,8 @@ if (cache_iter>0)
   cache_link(end+1)={fwee(aa(end)+1:end)};
 
   if (myid==1)
-    cache_raw
-    cache_link
+    cache_raw;
+    cache_link;
     system(['mkdir ' cache_raw{1}]);
     system(['mkdir ' cache_raw{2}]);
   end

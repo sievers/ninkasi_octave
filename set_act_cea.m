@@ -36,13 +36,30 @@ if strcmp(ar,'allequ')  %Hasselfield's preferred header for all equatorial maps
   return
 end
 
+if strcmp(ar,'allequ_round')  %Hasselfield's preferred header for all equatorial maps
+  %set_skymap_cea_predef_c(map,-0.0083336141, 0.0083336141,8558.0,265.0,0.99993261,28672,644);
+  set_skymap_cea_predef_c(map,-0.00825, 0.00825,7968.0,288.0,1.0,38304,640);
+  return
+end
+
 
 if strcmp(ar,'allsouth')  %Hasselfield's preferred header for all equatorial maps
   set_skymap_cea_predef_c(map,-0.0138696776687, 0.0138696776687,10582,9833,0.35381412,18787,1177);
   return
 end
+
+if strcmp(ar,'allsouth_round')  %Hasselfield's preferred header for all equatorial maps
+  set_skymap_cea_predef_c(map,-0.0138696776687, 0.0138696776687,10592,9824,0.35381412,18784+32,1184);
+  return
+end
+
 if strcmp(ar,'newsouth')  %patching up the header since some data maps out of bounds
   set_skymap_cea_predef_c(map,-0.0138696776687, 0.0138696776687,10582,9893+40,0.35381412,18787,1177+60+80+120);
+  return
+end
+
+if strcmp(ar,'newsouth_round')  %let the above header be multiple of 32 pixels
+  set_skymap_cea_predef_c(map,-0.0138696776687, 0.0138696776687,10582,9893+40,0.35381412,18816,1440);
   return
 end
 
