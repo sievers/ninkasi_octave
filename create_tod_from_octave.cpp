@@ -9,7 +9,7 @@ using namespace std;
 extern "C"
 {
 #endif
-
+  
 #include <ninkasi_config.h>
 #include <ninkasi.h>
 #include <dirfile.h>

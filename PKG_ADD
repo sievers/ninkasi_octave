@@ -190,3 +190,9 @@ autoload('set_tod_radec_lims_c',fullfile(fileparts(mfilename("fullpath")),'creat
 autoload('cuts_extend_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 
 autoload('convert_fits_bintable',fullfile(fileparts(mfilename("fullpath")),'fits_utils.oct'));
+
+
+autoload('ACTpolArray_init',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('ACTpolPointingEvaluate',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('FindTodPixLimits',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('tod2map_actpol',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
