@@ -46,7 +46,7 @@ void *get_pointer(octave_value val)
 
  /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD ( ACTpolArray_init, args, nargout, "Initialize and ACTpol pointing array.  Args are (x,y,angle,[freq])\n")
+DEFUN_DLD ( ACTpolArray_init, args, nargout, "Initialize an ACTpol pointing array.  Args are (x,y,angle,[freq])\n")
 {
   
   ColumnVector x=args(0).column_vector_value();
@@ -204,3 +204,69 @@ DEFUN_DLD (tod2map_actpol, args, nargout, "Project a tod into a map with actpole
 
   return octave_value_list();
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol pointing.  Args are tod,dx,dy,(angle),freq,dpiv\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+
+  ColumnVector x=args(1).column_vector_value();
+  actData *dx=x.fortran_vec();
+  ColumnVector y=args(2).column_vector_value();
+  actData *dy=y.fortran_vec();
+  ColumnVector a=args(3).column_vector_value();
+  actData *angle;
+  if (a.length()==tod->ndet)
+    angle=a.fortran_vec();
+  else
+    angle=NULL;
+  actData freq=get_value(args(4));
+  int dpiv=(int)get_value(args(5));
+  initialize_actpol_pointing(tod,dx,dy,angle,freq,dpiv);
+  return octave_value_list();
+
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(precalc_actpol_pointing,args,nargout,"Precalculated stuff for an actpol pointing fit.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  precalc_actpol_pointing(tod);
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(precalc_actpol_pointing_free,args,nargout,"Free precalculated stuff from an actpol pointing fit.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  precalc_actpol_pointing_free(tod);
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (get_detector_radec_actpol_c, args, nargout, "Get RA/Dec of a detector.\n")
+{
+  int nargin = args.length();
+  if (nargin<2) {
+    printf("Only have %d arguments in get_detector_radec_c\n",nargin);
+    return octave_value_list();
+  }
+
+  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  int det=(int)get_value(args(1));
+  PointingFitScratch *scratch=allocate_pointing_fit_scratch(tod);
+  
+  get_radec_one_det_actpol(tod,det,scratch);
+  
+  
+  Matrix radec(tod->ndata,2);
+  double *dat=radec.fortran_vec();
+  for (int i=0;i<tod->ndata;i++) {
+    dat[i]=scratch->ra[i];
+    dat[i+tod->ndata]=scratch->dec[i];
+  }
+  destroy_pointing_fit_scratch(scratch);
+
+  return octave_value(radec);
+
+}
+/*--------------------------------------------------------------------------------*/

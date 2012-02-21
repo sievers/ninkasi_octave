@@ -2792,13 +2792,13 @@ DEFUN_DLD (save_tod_noise_banded_projvec,args,nargout,"Save the banded_projvec n
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (read_tod_noise_banded_projvec,args,nargout,"Read the banded_projvec noise into a TOD.  Args are (tod,filename).\n")
 {
-  fprintf(stderr,"hello!\n");
+  //fprintf(stderr,"hello!\n");
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
-  fprintf(stderr,"god tod pointer.\n");
+  //fprintf(stderr,"god tod pointer.\n");
   char *fname=get_char_from_arg(args(1).char_matrix_value());
-  fprintf(stderr,"fname is %s\n",fname);
+  //fprintf(stderr,"fname is %s\n",fname);
   FILE *infile=fopen(fname,"r");
-  fprintf(stderr,"opened infile.\n");
+  //fprintf(stderr,"opened infile.\n");
   if (!infile) {
     fprintf(stderr,"Could not find file %s for reading in read_tod_noise_banded_projvec\n",fname);
     return octave_value_list();

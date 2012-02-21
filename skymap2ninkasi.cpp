@@ -58,7 +58,8 @@ DEFUN_DLD (allocate_ninkasi_skymap, args, nargout, "Make a ninkasi skymap, retur
 
   mprintf(stdout,"pixsize is %10.4f, lims are %12.5f %12.5f %12.5f %12.5f\n",pixsize,ramin,ramax,decmin,decmax);
 
-  MAP *map=(MAP *)malloc(sizeof(MAP));
+  //  MAP *map=(MAP *)malloc(sizeof(MAP));
+  MAP *map=(MAP *)calloc(sizeof(MAP),1);
   map->have_locks=false;
   map->pixsize=pixsize;
   map->ramin=ramin;
