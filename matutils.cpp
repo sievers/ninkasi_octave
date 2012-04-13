@@ -1,12 +1,13 @@
 #include <octave/oct.h>
 #include <iostream>
 #include <stdio.h>
-
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
 #include <omp.h>
   void dsyrk_(char *uplo, char *trans, int *n, int *k, double *alpha, double *a, int *lda, double *beta, double *c, int *ldc, int uplolen, int translen);
   void dpotrs_(char *uplo, int *n, int *nrhs, double *a, int *lda, double *b, int *ldb, int *info, int uplolen);
@@ -388,4 +389,10 @@ DEFUN_DLD (colmult, args, nargout, "Multiply columns of a matrix by a row vector
   return octave_value(mat);
   
 
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(unix_ctime,args,nargout,"Return the curent ctime.\n")
+{
+  time_t tt=time(NULL);
+  return octave_value(tt);
 }

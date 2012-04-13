@@ -245,13 +245,24 @@ DEFUN_DLD (set_tod_radec_lims_c, args, nargout, "Return the tod pointing limits.
 {
 
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
-
+  if (args.length()>4) {
+    double ramin=get_value(args(1));
+    double ramax=get_value(args(2));
+    double decmin=get_value(args(3));
+    double decmax=get_value(args(4));
+    mytod->ramin=ramin;
+    mytod->ramax=ramax;
+    mytod->decmin=decmin;
+    mytod->decmax=decmax;
+    return octave_value_list();
+  }
 
   double ramin,ramax,decmin,decmax;
-
+  //printf("getting ready to allocate.\n");
 #pragma omp parallel shared(mytod,ramin,ramax,decmin,decmax)  default(none) 
   {
     PointingFitScratch *scratch=allocate_pointing_fit_scratch(mytod);
+    //printf("allocated.\n");
     ramin=1000;
     ramax=-1000;
     decmin=1000;
@@ -260,7 +271,8 @@ DEFUN_DLD (set_tod_radec_lims_c, args, nargout, "Return the tod pointing limits.
     double myramax=ramax;
     double mydecmin=decmin;
     double mydecmax=decmax;
-    
+    //printf("checking ndet.\n");
+    //printf("it is %d\n",mytod->ndet);
 #pragma omp for
     for (int det=0;det<mytod->ndet;det++) {      
       get_radec_from_altaz_fit_1det_coarse(mytod,det,scratch);
@@ -273,7 +285,6 @@ DEFUN_DLD (set_tod_radec_lims_c, args, nargout, "Return the tod pointing limits.
 	  myramax=scratch->ra[i];
 	if (scratch->dec[i]>mydecmax)
 	  mydecmax=scratch->dec[i];	
-	
       }
     }
     destroy_pointing_fit_scratch(scratch);

@@ -243,7 +243,7 @@ DEFUN_DLD(precalc_actpol_pointing_free,args,nargout,"Free precalculated stuff fr
 
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (get_detector_radec_actpol_c, args, nargout, "Get RA/Dec of a detector.\n")
+DEFUN_DLD(get_detector_radec_actpol_c, args, nargout, "Get RA/Dec of a detector.\n")
 {
   int nargin = args.length();
   if (nargin<2) {
@@ -267,6 +267,101 @@ DEFUN_DLD (get_detector_radec_actpol_c, args, nargout, "Get RA/Dec of a detector
   destroy_pointing_fit_scratch(scratch);
 
   return octave_value(radec);
+
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_radec_from_altaz_actpol_c,args,nargout,"Convert az, el, and ctime to ra/dec and sin/cos(2gamma).\n")
+{
+  int nargin = args.length();
+  if (nargin<3) {
+    printf("Only have %d arguments in get_radec_from_altaz_actpol_c, need at least 3.\n",nargin);
+    return octave_value_list();
+  }
+  Matrix azmat=args(0).matrix_value();
+  Matrix elmat=args(1).matrix_value();
+  Matrix tmat=args(2).matrix_value();
+  double dx=0;
+  if (nargin>3)
+    dx=get_value(args(3));
+  double dy=0;
+  if (nargin>4)
+    dy=get_value(args(4));
+
+  double theta=0;
+  if (nargin>5)
+    theta=get_value(args(5));
+
+
+  double *az=azmat.fortran_vec();
+  double *el=elmat.fortran_vec();
+  double *tvec=tmat.fortran_vec();
+  dim_vector dm=azmat.dims();
+  int nelem=dm(0)*dm(1);
+  double azmin=az[0];
+  double azmax=az[0];
+  
+  Matrix ramat(dm);
+  Matrix decmat(dm);
+  Matrix sin2gammamat(dm);
+  Matrix cos2gammamat(dm);
+  double *ra=ramat.fortran_vec();
+  double *dec=decmat.fortran_vec();
+  double *sin2gamma=sin2gammamat.fortran_vec();
+  double *cos2gamma=cos2gammamat.fortran_vec();
+  
+
+  for (int i=0;i<nelem;i++) {
+    if (az[i]<azmin)
+      azmin=az[i];
+    if (az[i]>azmax)
+      azmax=az[i];
+  }
+  double az_cent=(azmin+azmax)/2;
+  double az_throw=(azmin-azmax)/2;
+
+
+  ACTpolPointingFit *fit=(ACTpolPointingFit *)calloc(1,sizeof(ACTpolPointingFit));
+  assert(fit);
+  int nhorns=1;
+  ACTpolArray *array = ACTpolArray_alloc(nhorns);
+  assert(array);
+
+  double xcent=0.0;
+  double ycent=0.0;
+  double freq=148.0;
+  ACTpolArray_init(array, freq, xcent,ycent);
+  
+  ACTpolFeedhorn_init(array->horn,dx,dy,theta);
+  ACTpolWeather weather;
+  ACTpolWeather_default(&weather);
+
+
+  ACTpolArrayCoords *coords = ACTpolArrayCoords_alloc(array);
+  ACTpolArrayCoords_init(coords);
+
+  ACTpolState *state = ACTpolState_alloc();
+  ACTpolState_init(state);
+
+  
+  ACTpolScan scan;
+  ACTpolScan_init(&scan, el[0], az_cent,az_throw);
+  ACTpolArrayCoords_update_refraction(coords, &scan, &weather);
+  for (int i = 0; i < nelem; i++)
+    {
+      ACTpolState_update(state, tvec[i],el[i],az[i]);
+      ACTpolArrayCoords_update(coords, state);
+      ACTpolFeedhornCoords *fc = coords->horn;
+      ra[i]=fc->ra;
+      dec[i]=fc->dec;
+      sin2gamma[i]=fc->sin2gamma;
+      cos2gamma[i]=fc->cos2gamma;
+    }
+  octave_value_list retval;
+  retval(0)=ramat;
+  retval(1)=decmat;
+  retval(2)=sin2gammamat;
+  retval(3)=cos2gammamat;
+  return retval;
 
 }
 /*--------------------------------------------------------------------------------*/

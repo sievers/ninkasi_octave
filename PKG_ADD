@@ -42,8 +42,11 @@ autoload('colmult',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('dpotrs',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('dsyrk',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('dsyrk2',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
+autoload('unix_ctime',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
+
 autoload('fft_omp',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'));
 autoload('fft_r2c',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'));
+autoload('fft_r2c_many',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'));
 autoload('fft_omp_r2c_many',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'));
 autoload('fft_c2r_c',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'));
 autoload('fftw_init_threaded',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'));
@@ -200,4 +203,5 @@ autoload('initialize_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),
 autoload('precalc_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('precalc_actpol_pointing_free',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_detector_radec_actpol_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('get_radec_from_altaz_actpol_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 

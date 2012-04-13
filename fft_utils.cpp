@@ -115,6 +115,7 @@ octave_value fft_omp_r2c_tight(Matrix mat)
   return octave_value(matft);
 
 }
+/*--------------------------------------------------------------------------------*/
 
 /*--------------------------------------------------------------------------------*/
 
@@ -159,6 +160,35 @@ DEFUN_DLD (fft_c2r_c, args, nargout, "Take fft along columns w/ openmp.\n")
 }
 
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (fft_r2c_many, args, nargout, "Take fft along columns w/ openmp.\n") 
+{
+  Matrix mat=args(0).matrix_value();
+  dim_vector dm=mat.dims();
+  dim_vector dm2=dm;
+  int nn=(dm(0)/2)+1;
+  dm2(0)=nn;
+  ComplexMatrix matft(dm2);
+
+  double *vec=mat.fortran_vec();
+  fftw_complex *cvec=(fftw_complex *)matft.fortran_vec();
+  
+
+  int ntrans=dm(1);
+  int len=dm(0);
+  
+  int *n=(int *)malloc(sizeof(int)*ntrans);
+  for (int i=0;i<ntrans;i++)
+    n[i]=len;
+  fftw_plan plan=fftw_plan_many_dft_r2c(1,n,ntrans,vec,NULL,1,len,cvec,NULL,1,nn,FFTW_MEASURE);
+  double t1=omp_get_wtime();
+  fftw_execute(plan);
+  double t2=omp_get_wtime();
+  printf("Took %8.5f seconds to execute plan.\n",t2-t1);
+  fftw_destroy_plan(plan);
+  free(n);
+  return octave_value(matft);
+
+}
 /*--------------------------------------------------------------------------------*/
 
 octave_value fft_omp_c2r_tight(ComplexMatrix matft,int iseven)
@@ -222,7 +252,11 @@ octave_value fft_omp_c2c(ComplexMatrix mat)
 DEFUN_DLD (fftw_init_threaded, args, nargout, "Initialize FFTW with threads.\n")
 {
   fftw_init_threads();
-  fftw_plan_with_nthreads(8);
+  int nthread;
+#pragma omp parallel
+#pragma omp single
+  nthread=omp_get_num_threads();
+  fftw_plan_with_nthreads(nthread);
   
   return octave_value_list();
 

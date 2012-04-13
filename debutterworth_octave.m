@@ -1,4 +1,4 @@
-function[value]=debutterworth_octave(tod,debutter)
+function[value]=debutterworth_octave(tod,debutter,varargin)
 if ~exist('debutter')
   debutter=true;
 end
@@ -7,7 +7,7 @@ end
 dat=get_tod_data(tod);
 n=size(dat,1);
 dt=get_tod_dt(tod);
-filt=butterworth_filter(n,dt);
+filt=butterworth_filter(n,dt,varargin{:});
 dat=fft_r2c_octave(dat);
 
 filt=filt(1:size(dat,1));

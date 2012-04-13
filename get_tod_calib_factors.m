@@ -1,9 +1,10 @@
 function[cal_facs,my_rr,my_ff]=get_tod_calib_factors(tod,varargin)
   fname=get_tod_name(tod); if fname(end)=='/', fname=fname(1:end-1);end;
 %flatfield_dir=get_keyval_default('flatfield_dir','/cita/d/raid-sievers/sievers/act/shared/flatFields/2008v0/',varargin{:});
-flatfield_dir=get_keyval_default('flatfield_dir','/home/sievers/act/shared/flatFields/2008v0/',varargin{:});
+flatfield_dir=get_keyval_default('flatfield_dir','/home/r/rbond/sievers/act/shared/flatFields/2008v0/',varargin{:});
 %response_dir=get_keyval_default('response_dir','/mnt/raid-cita/sievers/act/responsivities/2008/',varargin{:});
-response_dir=get_keyval_default('response_dir','/home/sievers/act/responsivities/2008/',varargin{:});
+%response_dir=get_keyval_default('response_dir','/home/r/rbond/sievers/act/responsivities/2008/',varargin{:});
+response_dir=get_keyval_default('response_dir','/project/r/rbond/sievers/act/responsivities/2008/',varargin{:});
 
 mdisp(['getting flatfields from ' flatfield_dir]);
 mdisp(['getting responsivities from ' response_dir]);

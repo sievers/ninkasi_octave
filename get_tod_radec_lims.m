@@ -1,4 +1,4 @@
-function[lims]=get_tod_radec_lims(tods)
+function[lims,ll]=get_tod_radec_lims(tods)
 for j=length(tods):-1:1,
   ll(j,:)=get_tod_radec_lims_c(tods(j));
 end

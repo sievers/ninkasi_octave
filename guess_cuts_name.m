@@ -4,7 +4,7 @@ if nargin<2
   %dirroot='/mnt/raid-cita/sievers/act/cuts/season2_cuts2/';
   %dirroot='/cita/d/raid-sievers3/sievers/act/cuts/season2_cuts2/';
   %dirroot='/home/sievers/act/cuts/season2_cuts2/';
-  dirroot='/home/sievers/act/cuts/season2_cuts3/';
+  dirroot='/home/r/rbond/sievers/act/cuts/season2_cuts3/';
   %dirroot='/home/sievers/act/cuts/season2_cuts/';
 end
 

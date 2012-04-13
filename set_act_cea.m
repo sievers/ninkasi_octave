@@ -63,6 +63,13 @@ if strcmp(ar,'newsouth_round')  %let the above header be multiple of 32 pixels
   return
 end
 
+if strcmp(ar,'ar1_dunner_as_das')
+  set_skymap_cea_predef_c(map,-0.0140108961842663, 0.0140108961842663,10478.0,9734.0,0.353814121044493,18600,1170);
+  return
+end
+
+
+
 if strcmp(ar,'newsouth_fine')  %patching up the header since some data maps out of bounds
   fac=1.5;
   set_skymap_cea_predef_c(map,-0.0138696776687/fac, 0.0138696776687/fac,10582*fac,(9893+40)*fac,0.35381412,18787*fac,(1177+60+80+120)*fac);

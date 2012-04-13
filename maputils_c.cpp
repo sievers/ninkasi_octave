@@ -464,6 +464,8 @@ DEFUN_DLD (get_skymap_cea_params_c, args, nargout, "Return current cea params fr
   retval(2)=map->projection->radelt;
   retval(3)=map->projection->decdelt;
   retval(4)=map->projection->pv;
+  retval(5)=map->nx;
+  retval(6)=map->ny;
   return retval;
   
 }
