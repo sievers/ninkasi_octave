@@ -256,6 +256,7 @@ DEFUN_DLD (fftw_init_threaded, args, nargout, "Initialize FFTW with threads.\n")
 #pragma omp parallel
 #pragma omp single
   nthread=omp_get_num_threads();
+  printf("planning with %d thread.\n",nthread);
   fftw_plan_with_nthreads(nthread);
   
   return octave_value_list();

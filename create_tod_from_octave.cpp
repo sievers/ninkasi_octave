@@ -75,11 +75,12 @@ DEFUN_DLD (set_tod_timevec_c, args, nargout, "Store a full time vector, useful f
   Matrix tvec=args(1).matrix_value();
   if (mytod->dt)
     free(mytod->dt);
-  mytod->dt=(float *)malloc(sizeof(float)*mytod->ndata);
+  mytod->dt=(double *)malloc(sizeof(double)*mytod->ndata);
   double *tt=tvec.fortran_vec();
   for (int i=0;i<mytod->ndata;i++)
     mytod->dt[i]=tt[i];
-  
+  printf("first time sample is %16.7e %16.7e %d\n",mytod->dt[0],tt[0],mytod->ndata);
+
   return octave_value_list();
 }
 
@@ -118,7 +119,21 @@ DEFUN_DLD (set_tod_pointing_saved, args, nargout, "Read a TOD header, including 
   return octave_value_list();
 
 }
-
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (set_tod_pointing_saved_branch,args,nargout,"Set the branch cut on a TOD pointing.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (!mytod->ra_saved) {
+    printf("Do not have ra saved in set_tod_pointing_saved_branch.\n");
+    return octave_value_list();
+  }
+  double val=get_value(args(1));
+  for (int i=0;i<mytod->ndet;i++)
+    for (int j=0;j<mytod->ndata;j++)
+      if (mytod->ra_saved[i][j]<val)
+	mytod->ra_saved[i][j]+=2*3.14592653589793;
+  return octave_value_list();
+}
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (free_tod_pointing_saved, args, nargout, "Read a TOD header, including pointing info etc.\n")
 {
