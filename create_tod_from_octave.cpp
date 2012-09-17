@@ -148,6 +148,15 @@ DEFUN_DLD (free_tod_pointing_saved, args, nargout, "Read a TOD header, including
     free(mytod->dec_saved);
     mytod->dec_saved=NULL;
   }
+
+#ifdef ACTPOL
+  if (mytod->twogamma_saved) {
+    free(mytod->twogamma_saved[0]);
+    free(mytod->twogamma_saved);
+    mytod->twogamma_saved=NULL;
+  }  
+#endif
+
   return octave_value_list();
 }
 

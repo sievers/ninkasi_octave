@@ -253,9 +253,14 @@ DEFUN_DLD (fftw_init_threaded, args, nargout, "Initialize FFTW with threads.\n")
 {
   fftw_init_threads();
   int nthread;
+  if (args.length()>0)
+    nthread=(int)get_value(args(0));
+  else {
 #pragma omp parallel
 #pragma omp single
-  nthread=omp_get_num_threads();
+    nthread=omp_get_num_threads();
+  }
+  
   printf("planning with %d thread.\n",nthread);
   fftw_plan_with_nthreads(nthread);
   

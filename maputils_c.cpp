@@ -516,3 +516,12 @@ DEFUN_DLD (get_skymap_tan_params_c, args, nargout, "Return current tan params fr
   
 }
 
+/*--------------------------------------------------------------------------------*/
+#ifdef ACTPOL
+DEFUN_DLD (get_map_npol,args,nargout,"Return # of polarizations in current skymap.\n")
+{
+  MAP *map=(MAP *)get_pointer(args(0));
+  return octave_value(get_npol_in_map(map));
+}
+
+#endif

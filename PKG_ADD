@@ -26,6 +26,9 @@ autoload('assign_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'tod
 autoload('pull_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('check_data_fft_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('clear_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('get_map_npol',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+
+
 autoload('copy_string',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
 autoload('createFFTWplans_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('cut_detector_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -203,6 +206,7 @@ autoload('FindTodPixLimits',fullfile(fileparts(mfilename("fullpath")),'actpol.oc
 autoload('tod2map_actpol',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('initialize_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('precalc_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('precalc_actpol_pointing_exact',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('precalc_actpol_pointing_free',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_detector_radec_actpol_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_radec_from_altaz_actpol_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));

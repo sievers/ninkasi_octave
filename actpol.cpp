@@ -9,7 +9,8 @@ using namespace std;
 extern "C"
 {
 #endif
-  
+
+#define ACTPOL  
 #include <ninkasi_config.h>
 #include <ninkasi.h>
 #include <dirfile.h>
@@ -225,6 +226,14 @@ DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol 
   return octave_value_list();
 
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(precalc_actpol_pointing_exact,args,nargout,"Precalculated stuff for an actpol pointing fit.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  precalc_actpol_pointing_exact(tod);
+  return octave_value_list();
+}
+
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD(precalc_actpol_pointing,args,nargout,"Precalculated stuff for an actpol pointing fit.\n")
 {

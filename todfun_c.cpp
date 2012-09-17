@@ -2353,6 +2353,32 @@ DEFUN_DLD (set_tod_pointing_tiled_c, args, nargout, "Set pointing to a tiled fit
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (get_all_detector_radec_c, args, nargout, "Get RA/Dec of a detector.\n")
 {
+  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  Matrix ra_mat(tod->ndata,tod->ndet);
+  Matrix dec_mat(tod->ndata,tod->ndet);
+  
+  
+  //printf("tod->ra_saved is %ld, tod->dec_saved is %ld\n",(long)tod.ra_saved-(long)tod,(long)tod.dec_saved-(long)tod);
+  //printf("tod->ra_saved is %ld, tod->dec_saved is %ld\n",(long)(&(tod->ra_saved))-(long)tod,(long)(&(tod->dec_saved))-(long)tod);
+
+  if ((tod->ra_saved!=NULL)&&(tod->dec_saved!=NULL)) {
+    printf("returning saved pointing.\n");
+    //printf("ndata and ndet are %d %d\n",tod->ndata,tod->ndet);
+    actData *ra_ptr=ra_mat.fortran_vec();
+    actData *dec_ptr=dec_mat.fortran_vec();
+    memcpy(ra_ptr,tod->ra_saved[0],tod->ndata*tod->ndet*sizeof(actData));
+    memcpy(dec_ptr,tod->dec_saved[0],tod->ndata*tod->ndet*sizeof(actData));
+  
+    octave_value_list retval;
+    retval(0)=octave_value(ra_mat);
+    retval(1)=octave_value(dec_mat);
+    
+    return retval;
+
+  }
+  
+
+
   int nargin = args.length();
   if (nargin<2) {
     printf("Only have %d arguments in get_detector_radec_c\n",nargin);
@@ -2361,12 +2387,8 @@ DEFUN_DLD (get_all_detector_radec_c, args, nargout, "Get RA/Dec of a detector.\n
 
   bool do_exact=false;
   if (nargin>2)
-    do_exact=true;
-	      
-  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
-
-  Matrix ra_mat(tod->ndata,tod->ndet);
-  Matrix dec_mat(tod->ndata,tod->ndet);
+    do_exact=true;	      
+  
 #pragma omp parallel shared(ra_mat,dec_mat,tod,do_exact) default(none)
   {
     PointingFitScratch *scratch=allocate_pointing_fit_scratch(tod);
