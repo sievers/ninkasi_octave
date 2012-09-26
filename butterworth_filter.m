@@ -30,7 +30,7 @@ if isequal(expt,'abs')
   omega=omega/dt/n/f_samp*2*pi;
   h1_omega=(1+2*exp(-i*omega)+exp(-2*i*omega))./(1+b_1_1*exp(-i*omega)+b_1_2*exp(-2*i*omega));
   h2_omega=(1+2*exp(-i*omega)+exp(-2*i*omega))./(1+b_2_1*exp(-i*omega)+b_2_2*exp(-2*i*omega));
-  filt=h1_omega.*h2_omega/mynorm;
+  filt=h1_omega.*h2_omega/mynorm*1311;
 
 
 end

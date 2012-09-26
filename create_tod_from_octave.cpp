@@ -97,6 +97,13 @@ DEFUN_DLD (set_tod_ndata_c, args, nargout, "Read a TOD header, including pointin
 
 
 /*--------------------------------------------------------------------------------*/
+#if 0
+DEFUN_DLD (convert_saved_pointing_to_pixellization, args, nargout, "Convert a TOD's saved RA/Dec to a map pixellization, freeing the RA/Dec storage..\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+}  
+#endif
+/*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (set_tod_pointing_saved, args, nargout, "Read a TOD header, including pointing info etc.\n")
 {
@@ -119,6 +126,7 @@ DEFUN_DLD (set_tod_pointing_saved, args, nargout, "Read a TOD header, including 
   return octave_value_list();
 
 }
+
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (set_tod_pointing_saved_branch,args,nargout,"Set the branch cut on a TOD pointing.\n")
 {

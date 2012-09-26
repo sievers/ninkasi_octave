@@ -706,7 +706,17 @@ DEFUN_DLD (tod2map, args, nargout, "Project tod into a map.  Args are (tod,map)\
 
   return octave_value_list();  
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(tod2polmap,args,nargout," Project a tod into a polmap.  Args are (tod,map)\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  MAP *mymap=(MAP *)get_pointer(args(1));
+  
+  tod2polmap(mymap,mytod);
 
+  return octave_value_list();
+
+}
 /*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (tod_times_map, args, nargout, "Multiply and sum a tod by a map.  Args are (tod,map)\n")
@@ -734,6 +744,15 @@ DEFUN_DLD (map2tod, args, nargout, "Project map into a tod.  Args are (map,tod).
   }
   else
     map2tod(mymap,mytod,NULL);
+  return octave_value_list();  
+}
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (polmap2tod, args, nargout, "Project polarizedmap into a tod.  Args are (map,tod).\n")
+{
+  MAP *mymap=(MAP *)get_pointer(args(0));
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(1));
+  polmap2tod(mymap,mytod);
   return octave_value_list();  
 }
 
@@ -1064,8 +1083,59 @@ DEFUN_DLD (get_tod_data, args, nargout, "Get the data from a tod into octave.  O
   
   return octave_value(dat);
 }
+/*--------------------------------------------------------------------------------*/
 
+DEFUN_DLD (get_tod_2gamma, args, nargout, "Get 2gamma from a tod into octave.  Only return non-cut dets.  Arg is (tod)\n")
+{
 
+  const mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+
+  if (!mytod->twogamma_saved) {
+    printf("Tod does not have twogamma loaded.\n");
+    return octave_value_list();
+  }
+  int ndet= how_many_dets_are_kept_c(mytod);
+  Matrix dat(mytod->ndata,ndet);
+  double *dd=dat.fortran_vec();
+  int icur=0;
+  int j;
+  for (int i=0;i<mytod->ndet;i++) {
+    if (!mbCutsIsAlwaysCut(mytod->cuts,mytod->rows[i],mytod->cols[i])) {
+      for (j=0;j<mytod->ndata;j++)
+        dd[icur*mytod->ndata+j]=mytod->twogamma_saved[i][j];
+      icur++;
+    }
+  }
+  
+  return octave_value(dat);
+}
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (get_tod_pixellization, args, nargout, "Get the pixellization from a tod into octave.  Only return non-cut dets.  Arg is (tod)\n")
+{
+
+  const mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+
+  if (!mytod->pixelization_saved) {
+    printf("Tod does not have pixellization loaded.\n");
+    return octave_value_list();
+  }
+  int ndet= how_many_dets_are_kept_c(mytod);
+  dim_vector dm(mytod->ndata,ndet);
+  int32NDArray dat(dm);
+  int *dd=(int *)dat.fortran_vec();
+  int icur=0;
+  int j;
+  for (int i=0;i<mytod->ndet;i++) {
+    if (!mbCutsIsAlwaysCut(mytod->cuts,mytod->rows[i],mytod->cols[i])) {
+      for (j=0;j<mytod->ndata;j++)
+        dd[icur*mytod->ndata+j]=mytod->pixelization_saved[i][j];
+      icur++;
+    }
+  }
+  
+  return octave_value(dat);
+}
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (apply_calib_facs_c, args, nargout, "Apply calibration factors to a TOD.  args are (tod,facs).\n")
 {
@@ -2466,6 +2536,16 @@ DEFUN_DLD (get_detector_altaz_c, args, nargout, "Get alt/az of a detector.\n")
 
 }
 /*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (convert_saved_pointing_to_pixellization, args, nargout, "Convert a TOD's saved RA/Dec to a map pixellization, freeing the RA/Dec storage..\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  MAP *mymap=(MAP *)get_pointer(args(1));
+  convert_saved_pointing_to_pixellization(mytod,mymap);
+  return octave_value_list();
+}
+
+
 /*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (get_tod_alldet_altaz_lims_c, args, nargout, "Get alt/az limits spanned by detectors in a TOD.\n")

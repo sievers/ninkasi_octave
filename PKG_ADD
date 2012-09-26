@@ -27,6 +27,10 @@ autoload('pull_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'todfu
 autoload('check_data_fft_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('clear_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('get_map_npol',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('is_map_polarized',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('set_map_polstate_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+
+
 
 
 autoload('copy_string',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
@@ -74,6 +78,8 @@ autoload('get_skymap_tan_params_c',fullfile(fileparts(mfilename("fullpath")),'ma
 autoload('get_skymap_rect_params_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('get_tod_col_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('get_tod_2gamma',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('get_tod_pixellization',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_altaz',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_dt',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_tvec_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -99,6 +105,7 @@ autoload('deres_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct')
 autoload('upres_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('make_weightmap_ninkasi',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('map2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('polmap2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('map_axpy',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('map_times_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('merge_cuts_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -138,6 +145,7 @@ autoload('test_eig_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'))
 autoload('test_omp_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('test_solve_posdef',fullfile(fileparts(mfilename("fullpath")),'corrnoise_utils.oct'));
 autoload('tod2map',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('tod2polmap',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod_times_map',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod2vecs',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod2vecs_blas',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -167,6 +175,8 @@ autoload('get_radec_from_altaz_ctime_c',fullfile(fileparts(mfilename("fullpath")
 autoload('get_radec_from_altaz_fit_tiled_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('set_tod_pointing_tiled_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('set_tod_pointing_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('convert_saved_pointing_to_pixellization',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+
 autoload('find_max_tod_pointing_err_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_coarse_ind_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_all_detector_radec_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
