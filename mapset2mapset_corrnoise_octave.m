@@ -17,6 +17,7 @@ if (1)
   skip_mpi=get_struct_mem(myopts,'skip_mpi',false);
   check_empty=get_struct_mem(myopts,'check_empty',false);
   new_mapptr=get_struct_mem(myopts,'new_mapptr',[]);
+  do_actpol_pointing=get_struct_mem(myopts,'do_actpol_pointing',false);
 else
   
   do_noise=get_keyval_default('do_noise',false,varargin{:});
@@ -52,6 +53,16 @@ for j=1:length(tods),
   t1=now;
   mtic
   mytod=tods(j);
+  
+  if (do_actpol_pointing)
+    precalc_actpol_pointing_exact(mytod);
+    if isfield(mapset,'skymap')
+      if isfield(mapset.skymap,'mapptr')
+        convert_saved_pointing_to_pixellization(mytod,mapset.skymap.mapptr)
+      end
+    end
+  end
+  
   allocate_tod_storage(mytod);
   assign_tod_value(mytod,0.0);
 
@@ -130,6 +141,13 @@ for j=1:length(tods),
   else
     assign_tod_value(mytod,0.0);
   end
+  
+  if (do_actpol_pointing)
+    free_tod_pointing_saved(mytod);
+    free_saved_pixellization(mytod);
+  end
+  
+  
   mtoc
   t2=now;
   tod_times(j,1)=86400*(t2-t1);

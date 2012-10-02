@@ -55,6 +55,14 @@ DEFUN_DLD (init_getdata_file, args, nargout, "Open a compressed dirfile.\n")
 }
 
 /*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (close_getdata_file, args, nargout, "Open a compressed dirfile.\n")
+{
+  DIRFILE *file=( DIRFILE *)get_pointer(args(0));
+  gd_close(file);
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD (getdata_double_channel_c,args,nargout,"Read a dirfile channel as a double.  Args are (dirfile,channel name).\n")
 {
   DIRFILE *file=( DIRFILE *)get_pointer(args(0));

@@ -206,6 +206,19 @@ DEFUN_DLD (tod2map_actpol, args, nargout, "Project a tod into a map with actpole
   return octave_value_list();
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD(get_tod_actpol_pointing_offsets_c,args,nargout,"Return detector pointing offsets.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  ACTpolPointingFit *fit=tod->actpol_pointing;
+  Matrix offsets(tod->ndet,2);
+  double *offs=offsets.fortran_vec();
+  for (int i=0;i<tod->ndet;i++) {
+    offs[2*i]=fit->dx[i];
+    offs[2*i+1]=fit->dy[i];
+  }
+  return octave_value(offsets);
+}
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol pointing.  Args are tod,dx,dy,(angle),freq,dpiv\n")
 {
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
@@ -670,3 +683,30 @@ DEFUN_DLD (get_altaz_from_radec_ctime_c,args,nargout,"Convert ra/dec/ctime to al
   return retval;
 }
 
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_map_poltag,args,nargout,"Return the polarization tag for a submap inside a polarized map.  Args are (map,which_pol).\n")
+{
+  MAP *map=(MAP *)get_pointer(args(0));  
+  int which_map=(int)get_value(args(1));
+  if ((which_map<=0)||(which_map>get_npol_in_map(map))) {
+    fprintf(stderr,"Requested tag %d is out of allowed range in map.  Use something between 1 and %d\n",which_map,get_npol_in_map(map));
+    return octave_value_list();
+  }
+  int icur=0;
+  for (int i=0;i<MAX_NPOL;i++) {
+    if (map->pol_state[i])
+      icur++;
+    if (icur==which_map) {
+      if (icur==1)
+	return octave_value('I');
+      if (icur==2)
+	return octave_value('Q');
+      if (icur==3)
+	return octave_value('U');
+      if (icur==4)
+	return octave_value('V');
+    }
+  }
+  fprintf(stderr,"Managed to not find a polarization.  Very odd...\n");
+  return octave_value_list();
+}

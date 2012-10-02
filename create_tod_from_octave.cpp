@@ -30,6 +30,17 @@ actData get_value(octave_value val)
 
 }
 
+/*--------------------------------------------------------------------------------*/
+char *get_char_from_arg(charMatrix ch)
+{
+  int nn=ch.length();
+  char *s=ch.fortran_vec();
+  char *ss=strndup(s,nn+1);
+  ss[nn]='\0';
+  return ss;
+}
+
+
 
 
 /*--------------------------------------------------------------------------------*/
@@ -233,6 +244,7 @@ DEFUN_DLD (set_tod_rowcol_c, args, nargout, "Read a TOD header, including pointi
   
   int ndet=dm(0)*dm(1);
   mytod->ndet=ndet;
+  printf("setting ndet to %d\n",ndet);
   mytod->rows=(int *)malloc(sizeof(int)*ndet);
   mytod->cols=(int *)malloc(sizeof(int)*ndet);
   double *rowptr=rows.fortran_vec();
@@ -344,7 +356,21 @@ DEFUN_DLD (set_tod_radec_lims_c, args, nargout, "Return the tod pointing limits.
 }
 
 /*--------------------------------------------------------------------------------*/
+#ifdef ACTPOL
+DEFUN_DLD (set_tod_hwp_angle_c,args,nargout,"Set the HWP angle of a TOD.  Args are (tod,hwp).\n")
+{
+  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  Matrix hwp_mat=args(1).matrix_value();
+  double *hwp=hwp_mat.fortran_vec();
+  
+  tod->hwp=(actData *)malloc(sizeof(actData)*tod->ndata);
+  for (int i=0;i<tod->ndata;i++)
+    tod->hwp[i]=hwp[i];
+  
+  return octave_value_list();  
 
+}
+#endif
 
 /*--------------------------------------------------------------------------------*/
 
@@ -375,4 +401,15 @@ DEFUN_DLD (set_tod_altaz_c, args, nargout, "Write alt/az into a TOD.  args are (
   memcpy(mytod->az,az.fortran_vec(),mytod->ndata*sizeof(actData));
 
   return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (set_tod_filename_c,args,nargout,"Set a TODs dirfile name.  args are (tod,fname).\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  charMatrix fname=args(1).char_matrix_value();
+  
+  mytod->dirfile=get_char_from_arg(fname);
+  return octave_value_list();
+  
 }

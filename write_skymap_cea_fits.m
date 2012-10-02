@@ -41,6 +41,20 @@ vals={};
 [keys,vals]=set_keyval_val('PC2_1',0.0,keys,vals);
 [keys,vals]=set_keyval_val('PC2_2',1.0,keys,vals);
 
+if ~is_map_polarized(map)
+  write_fits_cell(fname,mm,keys,vals);
+else
+  for j=1:size(mm,3)
+    ii=max(strfind(fname,'.fits'));
+    mytag=['_' get_map_poltag(map,j)];
+    if ~isempty(ii)
+      fname_use=[fname(1:ii-1) mytag fname(ii:end)];
+    else
+      fname_use=[fname mytag '.fits'];
+    end
+    write_fits_cell(fname_use,mm(:,:,j),keys,vals);
+  end
+end
 
-write_fits_cell(fname,mm,keys,vals);
+      
 

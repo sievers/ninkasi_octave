@@ -1056,6 +1056,24 @@ DEFUN_DLD (get_tod_altaz, args, nargout, "Return the alt/az of the boresight for
   return retval;
   
 }
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (get_tod_hwp, args, nargout, "Return the hwp angle of a tod.  Arg is (tod)\n")
+{
+  const mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
+  if (!mytod->hwp) {
+    fprintf(stderr,"Error in get_tod_hwp - HWP not found in TOD.\n");
+    return octave_value_list();
+  }
+  Matrix hwp(mytod->ndata,1);
+  double *hwpp=hwp.fortran_vec();
+  for (int i=0;i<mytod->ndata;i++) {
+    hwpp[i]=mytod->hwp[i];
+  }
+  return octave_value(hwp);
+}
+
+
 
 /*--------------------------------------------------------------------------------*/
 
@@ -2545,6 +2563,17 @@ DEFUN_DLD (convert_saved_pointing_to_pixellization, args, nargout, "Convert a TO
   return octave_value_list();
 }
 
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (free_saved_pixellization, args, nargout, "Free a TOD's saved pixellization.\n")
+{
+  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  if (tod->pixelization_saved) {
+    free(tod->pixelization_saved[0]);
+    free(tod->pixelization_saved);
+    tod->pixelization_saved=NULL;
+  }
+  return octave_value_list();
+}
 
 /*--------------------------------------------------------------------------------*/
 

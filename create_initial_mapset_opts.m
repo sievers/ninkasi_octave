@@ -28,6 +28,9 @@ write_cleaned_data=get_struct_mem(myopts,'write_cleaned_data');
 window_symmetric=get_struct_mem(myopts,'window_symmetric');
 remove_corrnoise=get_struct_mem(myopts,'remove_corrnoise');
 srccat=get_struct_mem(myopts,'srccat',[]);
+do_actpol_pointing=get_struct_mem(myopts,'do_actpol_pointing',false);
+
+
 abort_before_noise=get_struct_mem(myopts,'abort_before_noise',false);
 skip_mpi=get_struct_mem(myopts,'skip_mpi',false);
 if (do_gauss&hilton_noise)
@@ -52,6 +55,7 @@ if (do_noise)
   assert(length(rots)==length(noise_types));
   assert(length(rots)==length(bands)-1);
   noise_scale_facs=get_struct_mem(myopts,'noise_scale_facs');
+  saved_noise=get_struct_mem(myopts,'saved_noise',[]);
 end
 do_calib=get_struct_mem(myopts,'do_calib');
 
@@ -120,6 +124,12 @@ if length(tods)==0,
    disp(['process ' num2str(myid) ' had no tods.']);
 end
 
+if do_actpol_pointing %we're going to do some precalculating of pointing.  If there's no need, then skip it.
+  if ~isfield(mapset,'skymap') %if we don't couple to the sky, why do pointing?
+    do_actpol_pointing=false;
+  end
+end
+
 
 for j=1:length(tods),
   if length(tods)==1,
@@ -127,6 +137,14 @@ for j=1:length(tods),
   else
     mytod=tods(j);
   end
+
+  if (do_actpol_pointing)
+    precalc_actpol_pointing_exact(mytod);
+    if isfield(mapset.skymap,'mapptr')
+      convert_saved_pointing_to_pixellization(mytod,mapset.skymap.mapptr)
+    end
+  end
+
 
   if (monitor_tods)
     monitor_tag=get_tod_tags_from_names(get_tod_name(mytod)) ;
@@ -215,6 +233,7 @@ for j=1:length(tods),
         error(['error in hilton noise on TOD ' tt]);
       end
       push_tod_data(dat,mytod);
+      clear dat;
     end
 
     if (dedark)
@@ -275,12 +294,13 @@ for j=1:length(tods),
         %mdisp('retaued.')
       end
       %data_from_map=get_tod_data(mytod);
+      %sim_dat=dat; %JLS trying to get 64 bit running
       dat=dat+input_scale_fac*get_tod_data(mytod);
       push_tod_data(dat,mytod);      
     else
       mdisp('no input mapset or source catalog');
     end
-    mdisp('doobydoobydo.');
+    %mdisp('doobydoobydo.');
     gapfill_data_c(mytod);
     mdisp('gapfilled.');
 
@@ -317,7 +337,9 @@ for j=1:length(tods),
     add_noise_to_tod(mytod);
   end
 
-  
+  clear dat
+  clear ans
+
   if (do_detrend|do_array_detrend)
     if (do_array_detrend)
       mdisp('array detrending');
@@ -340,7 +362,7 @@ for j=1:length(tods),
   if (deconvolve_tau)
     mdisp('deconvolving time constants.');
     deconvolve_tod_time_constants_c(mytod);
-  end
+  end 
   window_data(mytod);
 
   
@@ -447,7 +469,13 @@ for j=1:length(tods),
     end
     if strcmp(noise_class,'banded_projvecs')
       mdisp('setting noise to banded_projvecs');
-      set_tod_noise_bands_projvecs(mytod,myopts);
+      %if ~isempty('saved_noise')
+      if numel(saved_noise)>1
+        mdisp(['reading noise model from ' saved_noise]);
+        read_all_tod_noises(saved_noise,mytod);
+      else
+        set_tod_noise_bands_projvecs(mytod,myopts);
+      end
     end
     if (strcmp(noise_class,'banded'))
       mdisp('setting noise to banded.');
@@ -509,7 +537,13 @@ for j=1:length(tods),
       dat=dat+get_tod_data(mytod);
     end
   end
-            
+  
+  if 0
+    warning('Warning!  Hand-forcing data to be signal only.')
+    push_tod_data(sim_dat,mytod);
+    clear sim_dat;
+  end
+        
 
   if (highpass_val>0)
     mdisp('highpassing');
@@ -580,6 +614,10 @@ for j=1:length(tods),
 
   if (~keep_data)
     free_tod_storage(mytod);
+  end
+  if (do_actpol_pointing) %we cached the pointing earlier, now we need to get rid of it.
+    free_tod_pointing_saved(mytod);
+    free_saved_pixellization(mytod);
   end
 
   if (monitor_tods)    
