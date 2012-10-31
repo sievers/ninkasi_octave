@@ -224,7 +224,7 @@ DEFUN_DLD (get_tod_ctime_c, args, nargout, "How long is a sample in a TOD.\n")
 
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (get_tod_name, args, nargout, "What is a TOD's name?.\n")
+DEFUN_DLD (get_tod_name_c, args, nargout, "What is a TOD's name?.\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   return octave_value(mytod->dirfile);
@@ -1933,6 +1933,29 @@ DEFUN_DLD (assign_tod_time_constants_c, args, nargout, "Assign the time constant
   return octave_value_list();
   
 }
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (apply_real_filter_to_data, args, nargout, "Apply a real-valued filter to the data.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix filt=args(1).matrix_value();
+  actData *ptr=filt.fortran_vec();
+  apply_real_filter_to_data(mytod,ptr);
+  return octave_value_list();
+
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (apply_complex_filter_to_data, args, nargout, "Apply a real-valued filter to the data.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  ComplexMatrix filt=args(1).complex_matrix_value();
+  actComplex *ptr=(actComplex *)filt.fortran_vec();
+  apply_complex_filter_to_data(mytod,ptr);
+  return octave_value_list();
+
+}
+
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (debutterworth_c, args, nargout, "Debutterworth the data.\n")
 {

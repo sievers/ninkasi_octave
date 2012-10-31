@@ -39,7 +39,7 @@ void *get_pointer(octave_value val)
 
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (init_getdata_file, args, nargout, "Open a compressed dirfile.\n")
+DEFUN_DLD (init_getdata_file_c, args, nargout, "Open a compressed dirfile.\n")
 {
   
   char *myfroot=get_char_from_arg(args(0).char_matrix_value());
@@ -56,7 +56,7 @@ DEFUN_DLD (init_getdata_file, args, nargout, "Open a compressed dirfile.\n")
 
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (close_getdata_file, args, nargout, "Open a compressed dirfile.\n")
+DEFUN_DLD (close_getdata_file_c, args, nargout, "Open a compressed dirfile.\n")
 {
   DIRFILE *file=( DIRFILE *)get_pointer(args(0));
   gd_close(file);

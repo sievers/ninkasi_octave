@@ -213,8 +213,11 @@ DEFUN_DLD(get_tod_actpol_pointing_offsets_c,args,nargout,"Return detector pointi
   Matrix offsets(tod->ndet,2);
   double *offs=offsets.fortran_vec();
   for (int i=0;i<tod->ndet;i++) {
-    offs[2*i]=fit->dx[i];
-    offs[2*i+1]=fit->dy[i];
+    //offs[2*i]=fit->dx[i];
+    //offs[2*i+1]=fit->dy[i];
+    offs[i]=fit->dx[i];
+    offs[tod->ndet+i]=fit->dy[i];
+
   }
   return octave_value(offsets);
 }

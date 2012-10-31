@@ -1,6 +1,6 @@
 function[filt]=butterworth_filter(n,dt,expt)
 
-if ~exist(expt)
+if ~exist('expt')
   expt='act';
 end
 

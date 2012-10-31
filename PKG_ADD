@@ -38,6 +38,8 @@ autoload('createFFTWplans_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c
 autoload('cut_detector_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('cut_tod_ends_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('set_tod_window_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('apply_real_filter_to_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('apply_complex_filter_to_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('debutterworth_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('rebutterworth_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('deconvolve_tod_time_constants_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -88,7 +90,7 @@ autoload('get_tod_tvec_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oc
 autoload('get_tod_dist_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_dist_vec_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_ctime_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
-autoload('get_tod_name',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('get_tod_name_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_ndata',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_row_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('cut_tod_global_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -234,6 +236,6 @@ autoload('get_map_poltag',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'
 
 
 
-autoload('init_getdata_file',fullfile(fileparts(mfilename("fullpath")),'octgetdata.oct'));
+autoload('init_getdata_file_c',fullfile(fileparts(mfilename("fullpath")),'octgetdata.oct'));
 autoload('getdata_double_channel_c',fullfile(fileparts(mfilename("fullpath")),'octgetdata.oct'));
-autoload('close_getdata_file',fullfile(fileparts(mfilename("fullpath")),'octgetdata.oct'));
+autoload('close_getdata_file_c',fullfile(fileparts(mfilename("fullpath")),'octgetdata.oct'));

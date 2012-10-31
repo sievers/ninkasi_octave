@@ -34,6 +34,9 @@ for j=1:length(tods),
   if abs(k-nsamp)>nmin,
     cut_tod_global_c(tods(j),k,nsamp);
   end
+
+  
+
 end
 
 
