@@ -7,7 +7,13 @@
 extern "C"
 {
 #endif
+
+#ifndef NO_FFTW
 #include <fftw3.h>
+#else
+#include <fftw/fftw3.h>
+#endif
+
 #include <omp.h>
 #ifdef __cplusplus
 }  /* end extern "C" */

@@ -22,7 +22,12 @@ extern "C"
 #include <cblas.h>
 #endif
 
+#ifndef NO_FFTW
 #include <fftw3.h>
+#else
+#include <fftw/fftw3.h>
+#endif
+
 #include <omp.h>
 
 void dgemm_(char *transa, char *transb, int *m, int *n, int *k, double *alpha, double *a, int *lda, double *b, int *ldb, double *beta, double *c, int *ldc);

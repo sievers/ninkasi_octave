@@ -8,8 +8,9 @@ extern "C"
 {
 #endif
 #include <string.h>
-  //#include <getdata.h>
-#include "/home/nolta/local/include/getdata.h"
+#include <getdata.h>
+  //#include "/home/nolta/local/include/getdata.h"
+
 #ifdef __cplusplus
 }  /* end extern "C" */
 #endif
