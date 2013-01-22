@@ -1,5 +1,5 @@
 function[mapset,medians,signal_mapset,data_from_map,data_org]=create_initial_mapset_opts(tods,mapset,mapset_in,myopts)
-
+ 
 
 myid=mpi_comm_rank+1;
 nproc=mpi_comm_size;
