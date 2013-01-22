@@ -9,7 +9,8 @@ using namespace std;
 extern "C"
 {
 #endif
-  
+
+#define ACTPOL  
 #include <ninkasi_config.h>
 #include <ninkasi.h>
 #include <dirfile.h>
@@ -205,6 +206,22 @@ DEFUN_DLD (tod2map_actpol, args, nargout, "Project a tod into a map with actpole
   return octave_value_list();
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD(get_tod_actpol_pointing_offsets_c,args,nargout,"Return detector pointing offsets.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  ACTpolPointingFit *fit=tod->actpol_pointing;
+  Matrix offsets(tod->ndet,2);
+  double *offs=offsets.fortran_vec();
+  for (int i=0;i<tod->ndet;i++) {
+    //offs[2*i]=fit->dx[i];
+    //offs[2*i+1]=fit->dy[i];
+    offs[i]=fit->dx[i];
+    offs[tod->ndet+i]=fit->dy[i];
+
+  }
+  return octave_value(offsets);
+}
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol pointing.  Args are tod,dx,dy,(angle),freq,dpiv\n")
 {
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
@@ -225,6 +242,14 @@ DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol 
   return octave_value_list();
 
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(precalc_actpol_pointing_exact,args,nargout,"Precalculated stuff for an actpol pointing fit.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  precalc_actpol_pointing_exact(tod);
+  return octave_value_list();
+}
+
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD(precalc_actpol_pointing,args,nargout,"Precalculated stuff for an actpol pointing fit.\n")
 {
@@ -271,6 +296,139 @@ DEFUN_DLD(get_detector_radec_actpol_c, args, nargout, "Get RA/Dec of a detector.
 }
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (get_radec_from_altaz_actpol_c,args,nargout,"Convert az, el, and ctime to ra/dec and sin/cos(2gamma).\n")
+{
+  int nargin = args.length();
+  if (nargin<3) {
+    printf("Only have %d arguments in get_radec_from_altaz_actpol_c, need at least 3.\n",nargin);
+    return octave_value_list();
+  }
+  Matrix azmat=args(0).matrix_value();
+  Matrix elmat=args(1).matrix_value();
+  Matrix tmat=args(2).matrix_value();
+
+  double zero=0;
+  double *dx=&zero,*dy=&zero;
+  Matrix dxmat,dymat;
+  int ndet=1;
+  
+  if (nargin>3) {
+    dxmat=args(3).matrix_value();
+    dx=dxmat.fortran_vec();
+    dim_vector dm=dxmat.dims();
+    ndet=dm(0)*dm(1);
+  }
+  if (nargin>4) {
+    dymat=args(4).matrix_value();
+    dy=dymat.fortran_vec();
+    dim_vector dm=dymat.dims();
+    assert(dm(0)*dm(1)==ndet);
+  }
+
+  double *theta;
+  Matrix theta_mat;
+  int free_theta=0;
+  if (nargin>5) {
+    theta_mat=args(5).matrix_value();
+    dim_vector dm=theta_mat.dims();
+    if (dm(0)*dm(1)==1) {
+      theta=(double *)malloc(sizeof(double)*ndet);
+      free_theta=1;
+      for (int i=0;i<ndet;i++)
+	theta[i]=theta_mat(1,1);
+    }
+    else {
+      assert(dm(0)*dm(1)==ndet);
+      theta=theta_mat.fortran_vec();
+    }
+  }
+  else {
+    theta=(double *)malloc(sizeof(double)*ndet);
+    free_theta=1;
+    for (int i=0;i<ndet;i++)
+      theta[i]=0;
+  }
+  
+  
+  double *az=azmat.fortran_vec();
+  double *el=elmat.fortran_vec();
+  double *tvec=tmat.fortran_vec();
+  dim_vector dm=azmat.dims();
+  int nelem=dm(0)*dm(1);
+  double azmin=az[0];
+  double azmax=az[0];
+  
+  Matrix ramat(nelem,ndet);
+  Matrix decmat(nelem,ndet);
+  Matrix sin2gammamat(nelem,ndet);
+  Matrix cos2gammamat(nelem,ndet);
+  double *ra=ramat.fortran_vec();
+  double *dec=decmat.fortran_vec();
+  double *sin2gamma=sin2gammamat.fortran_vec();
+  double *cos2gamma=cos2gammamat.fortran_vec(); 
+
+  for (int i=0;i<nelem;i++) {
+    if (az[i]<azmin)
+      azmin=az[i];
+    if (az[i]>azmax)
+      azmax=az[i];
+  }
+  //Fix this - JLS 23 June 2012.  Note to Nolta - for constant az, this makes no difference.
+  double az_cent=(azmin+azmax)/2;
+  double az_throw=(azmin-azmax)/2;
+
+
+  ACTpolPointingFit *fit=(ACTpolPointingFit *)calloc(1,sizeof(ACTpolPointingFit));
+  assert(fit);
+  int nhorns=ndet;
+  ACTpolArray *array = ACTpolArray_alloc(nhorns);
+  assert(array);
+
+  double xcent=0.0;
+  double ycent=0.0;
+  double freq=148.0;
+  ACTpolArray_init(array, freq, xcent,ycent);
+  for (int i=0;i<nhorns;i++) {
+    ACTpolFeedhorn_init(&(array->horn[i]),dx[i],dy[i],theta[i]);
+  }
+
+  ACTpolWeather weather;
+  ACTpolWeather_default(&weather);
+  
+  
+  ACTpolArrayCoords *coords = ACTpolArrayCoords_alloc(array);
+  ACTpolArrayCoords_init(coords);
+
+  ACTpolState *state = ACTpolState_alloc();
+  ACTpolState_init(state);
+
+  ACTpolScan scan;
+  ACTpolScan_init(&scan, el[0], az_cent,az_throw);
+  ACTpolArrayCoords_update_refraction(coords, &scan, &weather);
+  for (int i = 0; i < nelem; i++)
+    {
+      ACTpolState_update(state, tvec[i],el[i],az[i]);
+      ACTpolArrayCoords_update(coords, state);
+      for (int j=0;j<nhorns;j++) {
+	ACTpolFeedhornCoords *fc = &(coords->horn[j]);
+	ra[i+j*nelem]=fc->ra;
+	dec[i+j*nelem]=fc->dec;
+	sin2gamma[i+j*nelem]=fc->sin2gamma;
+	cos2gamma[i+j*nelem]=fc->cos2gamma;
+      }
+    }
+  if (free_theta==1)
+    free(theta);
+  octave_value_list retval;
+  retval(0)=ramat;
+  retval(1)=decmat;
+  retval(2)=sin2gammamat;
+  retval(3)=cos2gammamat;
+  return retval;
+
+}
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (get_radec_from_altaz_actpol_c_old,args,nargout,"Convert az, el, and ctime to ra/dec and sin/cos(2gamma).\n")
 {
   int nargin = args.length();
   if (nargin<3) {
@@ -365,3 +523,193 @@ DEFUN_DLD (get_radec_from_altaz_actpol_c,args,nargout,"Convert az, el, and ctime
 
 }
 /*--------------------------------------------------------------------------------*/
+
+
+//void get_radec_from_altaz_actpol_c(double *az, double *el, double *tvec, double *dx, double *dy, double *theta, double *ra, double *dec, int nhorns, int nt);
+
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_radec_from_altaz_actpol_test,args,nargout,"Convert az, el, and ctime to ra/dec and sin/cos(2gamma).\n")
+{
+  int nargin = args.length();
+  if (nargin<3) {
+    printf("Only have %d arguments in get_radec_from_altaz_actpol_c, need at least 3.\n",nargin);
+    return octave_value_list();
+  }
+  Matrix azmat=args(0).matrix_value();
+  Matrix elmat=args(1).matrix_value();
+  Matrix tmat=args(2).matrix_value();
+
+  double zero=0;
+  double *dx=&zero,*dy=&zero;
+  Matrix dxmat,dymat;
+  int ndet=1;
+  
+  if (nargin>3) {
+    dxmat=args(3).matrix_value();
+    dx=dxmat.fortran_vec();
+    dim_vector dm=dxmat.dims();
+    ndet=dm(0)*dm(1);
+  }
+  if (nargin>4) {
+    dymat=args(4).matrix_value();
+    dy=dymat.fortran_vec();
+    dim_vector dm=dymat.dims();
+    assert(dm(0)*dm(1)==ndet);
+  }
+
+  double *theta;
+  Matrix theta_mat;
+  int free_theta=0;
+  if (nargin>5) {
+    theta_mat=args(5).matrix_value();
+    dim_vector dm=theta_mat.dims();
+    if (dm(0)*dm(1)==1) {
+      theta=(double *)malloc(sizeof(double)*ndet);
+      free_theta=1;
+      for (int i=0;i<ndet;i++)
+	theta[i]=theta_mat(1,1);
+    }
+    else {
+      assert(dm(0)*dm(1)==ndet);
+      theta=theta_mat.fortran_vec();
+    }
+  }
+  else {
+    theta=(double *)malloc(sizeof(double)*ndet);
+    free_theta=1;
+    for (int i=0;i<ndet;i++)
+      theta[i]=0;
+  }
+  
+  
+  double *az=azmat.fortran_vec();
+  double *el=elmat.fortran_vec();
+  double *tvec=tmat.fortran_vec();
+  dim_vector dm=azmat.dims();
+  int nelem=dm(0)*dm(1);
+  double azmin=az[0];
+  double azmax=az[0];
+  
+  Matrix ramat(nelem,ndet);
+  Matrix decmat(nelem,ndet);
+  //Matrix sin2gammamat(nelem,ndet);
+  //Matrix cos2gammamat(nelem,ndet);
+  double *ra=ramat.fortran_vec();
+  double *dec=decmat.fortran_vec();
+  //double *sin2gamma=sin2gammamat.fortran_vec();
+  //double *cos2gamma=cos2gammamat.fortran_vec(); 
+
+  get_radec_from_altaz_actpol_c(az, el, tvec,dx,dy, theta, ra, dec,ndet,nelem);
+
+#if 0
+
+  for (int i=0;i<nelem;i++) {
+    if (az[i]<azmin)
+      azmin=az[i];
+    if (az[i]>azmax)
+      azmax=az[i];
+  }
+  //Fix this - JLS 23 June 2012.  Note to Nolta - for constant az, this makes no difference.
+  double az_cent=(azmin+azmax)/2;
+  double az_throw=(azmin-azmax)/2;
+
+
+  ACTpolPointingFit *fit=(ACTpolPointingFit *)calloc(1,sizeof(ACTpolPointingFit));
+  assert(fit);
+  int nhorns=ndet;
+  ACTpolArray *array = ACTpolArray_alloc(nhorns);
+  assert(array);
+
+  double xcent=0.0;
+  double ycent=0.0;
+  double freq=148.0;
+  ACTpolArray_init(array, freq, xcent,ycent);
+  for (int i=0;i<nhorns;i++) {
+    ACTpolFeedhorn_init(&(array->horn[i]),dx[i],dy[i],theta[i]);
+  }
+
+  ACTpolWeather weather;
+  ACTpolWeather_default(&weather);
+  
+  
+  ACTpolArrayCoords *coords = ACTpolArrayCoords_alloc(array);
+  ACTpolArrayCoords_init(coords);
+
+  ACTpolState *state = ACTpolState_alloc();
+  ACTpolState_init(state);
+
+  ACTpolScan scan;
+  ACTpolScan_init(&scan, el[0], az_cent,az_throw);
+  ACTpolArrayCoords_update_refraction(coords, &scan, &weather);
+  for (int i = 0; i < nelem; i++)
+    {
+      ACTpolState_update(state, tvec[i],el[i],az[i]);
+      ACTpolArrayCoords_update(coords, state);
+      for (int j=0;j<nhorns;j++) {
+	ACTpolFeedhornCoords *fc = &(coords->horn[j]);
+	ra[i+j*nelem]=fc->ra;
+	dec[i+j*nelem]=fc->dec;
+	sin2gamma[i+j*nelem]=fc->sin2gamma;
+	cos2gamma[i+j*nelem]=fc->cos2gamma;
+      }
+    }
+
+#endif
+  if (free_theta==1)
+    free(theta);
+  octave_value_list retval;
+  retval(0)=ramat;
+  retval(1)=decmat;
+  //retval(2)=sin2gammamat;
+  // retval(3)=cos2gammamat;
+  return retval;
+
+}
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (get_altaz_from_radec_ctime_c,args,nargout,"Convert ra/dec/ctime to alt/az.\n")
+{
+  double ra=get_value(args(0));
+  double dec=get_value(args(1));
+  double ct=get_value(args(2));
+  double alt,az;
+  int myerr=actpol_radec_to_crude_altaz(ct,ra,dec,&alt,&az);
+  //printf("error code is %d\n",myerr);
+  if (myerr) {
+    fprintf(stderr,"Error in get_altaz_from_radec_ctime_c.\n");
+    return octave_value_list();
+  }
+  octave_value_list retval;
+  retval(0)=alt;
+  retval(1)=az;
+  return retval;
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_map_poltag,args,nargout,"Return the polarization tag for a submap inside a polarized map.  Args are (map,which_pol).\n")
+{
+  MAP *map=(MAP *)get_pointer(args(0));  
+  int which_map=(int)get_value(args(1));
+  if ((which_map<=0)||(which_map>get_npol_in_map(map))) {
+    fprintf(stderr,"Requested tag %d is out of allowed range in map.  Use something between 1 and %d\n",which_map,get_npol_in_map(map));
+    return octave_value_list();
+  }
+  int icur=0;
+  for (int i=0;i<MAX_NPOL;i++) {
+    if (map->pol_state[i])
+      icur++;
+    if (icur==which_map) {
+      if (icur==1)
+	return octave_value('I');
+      if (icur==2)
+	return octave_value('Q');
+      if (icur==3)
+	return octave_value('U');
+      if (icur==4)
+	return octave_value('V');
+    }
+  }
+  fprintf(stderr,"Managed to not find a polarization.  Very odd...\n");
+  return octave_value_list();
+}

@@ -11,7 +11,7 @@ else
   fid=fname; %passed in a file pointer
 end
 while 1,
-      ll=fgetl(fname);
+      ll=fgetl(fid);
       if ischar(ll)
             value(end+1)={ll};
       else

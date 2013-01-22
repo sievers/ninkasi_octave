@@ -17,7 +17,7 @@ end
 
 
 if isfield(a,'skymap')
-  val=val+sum(sum(a.skymap.map.*b.skymap.map));
+  val=val+sum(sum(sum(a.skymap.map.*b.skymap.map)));
 end
 
 

@@ -4,12 +4,20 @@ function[mapset]=tod2mapset_octave(mapset,tod,which_tod)
 
 if isfield(mapset,'skymap')
   if (mytype==0)
-    tod2map(tod,mapset.skymap.mapptr);
-    mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
+    if (is_map_polarized(mapset.skymap.mapptr))
+      tod2polmap(tod,mapset.skymap.mapptr);
+    else
+      tod2map(tod,mapset.skymap.mapptr);
+    end
+    if isfield(mapset.skymap,'map')
+      mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
+    end
   end
   if (mytype==1)
     map_to_vis_transpose(myptr,mapset.skymap.mapptr);
-    mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
+    if isfield(mapset.skymap,'map')
+      mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
+    end
     
   end
 end

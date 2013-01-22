@@ -1,5 +1,14 @@
-function[value]=make_weightmap_octave(tods,map,do_window)
+function[value]=make_weightmap_octave(tods,map,do_window,varargin)
+
+do_new_pointing=get_keyval_default('do_new_pointing',false,varargin{:});
+
+
 clear_map(map);
+
+if isempty('do_window')
+  clear do_window;
+end
+
 
 if ~exist('do_window')
   do_window=true;
@@ -14,10 +23,20 @@ for j=1:length(tods),
     window_data(mytod);
   end
 
-
+  
+  if (do_new_pointing)
+    disp('doing pointing')
+    precalc_actpol_pointing_exact(mytod);
+  end
+  
   mdisp('assigned value');
   tod2map(mytod,map);
   mdisp('projected');
+  
+  if (do_new_pointing)
+    free_tod_pointing_saved(mytod);
+  end
+
 
   free_tod_storage(mytod);    
   %disp('freed');

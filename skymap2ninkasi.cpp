@@ -66,7 +66,10 @@ DEFUN_DLD (allocate_ninkasi_skymap, args, nargout, "Make a ninkasi skymap, retur
   map->ramax=ramax;
   map->decmin=decmin;
   map->decmax=decmax;
-  
+#ifdef ACTPOL
+  map->pol_state[0]=1;
+#endif
+
   map->nx=(map->ramax-map->ramin)/map->pixsize+1;
   map->ny=(map->decmax-map->decmin)/map->pixsize+1;
   
@@ -194,14 +197,27 @@ DEFUN_DLD (skymap2octave, args, nargout, "Turn a ninkasi skymap into an octave o
 {
   MAP *mymap=(MAP *)get_pointer(args(0));
   //printf("mapsizes are %d %d\n",mymap->nx,mymap->ny);
-  Matrix map(mymap->nx,mymap->ny);
+
+  //Matrix map(mymap->nx,mymap->ny);
+
+  dim_vector dims(mymap->nx,mymap->ny,get_npol_in_map(mymap));
+  //NDArray map(mymap->nx,mymap->ny,get_npol_in_map(mymap));
+  NDArray map(dims);
+
 
   double *mapvec=map.fortran_vec();
   long i;
+#ifdef ACTPOL
+  long nn=mymap->npix*get_npol_in_map(mymap);
+  printf("Have %ld %ld pixels.\n",nn,mymap->npix);
+  for (i=0;i<nn;i++) {
+    mapvec[i]=mymap->map[i];   
+  }
+#else
   for (i=0;i<mymap->npix;i++) {
     mapvec[i]=mymap->map[i];
   }
-
+#endif
   return octave_value(map);
 }
 

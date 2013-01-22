@@ -9,7 +9,11 @@ function[data]=mapset2tod_octave(mapset,tod,which_tod)
 
 if isfield(mapset,'skymap')
   if (mytype==0)
-    map2tod(mapset.skymap.mapptr,tod);
+    if (is_map_polarized(mapset.skymap.mapptr))
+      polmap2tod(mapset.skymap.mapptr,tod);
+    else
+      map2tod(mapset.skymap.mapptr,tod);
+    end
   end
   if (mytype==1)
     map_to_vis(myptr,mapset.skymap.mapptr);
