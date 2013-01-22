@@ -707,7 +707,11 @@ DEFUN_DLD (get_altaz_from_radec_ctime_c,args,nargout,"Convert ra/dec/ctime to al
   double dec=get_value(args(1));
   double ct=get_value(args(2));
   double alt,az;
+
+
   int myerr=actpol_radec_to_crude_altaz(ct,ra,dec,&alt,&az);
+  //assert(1==0);  //this call is missing on scinet...
+
   //printf("error code is %d\n",myerr);
   if (myerr) {
     fprintf(stderr,"Error in get_altaz_from_radec_ctime_c.\n");
