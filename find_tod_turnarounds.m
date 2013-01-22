@@ -11,7 +11,9 @@ fwee=fwee&((az(2:end-1)>max(az)-tol)|(az(2:end-1)<min(az)+tol));
 turns=ind(fwee);
 flub=unique(diff(turns));
 if (std(flub)>3)
-  warning(['Probably had some failures in find_tod_turnarounds.  Scan lengths in samples were ' num2str(flub) ' in file ' get_tod_name(tod) ]);
+  nn=get_tod_name(tod);
+  if iscell(nn)
+    nn=nn{1};
+  end
+  warning(['Probably had some failures in find_tod_turnarounds.  Scan lengths in samples were ' num2str(flub) ' in file ' nn ]);
 end
-
-
