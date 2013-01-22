@@ -45,7 +45,7 @@ void *get_pointer(octave_value val)
 
 }
 
- /*--------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD ( ACTpolArray_init, args, nargout, "Initialize an ACTpol pointing array.  Args are (x,y,angle,[freq])\n")
 {
@@ -222,6 +222,36 @@ DEFUN_DLD(get_tod_actpol_pointing_offsets_c,args,nargout,"Return detector pointi
   return octave_value(offsets);
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD(get_detector_offsets_actpol,args,nargout,"Pull the detector offsets stored in a TOD with actpol pointing.  Arg is tod.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  if (tod->actpol_pointing==NULL) {
+    fprintf(stderr,"don't have actpol pointing in this tod, cannot pull detector offsets.\n");
+    return octave_value_list();
+  }
+  int ndet=tod->ndet;
+  Matrix dx(ndet,1);
+  Matrix dy(ndet,1);
+  Matrix theta(ndet,1);
+
+  double *dxptr=dx.fortran_vec();
+  double *dyptr=dy.fortran_vec();
+  double *thptr=theta.fortran_vec();
+  ACTpolPointingFit *fit=tod->actpol_pointing;
+  
+  for (int i=0;i<ndet;i++) {
+    dxptr[i]=fit->dx[i];
+    dyptr[i]=fit->dy[i];
+    thptr[i]=fit->theta[i];
+  }
+  octave_value_list retval;
+  retval(0)=dx;
+  retval(1)=dy;
+  retval(2)=theta;
+  return retval;
+}
+
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol pointing.  Args are tod,dx,dy,(angle),freq,dpiv\n")
 {
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
@@ -238,7 +268,10 @@ DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol 
     angle=NULL;
   actData freq=get_value(args(4));
   int dpiv=(int)get_value(args(5));
-  initialize_actpol_pointing(tod,dx,dy,angle,freq,dpiv);
+  if (tod->actpol_pointing)
+    update_actpol_pointing(tod,dx,dy,angle,freq,dpiv);
+  else
+    initialize_actpol_pointing(tod,dx,dy,angle,freq,dpiv);
   return octave_value_list();
 
 }
