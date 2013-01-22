@@ -391,11 +391,26 @@ DEFUN_DLD (cuts_extend_c, args, nargout, "Extend a cut.  args are (tod,start,sto
 
 DEFUN_DLD (set_tod_altaz_c, args, nargout, "Write alt/az into a TOD.  args are (tod,alt,az).\n")
 {
+  int nargin = args.length();
+  if (nargin<3) {
+    printf("not enough arguments to set_tod_altaz_c.  Need at least 3.\n");
+    return octave_value_list();
+  }
+  int force_alloc=0;
+  if (nargin>3) {
+    int val=(int)get_value(args(3));
+    if (val)
+      force_alloc=1;
+  }
+
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   Matrix alt=args(1).matrix_value();
   Matrix az=args(2).matrix_value();
-  mytod->alt=(actData *)malloc(sizeof(actData)*mytod->ndata);
-  mytod->az=(actData *)malloc(sizeof(actData)*mytod->ndata);
+
+  if ((mytod->alt==NULL)||(force_alloc))
+    mytod->alt=(actData *)malloc(sizeof(actData)*mytod->ndata);
+  if ((mytod->az==NULL)||(force_alloc))
+    mytod->az=(actData *)malloc(sizeof(actData)*mytod->ndata);
 
   memcpy(mytod->alt,alt.fortran_vec(),mytod->ndata*sizeof(actData));
   memcpy(mytod->az,az.fortran_vec(),mytod->ndata*sizeof(actData));
