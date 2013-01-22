@@ -172,6 +172,7 @@ if (cache_iter>0)
     system(['mkdir ' cache_raw{1}]);
     system(['mkdir ' cache_raw{2}]);
   end
+  mpi_barrier; %this can be needed if the mkdir command is *so* slow that others get to needing it before the mkdir call has completed.
 end
 
 

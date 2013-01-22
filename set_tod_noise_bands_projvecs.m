@@ -8,10 +8,12 @@ det_mode_thresh=get_struct_mem(myopts,'det_mode_thresh',1);  %if a mode has a si
 det_weight_thresh=get_struct_mem(myopts,'det_weight_thresh',0);  %if a detector in a band has a weight bigger than this times the median, assume something is screwy, replace by median
                                                                  %ignore if it's <=0
 mode_scale_fac=get_struct_mem(myopts,'noise_mode_scale_fac',1.0);  %scale the correlated noise power spectra by this factor
+skip_corrnoise_sub=get_struct_mem(myopts,'skip_corrnoise_sub',false);
+
 if mode_scale_fac ~=1,
   mdisp(['going to scale correlated noise spectra by ' num2str(mode_scale_fac)]);
 end
-
+mdisp('greetings from projvecs')
 
 if numel(scale_facs)<nband,
   scale_facs(end+1:nband)=1;
@@ -59,7 +61,12 @@ for j=nband:-1:1,
   block_amps=myblock*vecs;
   big_block_amps(j,:)=mean(abs(block_amps).^2)/n;
 
-  myblock_clean=myblock-block_amps*vecs';
+  if skip_corrnoise_sub
+    %mdisp('not subtracting correlated noise from data in set_tod_noise_bands_projvecs.m.');
+    myblock_clean=myblock;
+  else
+    myblock_clean=myblock-block_amps*vecs';
+  end
   big_det_noise_amps(j,:)=mean(abs(myblock_clean).^2)/n;
   if (det_weight_thresh>0)
     medval=median(big_det_noise_amps(j,:));
@@ -68,7 +75,23 @@ for j=nband:-1:1,
     ncut=ncut+sum(ind);
   end
 
-  vecs_use=vecs;for k=1:nvecs, vecs_use(:,k)=vecs(:,k)*sqrt(big_block_amps(j,k))*mode_scale_fac;end;
+
+  if (0)
+    vecs_use=vecs;
+    for k=1:nvecs,      
+      try
+        myfac=sqrt(big_block_amps(j,k));
+      catch
+        whos
+        nvecs
+        error(['broken tod is ' get_tod_name(tod)]);
+      end
+      
+      vecs_use(:,k)=vecs(:,k)*myfac*mode_scale_fac;
+    end;    
+  else
+    vecs_use=vecs;for k=1:nvecs, vecs_use(:,k)=vecs(:,k)*sqrt(big_block_amps(j,k))*mode_scale_fac;end;
+  end
 
   set_oneband_tod_noise_banded_projvec(tod,j,scale_facs(j)./big_det_noise_amps(j,:),vecs_use);
 

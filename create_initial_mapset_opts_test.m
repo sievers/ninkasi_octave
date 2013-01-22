@@ -2,7 +2,7 @@ function[mapset,medians,signal_mapset,data_from_map,data_org]=create_initial_map
 
 
 myid=mpi_comm_rank+1;
-
+nproc=mpi_comm_size;
 myopts=set_default_mapping_opts(myopts);
 debutter_octave=get_struct_mem(myopts,'debutter_octave');
 remove_common=get_struct_mem(myopts,'remove_common');
@@ -29,7 +29,8 @@ window_symmetric=get_struct_mem(myopts,'window_symmetric');
 remove_corrnoise=get_struct_mem(myopts,'remove_corrnoise');
 srccat=get_struct_mem(myopts,'srccat',[]);
 
-
+abort_before_noise=get_struct_mem(myopts,'abort_before_noise',false);
+skip_mpi=get_struct_mem(myopts,'skip_mpi',false);
 if (do_gauss&hilton_noise)
   warning('requested both gaussian and Hilton noise.  Choosing Gaussian.');
   hilton_noise=false;
@@ -52,6 +53,7 @@ if (do_noise)
   assert(length(rots)==length(noise_types));
   assert(length(rots)==length(bands)-1);
   noise_scale_facs=get_struct_mem(myopts,'noise_scale_facs');
+  saved_noise=get_struct_mem(myopts,'saved_noise',[]);
 end
 do_calib=get_struct_mem(myopts,'do_calib');
 
@@ -105,7 +107,9 @@ if (find_modes)
     if (myid==1)
     system(['mkdir ' corr_root]);
     end
-    mpi_barrier;  %make sure directory exists before moving on
+    if (~skip_mpi)
+      mpi_barrier;  %make sure directory exists before moving on
+    end
   end
   mdisp(['going to cut ' num2str(nbadmode) ' modes at ' num2str([nu1 nu2 nu3])]);
 end
@@ -213,6 +217,7 @@ for j=1:length(tods),
         error(['error in hilton noise on TOD ' tt]);
       end
       push_tod_data(dat,mytod);
+      clear dat;
     end
 
     if (dedark)
@@ -251,28 +256,37 @@ for j=1:length(tods),
         if inject_sources,
           mdisp('adding sources into data');
           add_srccat2tod(mytod,srccat);
+          mdisp('finished.')
         end
       end
       
       if (debutter)
+        %mdisp('debutterworthing');
         if debutter_octave
+          %mdisp('debutterworthing octave')
           debutterworth_octave(mytod,false);
         else
+          %mdisp('debutterworthing c.')
           rebutterworth_c(mytod);
         end
+        %mdisp('debutterworthed');
       end
-      
+
       if (deconvolve_tau)
+        %mdisp('retauing.');
         reconvolve_tod_time_constants_c(mytod);
+        %mdisp('retaued.')
       end
       %data_from_map=get_tod_data(mytod);
+      %sim_dat=dat; %JLS trying to get 64 bit running
       dat=dat+input_scale_fac*get_tod_data(mytod);
       push_tod_data(dat,mytod);      
     else
       mdisp('no input mapset or source catalog');
     end
-
+    %mdisp('doobydoobydo.');
     gapfill_data_c(mytod);
+    mdisp('gapfilled.');
 
     if (remove_common)
       mdisp('removing common mode');
@@ -307,7 +321,9 @@ for j=1:length(tods),
     add_noise_to_tod(mytod);
   end
 
-  
+  clear dat
+  clear ans
+
   if (do_detrend|do_array_detrend)
     if (do_array_detrend)
       mdisp('array detrending');
@@ -330,7 +346,7 @@ for j=1:length(tods),
   if (deconvolve_tau)
     mdisp('deconvolving time constants.');
     deconvolve_tod_time_constants_c(mytod);
-  end
+  end 
   window_data(mytod);
 
   
@@ -411,6 +427,11 @@ for j=1:length(tods),
   if (do_noise)
     mdisp('doing noise');
     mdisp(['remove_corrnoise is ' num2str(remove_corrnoise)]);
+    if (abort_before_noise)
+      mdisp('Aborting before noise, as requested.');
+      return;
+    end
+
 
     use_current_data=false;
     if remove_corrnoise,
@@ -430,10 +451,15 @@ for j=1:length(tods),
         remove_corrnoise=false; %don't have anything part of the guess to pull, so why keep checking
       end
     end
-  
     if strcmp(noise_class,'banded_projvecs')
       mdisp('setting noise to banded_projvecs');
-      set_tod_noise_bands_projvecs(mytod,myopts);
+      %if ~isempty('saved_noise')
+      if numel(saved_noise)>1
+        mdisp(['reading noise model from ' saved_noise]);
+        read_all_tod_noises(saved_noise,mytod);
+      else
+        set_tod_noise_bands_projvecs(mytod,myopts);
+      end
     end
     if (strcmp(noise_class,'banded'))
       mdisp('setting noise to banded.');
@@ -495,7 +521,13 @@ for j=1:length(tods),
       dat=dat+get_tod_data(mytod);
     end
   end
-            
+  
+  if 0
+    warning('Warning!  Hand-forcing data to be signal only.')
+    push_tod_data(sim_dat,mytod);
+    clear sim_dat;
+  end
+        
 
   if (highpass_val>0)
     mdisp('highpassing');
@@ -579,28 +611,38 @@ end
 mdisp('master has finished his TODs');
 
 if isfield(mapset,'skymap')
-  mapset.skymap.map=mpi_allreduce(mapset.skymap.map);
+  if ~skip_mpi
+    mapset.skymap.map=mpi_allreduce(mapset.skymap.map);
+  end
   octave2skymap(mapset.skymap);
 end
 
 if isfield(mapset,'srccat')
   if iscell(mapset.srccat)
     for ss=1:numel(mapset.srccat),
-      mapset.srccat{ss}.amps=mpi_allreduce(mapset.srccat{ss}.amps);
+      if ~skip_mpi
+        mapset.srccat{ss}.amps=mpi_allreduce(mapset.srccat{ss}.amps);
+      end
     end
   else
-    mapset.srccat.amps=mpi_allreduce(mapset.srccat.amps);
+    if ~skip_mpi
+      mapset.srccat.amps=mpi_allreduce(mapset.srccat.amps);
+    end
   end
 end
 
 
 if (signal_only)
   if isfield(mapset,'skyamp')
-    signal_mapset.skymap.map=mpi_allreduce(signal_mapset.skymap.map);
+    if ~skip_mpi
+      signal_mapset.skymap.map=mpi_allreduce(signal_mapset.skymap.map);
+    end
     octave2skymap(signal_mapset.skymap);
   end
   if isfield(mapset,'srccat')
-    signal_mapset.srccat.amps=mpi_allreduce(signal_mapset.srccat.amps);
+    if ~skip_mpi
+      signal_mapset.srccat.amps=mpi_allreduce(signal_mapset.srccat.amps);
+    end
   end
 end
 
