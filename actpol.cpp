@@ -13,6 +13,7 @@ extern "C"
 #define ACTPOL  
 #include <ninkasi_config.h>
 #include <ninkasi.h>
+#include <noise.h>
 #include <dirfile.h>
 #include <slalib.h>
 #include <actpol/actpol.h>
@@ -279,7 +280,21 @@ DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol 
 DEFUN_DLD(precalc_actpol_pointing_exact,args,nargout,"Precalculated stuff for an actpol pointing fit.\n")
 {
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
-  precalc_actpol_pointing_exact(tod);
+  int op_flag=NINKASI_DO_RADEC|NINKASI_DO_TWOGAMMA;
+  if (args.length()>1)
+    op_flag=(int)get_value(args(1));
+  precalc_actpol_pointing_exact(tod,op_flag);
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(find_tod_radec_lims_actpol_pointing_exact_c,args,nargout,"Find the TOD ra/dec limits without storing the full pointing.  Arguments are tod,(wrap).\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  actData rawrap=3.14159265;
+  if (args.length()>1)
+    rawrap=get_value(args(1));
+  find_tod_radec_lims_actpol_pointing_exact(tod,rawrap);
   return octave_value_list();
 }
 
@@ -749,4 +764,135 @@ DEFUN_DLD (get_map_poltag,args,nargout,"Return the polarization tag for a submap
   }
   fprintf(stderr,"Managed to not find a polarization.  Very odd...\n");
   return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(fit_hwp_poly_to_data_c,args,nargout,"Fit sins/cosines/(low-order) polynomials to tod data.  Args are (tod, nsin, npoly).\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  if ((tod->data==NULL) ||(tod->hwp==NULL)) {
+    fprintf(stderr,"TOD isn't sufficiently populated in fit_hwp_poly_to_data_c.\n");
+    return octave_value_list();
+  }
+  int npoly=1;
+  int nsine=20;
+  int nargin=args.length();
+  if (nargin>1)
+    nsine=(int)get_value(args(1));
+  if (nargin>2)
+    npoly=(int)get_value(args(2));
+  if (1) {
+    remove_hwp_poly_from_data(tod,nsine,npoly);
+    return octave_value_list();
+  }
+
+
+  int nparam=2*nsine+npoly;
+  actData **fitp=matrix(tod->ndet,nparam);
+  memset(fitp[0],0,sizeof(actData)*tod->ndet*nparam);
+
+  fit_hwp_poly_to_data(tod, nsine,npoly,fitp,NULL);
+  Matrix myfitp(nparam,tod->ndet);
+  //printf("doing memcpy now.\n");
+  memcpy(myfitp.fortran_vec(),fitp[0],nparam*tod->ndet*sizeof(actData));
+  //printf("finished.\n");
+  free(fitp[0]);
+  free(fitp);
+  return octave_value(myfitp);
+
+
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_sincos_mat,args,nargout,"Fill a matrix with sin/cos(n*hwp).  Args are (tod,n_sin).\n")
+{
+  int nterm=(int)get_value(args(1));
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  Matrix mat(2*nterm,tod->ndata);
+  actData *vec=mat.fortran_vec();
+  fill_tod_sin_cos_vec(tod, nterm, vec);
+  return octave_value(mat);
+
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (test_ninkasi_linfit,args,nargout,"Test out ninkasi linear fitting.\n")
+{
+  int ndata=5;
+  int nparam=3;
+  int ncol=2;
+  actData **crap=matrix(ndata,nparam);
+  for (int i=0;i<ndata;i++) {
+    crap[i][0]=1;
+    for (int j=1;j<nparam;j++)
+      crap[i][j]=crap[i][j-1]*i;
+  }  
+  printf("crap block is:\n %16.6e %16.6e %16.6e\n %16.6e %16.6e %16.6e\n %16.6e %16.6e %16.6e\n",crap[0][0],crap[0][1],crap[0][2],crap[1][0],crap[1][1],crap[1][2],crap[2][0],crap[2][1],crap[2][2]);
+  actData **dat=matrix(ncol,ndata);
+  for (int i=0;i<ncol;i++)
+    for (int j=0;j<ndata;j++)
+      dat[i][j]=(1-2*i)*j+(2*i);
+  for (int i=0;i<ndata;i++) {
+    for (int j=0;j<ncol;j++)
+      printf("%4.0f ",dat[j][i]);
+    printf("\n");
+  }
+
+
+  
+
+
+  //linfit_many_vecs(NULL,crap,ndata,1,nparam);
+  actData **fitp=matrix(ncol,nparam);
+  linfit_many_vecs(dat,crap,ndata,ncol,nparam,fitp);
+  for (int i=0;i<nparam;i++) {
+    for (int j=0;j<ncol;j++) 
+      printf("%14.6f ",fitp[j][i]);
+    printf("\n");
+  }
+  return octave_value_list();
+
+  
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(get_demodulated_hwp_data_c,args,nargout,"Get (complex) I/QU data with pol data demodulated by the HWP.  Original data will be overwritten.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  actData hwp_freq=2.5;
+  if (args.length()>1)
+    hwp_freq=get_value(args(1));
+  int nmode=get_demodulated_hwp_data(tod,hwp_freq,NULL,NULL);
+  //printf("allocating.\n");
+  ComplexMatrix cmat(2*nmode-1,tod->ndet);
+  ComplexMatrix mat(nmode,tod->ndet);
+  Complex *cvec=cmat.fortran_vec();
+  Complex *vec=mat.fortran_vec();
+
+  actComplex **mycmat=(actComplex **)malloc(sizeof(actComplex *)*tod->ndet);
+  actComplex **mymat=(actComplex **)malloc(sizeof(actComplex *)*tod->ndet);
+
+
+  void *crap=&(cvec[0]);
+  actComplex *cvecptr=(actComplex *)crap;
+  crap=&(vec[0]);
+  actComplex *vecptr=(actComplex *)crap;
+
+  //printf("got my stuff allocated.\n");
+
+  for (int i=0;i<tod->ndet;i++) {
+    mycmat[i]=cvecptr+i*(2*nmode-1);
+    mymat[i]=vecptr+i*(nmode);
+  }
+  //printf("pointers are set.\n");
+  for (int i=0;i<tod->ndet;i++) {
+    memset(mycmat[i],0,(2*nmode-1)*sizeof(actComplex));
+    memset(mymat[i],0,nmode*sizeof(actComplex));
+    }
+  //printf("cleared out some of my stuff.\n");
+  get_demodulated_hwp_data(tod,hwp_freq,mymat,mycmat);
+  octave_value_list retval;
+  retval(0)=octave_value(mat);
+  retval(1)=octave_value(cmat);
+  
+  return octave_value(retval);
+  
 }
