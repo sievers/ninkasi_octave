@@ -240,6 +240,11 @@ autoload('get_sincos_mat',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'
 autoload('test_ninkasi_linfit',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('fit_hwp_poly_to_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_demodulated_hwp_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('remodulate_hwp_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('init_demod_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('demodulate_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('write_demodulated_detector_text',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('return_data_from_demod_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 
 
 

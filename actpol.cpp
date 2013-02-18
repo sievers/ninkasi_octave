@@ -896,3 +896,127 @@ DEFUN_DLD(get_demodulated_hwp_data_c,args,nargout,"Get (complex) I/QU data with 
   return octave_value(retval);
   
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(remodulate_hwp_data_c,args,nargout,"Turn demodulated T/pol data back into a timestream and write into the TOD.  Args are (tod,T,pol,[hwp frequency]) as made by get_demodulated_hwp_data_c.\n")
+{
+
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  ComplexMatrix mat=args(1).complex_matrix_value();
+  ComplexMatrix cmat=args(2).complex_matrix_value();
+
+
+  actData hwp_freq=2.5;
+  if (args.length()>3)
+    hwp_freq=get_value(args(3));
+
+  
+  int nmode=get_demodulated_hwp_data(tod,hwp_freq,NULL,NULL);
+
+  
+  Complex *cvec=cmat.fortran_vec();
+  Complex *vec=mat.fortran_vec();
+
+  actComplex **mycmat=(actComplex **)malloc(sizeof(actComplex *)*tod->ndet);
+  actComplex **mymat=(actComplex **)malloc(sizeof(actComplex *)*tod->ndet);
+
+
+  void *crap=&(cvec[0]);
+  actComplex *cvecptr=(actComplex *)crap;
+  crap=&(vec[0]);
+  actComplex *vecptr=(actComplex *)crap;
+
+  //printf("got my stuff allocated.\n");
+
+  for (int i=0;i<tod->ndet;i++) {
+    mycmat[i]=cvecptr+i*(2*nmode-1);
+    mymat[i]=vecptr+i*(nmode);
+  }
+  //printf("pointers are set.\n");
+  //printf("cleared out some of my stuff.\n");
+  remodulate_hwp_data(tod,hwp_freq,mymat,mycmat);
+  octave_value_list retval;
+  //retval(0)=octave_value(mat);
+  //retval(1)=octave_value(cmat);
+  
+  return octave_value_list();
+  
+}
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (init_demod_data_c, args, nargout, "Set up a demod data structure and return it.  Args are tod,freqs,[hwp_freq]\n")
+{
+  
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  Matrix freqs(2,1);
+  freqs(0,0)=2;
+  freqs(1,0)=4;
+  if (args.length()>=2)
+    freqs=args(1).matrix_value();
+  dim_vector dm=freqs.dims();
+  int nfreq=dm(0)*dm(1);
+  actData hwp_freq=0;
+  if (args.length()>=3)
+    hwp_freq=get_value(args(2));
+  DemodData *demod=init_demod_data(tod,hwp_freq,2,0,0,0);
+  set_demod_freqs(demod,freqs.fortran_vec(),nfreq);
+
+  int64NDArray myptr(1);
+
+  myptr(0)=(long)demod;
+  
+  return octave_value(myptr);
+}
+
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD(demodulate_data_c,args,nargout,"Demodulate data using HWP and a demod structure.  Args are (tod,demod).\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  DemodData *demod=(DemodData *)get_pointer(args(1));
+  demodulate_data(tod,demod);
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(write_demodulated_detector_text,args,nargout,"Write a text file with demodulated data in it.\n")
+{
+  DemodData *demod=(DemodData *)get_pointer(args(0));
+  int det=0;
+  if (args.length()>1)
+    det=(int)get_value(args(1));
+
+  char fname[512];
+  //sprintf(fname,"demodulate_streams_r%02dc%02d.txt",tod->rows[det],tod->cols[det]);
+  FILE *outfile=fopen("demodulated_streams.txt","w");
+  //FILE *outfile=fopen(fname,"w");
+  int ncol=get_demod_nchannel(demod);
+  for (int i=0;i<demod->nmode;i++) {
+    for (int j=0;j<ncol;j++)  {
+      //fprintf(outfile,"%16.7e %16.7e   ",creal(demod->data[j+det*ncol][i]),cimag(demod->data[j+det*ncol][i]));      
+      fprintf(outfile,"%16.7e %16.7e   ",(demod->data[j+det*ncol][i][0]),(demod->data[j+det*ncol][i][1]));      
+    }
+    fprintf(outfile,"\n");
+  }
+  fclose(outfile);
+
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(return_data_from_demod_c,args,nargout,"Return the demodulated data stored in a demod C structure.  Args are (tod,demod).\n")
+{
+  if (args.length()<2) {
+    printf("need at least (tod,demod) inputs in return_data_from_demod_c.\n");
+    return octave_value_list();
+  }
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  DemodData *demod=(DemodData *)get_pointer(args(1));
+  if (demod->data==NULL) {
+    printf("do not have demodulated data stored in return_data_from_demod_c.\n");
+    return octave_value_list();
+  }
+  int ncol=get_demod_nchannel(demod);
+  ComplexMatrix cmat(demod->nmode,ncol*tod->ndet);
+  memcpy(cmat.fortran_vec(),&(demod->data[0][0][0]),ncol*demod->nmode*tod->ndet*sizeof(actComplex));
+  return octave_value(cmat);
+
+}
