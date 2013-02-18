@@ -6,6 +6,8 @@ ntod=numel(tod_names);
 [tods,lims,all_lims]=read_all_tod_headers_vararg(tod_names,'pointing',pfile);
 ii=all_lims(:,2)<all_lims(:,1);
 all_lims(ii,2)=all_lims(ii,2)+2*pi;
+all_lims=all_lims*180/pi;
+
 mystr=cell(ntod,1);
 for j=1:ntod,
   ll=get_tod_name(tods(j));

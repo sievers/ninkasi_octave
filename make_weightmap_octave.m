@@ -1,7 +1,7 @@
 function[value]=make_weightmap_octave(tods,map,do_window,varargin)
 
-do_new_pointing=get_keyval_default('do_new_pointing',false,varargin{:});
-
+do_new_pointing=get_keyval_default('do_new_pointing',false,varargin{:})
+do_reduce=get_keyval_default('mpi_reduce',false,varargin{:});
 
 clear_map(map);
 
@@ -42,6 +42,12 @@ for j=1:length(tods),
   %disp('freed');
 end
 
-
+if (do_reduce)
+  mdisp('reducing')
+  weight=skymap2octave(map);
+  weight=mpi_allreduce(weight);
+  octave2skymap(weight,map);
+  clear weight;
+end
 
   

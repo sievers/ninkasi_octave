@@ -209,7 +209,7 @@ DEFUN_DLD (skymap2octave, args, nargout, "Turn a ninkasi skymap into an octave o
   long i;
 #ifdef ACTPOL
   long nn=mymap->npix*get_npol_in_map(mymap);
-  printf("Have %ld %ld pixels.\n",nn,mymap->npix);
+  //printf("Have %ld %ld pixels.\n",nn,mymap->npix);
   for (i=0;i<nn;i++) {
     mapvec[i]=mymap->map[i];   
   }

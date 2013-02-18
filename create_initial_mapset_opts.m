@@ -22,6 +22,7 @@ dedark=get_struct_mem(myopts,'dedark');
 dark_dirroot=get_struct_mem(myopts,'dark_dirroot','');
 signal_only=get_struct_mem(myopts,'signal_only');
 do_gauss=get_struct_mem(myopts,'gaussian_noise');
+sim_1overf=get_struct_mem(myopts,'sim_1overf',false);
 monitor_tods=get_struct_mem(myopts,'monitor_tods');
 outroot=get_struct_mem(myopts,'outroot',datestr(now,30));
 write_cleaned_data=get_struct_mem(myopts,'write_cleaned_data');
@@ -29,7 +30,8 @@ window_symmetric=get_struct_mem(myopts,'window_symmetric');
 remove_corrnoise=get_struct_mem(myopts,'remove_corrnoise');
 srccat=get_struct_mem(myopts,'srccat',[]);
 do_actpol_pointing=get_struct_mem(myopts,'do_actpol_pointing',false);
-
+remove_hwp=get_struct_mem(myopts,'remove_hwp',false);
+read_data_new=get_struct_mem(myopts,'read_data_new',false);
 
 abort_before_noise=get_struct_mem(myopts,'abort_before_noise',false);
 skip_mpi=get_struct_mem(myopts,'skip_mpi',false);
@@ -160,20 +162,30 @@ for j=1:length(tods),
     mdisp('creating from input map.');
     mapset2tod_octave(mapset_in,mytod,j);
   else
-    if (do_gauss)
-      tic
-      mdisp(['adding gaussian noise on ' get_tod_name(mytod)]);
-      %crud=get_tod_data(mytod);
-      %crud=randn(size(crud));
-      %push_tod_data(crud,mytod);
-      add_noise_to_tod_gaussian(mytod);
-      if myid==1
-        toc;
+    if ((do_gauss)|(sim_1overf))
+      if (do_gauss)        
+        mdisp(['adding gaussian noise on ' get_tod_name(mytod)]);
+        %crud=get_tod_data(mytod);
+        %crud=randn(size(crud));
+        %push_tod_data(crud,mytod);
+        add_noise_to_tod_gaussian(mytod);
+      end
+      if (sim_1overf)
+        mdisp('creating simulated 1 over f data.');
+        simdat=make_fake_1overf_common_mode_data(mytod,myopts);
+        push_tod_data(simdat,mytod);
+        clear simdat;
       end
     else
-      mdisp('reading tod data');
+      mdisp('reading tod data here');
       tic;
-      read_tod_data(mytod);
+        if (read_data_new)
+          mdisp('reading data new style.');
+          read_tod_data_new(mytod);
+        else
+          mdisp('reading data old style.');
+          read_tod_data(mytod);
+        end
       if (myid==1)
         toc;
       end      
@@ -214,11 +226,12 @@ for j=1:length(tods),
       array_detrend(mytod);
       gapfill_data_c(mytod);
       if debutter
-        if debutter_octave
-          debutterworth_octave(mytod);
-        else
-          debutterworth_c(mytod);
-        end
+        debutter_opts(mytod,myopts);
+      %  if debutter_octave
+      %    debutterworth_octave(mytod);
+      %  else
+      %    debutterworth_c(mytod);
+      %  end
       end
       dat=get_tod_data(mytod);
       if (save_seeds)
@@ -277,15 +290,19 @@ for j=1:length(tods),
       end
       
       if (debutter)
-        %mdisp('debutterworthing');
-        if debutter_octave
-          %mdisp('debutterworthing octave')
-          debutterworth_octave(mytod,false);
+        if (1)
+          rebutter_opts(mytod,myopts);
         else
-          %mdisp('debutterworthing c.')
-          rebutterworth_c(mytod);
+          %mdisp('debutterworthing');
+          if debutter_octave
+            %mdisp('debutterworthing octave')
+            debutterworth_octave(mytod,false);
+          else
+            %mdisp('debutterworthing c.')
+            rebutterworth_c(mytod);
+          end
+          %mdisp('debutterworthed');
         end
-        %mdisp('debutterworthed');
       end
 
       if (deconvolve_tau)
@@ -353,18 +370,42 @@ for j=1:length(tods),
     
   if (debutter)
     mdisp('debutterworthing');
-    if debutter_octave
-      debutterworth_octave(mytod);
+    if (1)
+      debutter_opts(mytod,myopts);
     else
-      debutterworth_c(mytod);
+      if debutter_octave
+        debutterworth_octave(mytod);
+      else
+        debutterworth_c(mytod);
+      end
     end
   end
   if (deconvolve_tau)
     mdisp('deconvolving time constants.');
     deconvolve_tod_time_constants_c(mytod);
   end 
-  window_data(mytod);
 
+  if remove_hwp
+    mdisp('removing half-wave plate')
+    push_hwp_data=get_struct_mem(myopts,'push_hwp_data',false);
+    if (push_hwp_data==false)
+      warning('You have requested HWP removal, however, push_hwp_data is set to false.  You may wish to change this.');
+    end
+    hwp_niter=get_struct_mem(myopts,'hwp_niter',3);
+    
+    for iter=1:hwp_niter
+      gapfill_data_c(mytod);
+      [crap,crud,fitp]=fit_sines_to_hwp(mytod,myopts);
+      mdisp(['on hwp iteration ' num2str(iter) ' summed fitp is ' num2str(sum(sum(abs(fitp))))]);
+      clear crap
+      clear crud
+      clear fitp
+    end
+  end
+  
+
+  window_data(mytod);
+  
   
   
   
@@ -524,10 +565,14 @@ for j=1:length(tods),
       assign_tod_value(mytod,0);
       mapset2tod_octave(mapset_in,mytod,j);
       if (debutter)
-        if debutter_octave
-          debutterworth_octave(mytod,false);
+        if (1)
+          rebutter_opts(mytod,myopts);
         else
-          rebutterworth_c(mytod);
+          if debutter_octave
+            debutterworth_octave(mytod,false);
+          else
+            rebutterworth_c(mytod);
+          end
         end
       end
       if (deconvolve_tau)

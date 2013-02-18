@@ -65,11 +65,19 @@ for j=1:ntod,
   lims(j,:)=mylims';
 end
 
+mdisp('getting to time constant barrier');
+mpi_barrier
+mdisp('past time constant barrier');
+
 if isempty(tau_files)
   assign_tod_time_constants(tods);
 else
   assign_tod_time_constants(tods,tau_files);
 end
+
+mpi_barrier
+mdisp('past time constant read');
+
 
 %mdisp('set time constants');
 all_lims=lims;

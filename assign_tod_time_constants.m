@@ -1,4 +1,5 @@
 function[taus]=assign_tod_time_constants(tods,taus)
+
 if ~exist('taus')
   my_ar=get_tod_array(tods(1));assert(~isempty(my_ar));
 %f3db=load(['/home/sievers/act/detectors/2008/' my_ar  '_f3db_090423.txt']);
@@ -16,6 +17,9 @@ else
     assert(sum(sum(isinf(taus)))==0);
   else
     if iscell(taus)
+      %disp(num2str([mpi_comm_rank size(taus{4})]))
+      mpi_barrier;
+      
       mdisp('assigning time constants from cell.');
       for j=1:length(tods),
         f3db=taus{guess_tod_season(tods(j))};
@@ -23,12 +27,15 @@ else
         mytau(f3db==0)=0;
         assert(sum(sum(isnan(mytau)))==0);
         assert(sum(sum(isinf(mytau)))==0);
+        %mpi_barrier;mdisp(['j is ' num2str(j)]);
         assign_tod_time_constants_c(tods(j),mytau);
+        %mpi_barrier;mdisp('passed.');
       end
       return;
     end
   end
 end
+
 
 
 for j=1:length(tods),

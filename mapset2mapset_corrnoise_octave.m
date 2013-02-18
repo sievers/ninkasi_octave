@@ -157,6 +157,7 @@ for j=1:length(tods),
   
 end
 node_time=86400*(now-node_start);
+mdisp(tod_times)
 
 mpi_time=0;
 %need to make sure we don't memory leak...

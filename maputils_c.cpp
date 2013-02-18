@@ -148,7 +148,7 @@ DEFUN_DLD (octave2skymap_c, args, nargout, "Copy an octave array into a skymap.\
   long i;
 #ifdef ACTPOL
   long nn=mymap->npix*get_npol_in_map(mymap);
-  printf("Have %ld %ld pixels.\n",nn,mymap->npix);
+  //printf("Have %ld %ld pixels.\n",nn,mymap->npix);
   for (i=0;i<nn;i++) {
     mymap->map[i]=mapvec[i];
   }
@@ -547,7 +547,20 @@ DEFUN_DLD (is_map_polarized,args,nargout,"Return if a map has polarizations othe
 
 /*--------------------------------------------------------------------------------*/
 #ifdef ACTPOL
+DEFUN_DLD (get_map_polstate_c,args,nargout,"Return current polarization state of a map.\n")
+{
+  MAP *map=(MAP *)get_pointer(args(0));
+  Matrix polstate(MAX_NPOL,1);
+  double *ptr=polstate.fortran_vec();
+  for (int i=0;i<MAX_NPOL;i++)
+    ptr[i]=map->pol_state[i];
+  return octave_value(polstate);
+}
+#endif
+/*--------------------------------------------------------------------------------*/
+#ifdef ACTPOL
 DEFUN_DLD (set_map_polstate_c,args,nargout,"Set the polarization state of a map.  If no arguments present, return current max_npol.\n")
+
 {
   if (args.length()==0)
     return octave_value(MAX_NPOL);

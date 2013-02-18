@@ -251,8 +251,11 @@ DEFUN_DLD (read_cuts_c, args, nargout, "What is a TOD's name?.\n")
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   char *myfroot=get_char_from_arg(args(1).char_matrix_value());  
   //mytod->cuts=mbCutsAlloc(mytod->nrow,mytod->ncol); //should already be allocated
+  printf("reading cuts from %s\n",myfroot);
   mbCutsRead(mytod->cuts, myfroot);
+  printf("cutting mispointed detectors.\n");
   cut_mispointed_detectors(mytod);
+  printf("cut.\n");
   
   for (int i=0;i<mytod->decimate;i++)
     mbCutsDecimate(mytod->cuts);
@@ -1167,6 +1170,16 @@ DEFUN_DLD (apply_calib_facs_c, args, nargout, "Apply calibration factors to a TO
     fprintf(stderr,"Data must be present in apply_calib_facs_c.\n");
     return octave_value_list();
   }
+  if (mytod->calib_facs_saved) {
+    printf("Using saved calibration factors.\n");
+    for (int i=0;i<mytod->ndet;i++) {
+      actData fac=mytod->calib_facs_saved[mytod->rows[i]][mytod->cols[i]];
+      for (int j=0;j<mytod->ndata;j++)
+	mytod->data[i][j]*=fac;
+    }						
+    return octave_value_list();
+  }
+
   Matrix facs=args(1).matrix_value();
   dim_vector dm=facs.dims();
   if ((dm(0)!=mytod->ndet)||(dm(1)!=1)) {
@@ -1185,6 +1198,40 @@ DEFUN_DLD (apply_calib_facs_c, args, nargout, "Apply calibration factors to a TO
   return octave_value_list();
 }
 /*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (tod_has_calib_facs_c, args, nargout, "Does a TOD have calibration factors saved in it?.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->calib_facs_saved)
+    return octave_value(1);
+  else
+    return octave_value(0);
+  return octave_value_list(); //never get here.
+}
+
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (save_calib_facs_c, args, nargout, "Save calibration factors into a TOD.  args are (tod,facs).\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix facs=args(1).matrix_value();
+  dim_vector dm=facs.dims();
+  //printf("dimensions are %d %d, vs. %d\n",dm(0),dm(1),mytod->ndet);
+  if ((dm(0)!=mytod->ndet)||(dm(1)!=1)) {
+    fprintf(stderr,"Error in save_calib_facs_c - unexpected input size.\n");
+    return octave_value_list();
+  }
+  
+
+  if (mytod->calib_facs_saved==NULL) 
+    mytod->calib_facs_saved=matrix(mytod->nrow,mytod->ncol);
+
+  for (int i=0;i<mytod->ndet;i++) 
+    mytod->calib_facs_saved[mytod->rows[i]][mytod->cols[i]]=facs(i,0);
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+
 
 DEFUN_DLD (get_tod_row_c, args, nargout, "Get the used rows from a tod into octave.  Only return non-cut dets.  Arg is (tod)\n")
 {
