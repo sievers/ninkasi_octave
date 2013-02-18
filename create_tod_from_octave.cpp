@@ -262,6 +262,7 @@ DEFUN_DLD (set_tod_rowcol_c, args, nargout, "Read a TOD header, including pointi
   }
   mytod->nrow=maxrow+1;
   mytod->ncol=maxcol+1;
+  printf("setting nrow/ncol to %d %d\n",mytod->nrow,mytod->ncol);
 
   mytod->dets=imatrix(mytod->nrow,mytod->ncol);
   
@@ -376,6 +377,10 @@ DEFUN_DLD (set_tod_hwp_angle_c,args,nargout,"Set the HWP angle of a TOD.  Args a
 
 DEFUN_DLD (cuts_extend_c, args, nargout, "Extend a cut.  args are (tod,start,stop,row,col).\n")
 {
+  if (args.length() <5) {
+    fprintf(stderr,"You need to pass at least 5 arguments to cuts_extend_c.\n");
+    return octave_value_list();
+  }
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   int start=(int)get_value(args(1));
   int stop=(int)get_value(args(2));
