@@ -433,3 +433,39 @@ DEFUN_DLD (set_tod_filename_c,args,nargout,"Set a TODs dirfile name.  args are (
   return octave_value_list();
   
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(free_tod_altaz_c,args,nargout,"Free the alt/az from a TOD.\n")
+{
+  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  if (tod->alt) {
+    free(tod->alt);
+    tod->alt=NULL;
+  }
+  if (tod->az) {
+    free(tod->az);
+    tod->az=NULL;
+  }
+  return octave_value_list();
+    
+    
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(free_tod_timevec_c,args,nargout,"Free the time from a TOD.\n")
+{
+  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  if (tod->dt) {
+    free(tod->dt);
+    tod->dt=NULL;
+  }
+  return octave_value_list();    
+    
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(free_tod_pointer_c,args,nargout,"Free a TOD pointer.  Anything still saved in here will be lost!\n")
+{
+  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  if (tod)
+    free(tod);
+  return octave_value_list();
+}

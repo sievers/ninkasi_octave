@@ -209,6 +209,9 @@ autoload('set_tod_ndata_c',fullfile(fileparts(mfilename("fullpath")),'create_tod
 autoload('set_tod_rowcol_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_altaz_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_hwp_angle_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
+autoload('free_tod_altaz_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
+autoload('free_tod_timevec_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
+autoload('free_tod_pointer_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 
 
 autoload('set_tod_pointing_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));

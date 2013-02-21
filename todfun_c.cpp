@@ -2557,7 +2557,7 @@ DEFUN_DLD (get_all_detector_radec_c, args, nargout, "Get RA/Dec of a detector.\n
   //printf("tod->ra_saved is %ld, tod->dec_saved is %ld\n",(long)(&(tod->ra_saved))-(long)tod,(long)(&(tod->dec_saved))-(long)tod);
 
   if ((tod->ra_saved!=NULL)&&(tod->dec_saved!=NULL)) {
-    printf("returning saved pointing.\n");
+    //printf("returning saved pointing.\n");
     //printf("ndata and ndet are %d %d\n",tod->ndata,tod->ndet);
     actData *ra_ptr=ra_mat.fortran_vec();
     actData *dec_ptr=dec_mat.fortran_vec();
