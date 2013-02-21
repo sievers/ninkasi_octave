@@ -172,9 +172,14 @@ for j=1:length(tods),
       end
       if (sim_1overf)
         mdisp('creating simulated 1 over f data.');
-        simdat=make_fake_1overf_common_mode_data(mytod,myopts);
-        push_tod_data(simdat,mytod);
-        clear simdat;
+        if (1) %should now make the simulated data in-place
+          make_fake_1overf_common_mode_data(mytod,myopts);
+        else
+          simdat=make_fake_1overf_common_mode_data(mytod,myopts);
+          push_tod_data(simdat,mytod);
+          clear simdat;
+        end
+
       end
     else
       mdisp('reading tod data here');

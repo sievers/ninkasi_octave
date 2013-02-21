@@ -969,7 +969,39 @@ DEFUN_DLD (tod2srcvec, args, nargout, "Project a tod into source vecs.  Args are
 }
 /*--------------------------------------------------------------------------------*/
 
+DEFUN_DLD (add_vector_to_tod_data, args, nargout, "Adds a vector to each detector in tod data.  Optionally, scale vector by a third agrument.   Args are (tod,vector,[ampt])\n")
+{
+  if (args.length()<2) {
+    fprintf(stderr,"Need at least 2 args to add_vector_to_tod_data.\n");
+    return octave_value_list();
+  }
+  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  if (!tod->have_data) {
+    fprintf(stderr,"Error in add_matrix_to_tod_data - data not allocated in tod.\n");
+    return octave_value_list();    
+  }
+  Matrix vec=args(1).matrix_value();
+  double *vv=vec.fortran_vec();
+  if (args.length()==2) {
+    for (int i=0;i<tod->ndet;i++)
+      for (int j=0;j<tod->ndata;j++)
+	tod->data[i][j]+=vv[j];
+  }
+  if (args.length()==3) {
+    Matrix scale_facs=args(3).matrix_value();
+    double *ss=scale_facs.fortran_vec();
+    for (int i=0;i<tod->ndet;i++)
+      for (int j=0;j<tod->ndata;j++)
+	tod->data[i][j]+=vv[j]*ss[i];
+  }
+  
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+
 DEFUN_DLD (add_matrix_to_tod_data, args, nargout, "Adds a matrix to tod data.  Args are (tod,matrix,[value])\n")
+
 {
 
   if (args.length()<2) {

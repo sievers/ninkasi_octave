@@ -23,6 +23,7 @@ autoload('tod_hits_source_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c
 autoload('add_src2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_srcvec2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod2srcvec',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('add_vector_to_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_matrix_to_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('pull_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
