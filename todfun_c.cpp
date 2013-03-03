@@ -720,7 +720,7 @@ DEFUN_DLD(tod2polmap,args,nargout," Project a tod into a polmap.  Args are (tod,
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   MAP *mymap=(MAP *)get_pointer(args(1));
   
-  tod2polmap(mymap,mytod);
+  tod2polmap_copy(mymap,mytod);
 
   return octave_value_list();
 
