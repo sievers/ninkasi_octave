@@ -33,6 +33,8 @@ autoload('get_map_npol',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oc
 autoload('is_map_polarized',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('get_map_polstate_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_map_polstate_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('invert_pol_precon_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('apply_pol_precon_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 
 
 
@@ -184,6 +186,7 @@ autoload('get_radec_from_altaz_fit_tiled_c',fullfile(fileparts(mfilename("fullpa
 autoload('set_tod_pointing_tiled_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('set_tod_pointing_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('convert_saved_pointing_to_pixellization',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('tod2polmap_copy',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 
 autoload('find_max_tod_pointing_err_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_coarse_ind_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -211,6 +214,7 @@ autoload('set_tod_altaz_c',fullfile(fileparts(mfilename("fullpath")),'create_tod
 autoload('set_tod_hwp_angle_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('free_tod_altaz_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('free_tod_timevec_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
+autoload('free_tod_hwp_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('free_tod_pointer_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 
 
@@ -218,6 +222,7 @@ autoload('set_tod_pointing_saved',fullfile(fileparts(mfilename("fullpath")),'cre
 autoload('set_tod_pointing_saved_branch',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_data_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('free_tod_pointing_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
+autoload('free_tod_2gamma_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('free_tod_data_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_radec_lims_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('cuts_extend_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
@@ -234,6 +239,7 @@ autoload('update_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),'act
 autoload('get_detector_offsets_actpol',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_tod_actpol_pointing_offsets_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('precalc_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('set_tod_twogamma_fit_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('precalc_actpol_pointing_exact',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('precalc_actpol_pointing_free',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('find_tod_radec_lims_actpol_pointing_exact_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));

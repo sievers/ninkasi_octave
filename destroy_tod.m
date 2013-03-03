@@ -5,7 +5,7 @@ free_tod_storage(tod);
 free_tod_pointing_saved(tod);
 free_tod_timevec_c(tod);
 free_tod_altaz_c(tod);
-
+free_tod_hwp_c(tod);
 
 
 free_tod_pointer_c(tod);  %better be the last call!

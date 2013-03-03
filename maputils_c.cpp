@@ -584,3 +584,27 @@ DEFUN_DLD (set_map_polstate_c,args,nargout,"Set the polarization state of a map.
 }
 
 #endif
+/*--------------------------------------------------------------------------------*/
+#ifdef ACTPOL
+DEFUN_DLD(invert_pol_precon_c,args,nargout,"Invert the blocks of a polarized preconditioner.\n")
+{
+  MAP *map=(MAP *)get_pointer(args(0));
+  invert_pol_precon(map);
+  return octave_value_list();
+}
+#endif
+/*--------------------------------------------------------------------------------*/
+#ifdef ACTPOL
+DEFUN_DLD(apply_pol_precon_c,args,nargout,"Apply an inverted polarized preconditioner.  Args are (map,precon).\n")
+{
+  if (args.length()<2) {
+    fprintf(stderr,"Need at least two args in apply_pol_precon_c.\n");
+    return octave_value_list();
+  }
+  MAP *map=(MAP *)get_pointer(args(0));
+  MAP *precon=(MAP *)get_pointer(args(1));
+  apply_pol_precon(map,precon);
+  return octave_value_list();
+
+}
+#endif

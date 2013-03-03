@@ -106,14 +106,6 @@ DEFUN_DLD (set_tod_ndata_c, args, nargout, "Read a TOD header, including pointin
   return octave_value_list();
 }
 
-
-/*--------------------------------------------------------------------------------*/
-#if 0
-DEFUN_DLD (convert_saved_pointing_to_pixellization, args, nargout, "Convert a TOD's saved RA/Dec to a map pixellization, freeing the RA/Dec storage..\n")
-{
-  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
-}  
-#endif
 /*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (set_tod_pointing_saved, args, nargout, "Read a TOD header, including pointing info etc.\n")
@@ -150,7 +142,7 @@ DEFUN_DLD (set_tod_pointing_saved_branch,args,nargout,"Set the branch cut on a T
   for (int i=0;i<mytod->ndet;i++)
     for (int j=0;j<mytod->ndata;j++)
       if (mytod->ra_saved[i][j]<val)
-	mytod->ra_saved[i][j]+=2*3.14592653589793;
+	mytod->ra_saved[i][j]+=2*3.141592653589793;
   return octave_value_list();
 }
 /*--------------------------------------------------------------------------------*/
@@ -177,6 +169,21 @@ DEFUN_DLD (free_tod_pointing_saved, args, nargout, "Read a TOD header, including
 #endif
 
   return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (free_tod_2gamma_saved,args,nargou,"Free 2gamma in a tod.\n")
+{
+#ifdef ACTPOL
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->twogamma_saved) {
+    free(mytod->twogamma_saved[0]);
+    free(mytod->twogamma_saved);
+    mytod->twogamma_saved=NULL;
+  }
+#endif
+  return octave_value_list();
+  
 }
 
 /*--------------------------------------------------------------------------------*/
@@ -456,6 +463,18 @@ DEFUN_DLD(free_tod_timevec_c,args,nargout,"Free the time from a TOD.\n")
   if (tod->dt) {
     free(tod->dt);
     tod->dt=NULL;
+  }
+  return octave_value_list();    
+    
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(free_tod_hwp_c,args,nargout,"Free the HWP from a TOD.\n")
+{
+  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  if (tod->hwp) {
+    free(tod->hwp);
+    tod->hwp=NULL;
   }
   return octave_value_list();    
     
