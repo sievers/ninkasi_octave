@@ -1,4 +1,4 @@
-function[pix1,pix2]=radec2pix_fits(ra,dec,params)
+function[pix1,pix2]=radec2pix_fits(ra,dec,params,varargin)
 %convert ra/dec into FITS map coordinates using parameters contained in params.
 %params can be set from a file using get_fits_projection_params.m  ra/dec in degrees
 
@@ -6,13 +6,18 @@ if ~isfield(params,'fittype')
   error('Need field fittype set inside params in radec2pix_fits.');
 end
 
+force_positive=get_keyval_default('force_positive',true,varargin{:});
+
 
 switch(params.fittype)
   case {'cea'}
    pix1=ra/params.radelt+params.raoff;
-   ind=pix1<0;
-   %disp(['correcting ' num2str(sum(ind)) ' sources.']);
-   pix1(ind)=(ra(ind)-360)/params.radelt+params.raoff;
+   if (force_positive)
+     ind=pix1<0;
+     %disp(['correcting ' num2str(sum(ind)) ' sources.']);
+     pix1(ind)=(ra(ind)-360)/params.radelt+params.raoff;
+   end
+
    pix2=params.decoff+sin(dec*pi/180)*180/pi/params.pv/params.decdelt;
  case {'tan'}
   dec0=params.deccent*pi/180;
