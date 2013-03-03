@@ -61,6 +61,7 @@ for j=1:length(tods),
         convert_saved_pointing_to_pixellization(mytod,mapset.skymap.mapptr)
       end
     end
+    free_tod_pointing_saved(mytod);
   end
   
   allocate_tod_storage(mytod);
@@ -143,7 +144,7 @@ for j=1:length(tods),
   end
   
   if (do_actpol_pointing)
-    free_tod_pointing_saved(mytod);
+    %free_tod_pointing_saved(mytod);
     free_saved_pixellization(mytod);
   end
   

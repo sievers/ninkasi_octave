@@ -277,6 +277,49 @@ DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol 
 
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD(set_tod_twogamma_fit_c,args,nargout,"Install a saved twogamma fit to az.\n")
+{
+  if (args.length()<3) {
+    printf("need at least 3 args to set_tod_twogamma_fit_c.\n");
+    return octave_value_list();
+  }
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  if (!tod->actpol_pointing) {
+    printf("actpol_pointing not saved in TOD.\n");
+    return octave_value_list();
+  }
+
+  Matrix sinmat=args(1).matrix_value();
+  Matrix cosmat=args(2).matrix_value();
+  dim_vector dm_sin=sinmat.dims();
+  dim_vector dm_cos=cosmat.dims();
+  printf("dims are %d %d, %d %d\n",dm_sin(0),dm_sin(1),dm_cos(0),dm_cos(1));
+  if ((dm_sin(0)!=dm_cos(0))||(dm_sin(1)!=dm_cos(1))||(dm_sin(1)!=tod->ndet)) {
+    printf("dimesion mismatch in set_tod_twogamma_fit_c.\n");
+    return octave_value_list();
+  }
+  ACTpolPointingFit *pfit=tod->actpol_pointing;
+  int nterm=dm_sin(0)-1;
+  pfit->gamma_az_sin_coeffs=matrix(tod->ndet,nterm);
+  pfit->gamma_az_cos_coeffs=matrix(tod->ndet,nterm);
+  pfit->gamma_ctime_sin_coeffs=(actData *)malloc(sizeof(actData)*tod->ndet);
+  pfit->gamma_ctime_cos_coeffs=(actData *)malloc(sizeof(actData)*tod->ndet);
+  pfit->n_gamma_az_coeffs=nterm;
+  for (int det=0;det<tod->ndet;det++) {
+    for (int j=0;j<nterm;j++) {
+      pfit->gamma_az_sin_coeffs[det][j]=sinmat(nterm-1-j,det);
+      pfit->gamma_az_cos_coeffs[det][j]=cosmat(nterm-1-j,det);
+    }
+    pfit->gamma_ctime_sin_coeffs[det]=sinmat(nterm,det);
+    pfit->gamma_ctime_cos_coeffs[det]=cosmat(nterm,det);
+  }
+  for (int i=0;i<nterm;i++) {
+    printf("first detector fits are %d %14.6g %14.6g\n",i,pfit->gamma_az_sin_coeffs[0][i],pfit->gamma_az_cos_coeffs[0][i]);
+  }
+  
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD(precalc_actpol_pointing_exact,args,nargout,"Precalculated stuff for an actpol pointing fit.\n")
 {
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
@@ -761,7 +804,11 @@ DEFUN_DLD (get_map_poltag,args,nargout,"Return the polarization tag for a submap
       if (icur==3)
 	return octave_value('U');
       if (icur==4)
-	return octave_value('V');
+	return octave_value("QQ");
+      if (icur==5)
+	return octave_value("QU");
+      if (icur==6)
+	return octave_value("UU");
     }
   }
   fprintf(stderr,"Managed to not find a polarization.  Very odd...\n");

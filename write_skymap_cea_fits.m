@@ -44,7 +44,7 @@ vals={};
 if ~is_map_polarized(map)
   write_fits_cell(fname,mm,keys,vals);
 else
-  for j=1:size(mm,3)
+  for j=1:size(mm,1)
     ii=max(strfind(fname,'.fits'));
     mytag=['_' get_map_poltag(map,j)];
     if ~isempty(ii)
@@ -52,7 +52,7 @@ else
     else
       fname_use=[fname mytag '.fits'];
     end
-    write_fits_cell(fname_use,mm(:,:,j),keys,vals);
+    write_fits_cell(fname_use,squeeze(mm(j,:,:)),keys,vals);
   end
 end
 

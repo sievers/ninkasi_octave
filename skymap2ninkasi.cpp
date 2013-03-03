@@ -196,29 +196,25 @@ DEFUN_DLD (make_weightmap_ninkasi, args, nargout, "Make a weight map.\n")
 DEFUN_DLD (skymap2octave, args, nargout, "Turn a ninkasi skymap into an octave one.\n")
 {
   MAP *mymap=(MAP *)get_pointer(args(0));
-  //printf("mapsizes are %d %d\n",mymap->nx,mymap->ny);
 
-  //Matrix map(mymap->nx,mymap->ny);
-
-  dim_vector dims(mymap->nx,mymap->ny,get_npol_in_map(mymap));
-  //NDArray map(mymap->nx,mymap->ny,get_npol_in_map(mymap));
-  NDArray map(dims);
-
-
-  double *mapvec=map.fortran_vec();
-  long i;
-#ifdef ACTPOL
-  long nn=mymap->npix*get_npol_in_map(mymap);
-  //printf("Have %ld %ld pixels.\n",nn,mymap->npix);
-  for (i=0;i<nn;i++) {
-    mapvec[i]=mymap->map[i];   
+  //dim_vector dims(mymap->nx,mymap->ny,get_npol_in_map(mymap));
+  int npol=get_npol_in_map(mymap);
+  if (npol==1) {
+    dim_vector dims(mymap->nx,mymap->ny);
+    NDArray map(dims);
+    double *mapvec=map.fortran_vec();
+    memcpy(mapvec,mymap->map,mymap->npix*sizeof(double));
+    return octave_value(map);
   }
-#else
-  for (i=0;i<mymap->npix;i++) {
-    mapvec[i]=mymap->map[i];
+  else {
+    dim_vector dims(npol,mymap->nx,mymap->ny);    
+    NDArray map(dims);
+    double *mapvec=map.fortran_vec();
+    memcpy(mapvec,mymap->map,mymap->npix*sizeof(double)*npol);
+    return octave_value(map);
   }
-#endif
-  return octave_value(map);
+  return octave_value_list();  //never get here.
+
 }
 
 /*--------------------------------------------------------------------------------*/

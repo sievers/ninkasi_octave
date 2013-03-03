@@ -720,7 +720,7 @@ DEFUN_DLD(tod2polmap,args,nargout," Project a tod into a polmap.  Args are (tod,
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   MAP *mymap=(MAP *)get_pointer(args(1));
   
-  tod2polmap(mymap,mytod);
+  tod2polmap_copy(mymap,mytod);
 
   return octave_value_list();
 
@@ -2658,6 +2658,16 @@ DEFUN_DLD (get_detector_altaz_c, args, nargout, "Get alt/az of a detector.\n")
   destroy_pointing_fit_scratch(scratch);
  
   return octave_value(altaz);
+
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (tod2polmap_copy,args,nargout,"Project a polmap into a TOD.  pointing *must* be saved.  Args are (map,tod).\n")
+{
+  MAP *mymap=(MAP *)get_pointer(args(0));
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(1));
+  
+  tod2polmap_copy(mymap,mytod);
+  return octave_value_list();
 
 }
 /*--------------------------------------------------------------------------------*/
