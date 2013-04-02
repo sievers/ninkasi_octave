@@ -32,7 +32,9 @@ double convert_val(const char *c, int fmt)
   char ii[8];
   double val;
   float *f;
+  double *d;
   short int *s;
+  long *l;
   switch(fmt) {
   case -4:
     f=(float *)ii;
@@ -48,11 +50,32 @@ double convert_val(const char *c, int fmt)
     ii[1]=c[0];
     val=(double)(*s);
     break;
+    //case 1:
+    //val=(double)(*c);
+    //break;
+  case 4:
+    val=(int)(*c);
+    break;
+  case -8:
+    d=(double *)ii;
+    ii[0]=c[7];
+    ii[1]=c[6];
+    ii[2]=c[5];
+    ii[3]=c[4];
+    ii[4]=c[3];
+    ii[5]=c[2];
+    ii[6]=c[1];
+    ii[7]=c[0];
+    val=(double)(*d);
+    break;
+  case 8:
+    val=(long)(*s);
+    break;
   case 1:
-    val=(double)(*c);
+    val=(int)(c[0]);
     break;
   }
-
+  
   return val;
 
 }
