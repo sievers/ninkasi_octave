@@ -22,8 +22,9 @@ pixsize_y=1/(pixsize/60*pi/180*ny)*2*pi;
 
 rr=sqrt(repmat(pixsize_x^2*rx'.^2,[1 ny])+repmat(pixsize_y^2*ry.^2,[nx 1]));
 
-rr=interp1(l,sqrt(powspec),rr,'pchip',0);
-map=ifft2(map.*rr);
+%rr=interp1(l,sqrt(powspec),rr,'pchip',0);
+rr=interp1(l,sqrt(powspec),rr,0);
+map=ifft2(map.*rr)*sqrt(numel(rr))/2;
 
 map=map(1:mapsize(1),1:mapsize(2));
 

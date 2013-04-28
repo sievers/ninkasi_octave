@@ -55,6 +55,7 @@ autoload('detrend_data_c_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.
 autoload('scale_rowcol_mat',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('colmult',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('dpotrs',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
+autoload('invsafe_c',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('dsyrk',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('dsyrk2',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('unix_ctime',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));

@@ -11,7 +11,14 @@ end
 
 if isfield(mapset,'skymap')
   if isfield(precon,'skymap'),  %apply a Jacoby preconditioner to the sky
-    mapset.skymap.map(precon.skymap.map>0)=mapset.skymap.map(precon.skymap.map>0)./precon.skymap.map(precon.skymap.map>0);    
+    if (~is_map_polarized(mapset.skymap.mapptr))
+      mapset.skymap.map(precon.skymap.map>0)=mapset.skymap.map(precon.skymap.map>0)./precon.skymap.map(precon.skymap.map>0);
+    else
+      octave2skymap(mapset.skymap);
+      apply_pol_precon_c(mapset.skymap.mapptr,precon.skymap.mapptr);
+      mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
+    end
+
     %mapset.skymap.map=mapset.skymap.map.*precon.skymap.map;
   end
 end

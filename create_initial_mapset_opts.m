@@ -134,6 +134,8 @@ end
 
 
 for j=1:length(tods),
+  tt_start=now;
+  mdisp(['master working on TOD ' num2str(j) ' of ' num2str(length(tods))]);
   if length(tods)==1,
     mytod=tods;
   else
@@ -142,11 +144,13 @@ for j=1:length(tods),
 
   if (do_actpol_pointing)
     precalc_actpol_pointing_exact(mytod);
-    set_tod_twogamma_fit(tods,'npoly_2gamma',3);
+    set_tod_twogamma_fit(mytod,'npoly_2gamma',3);
     
     if isfield(mapset.skymap,'mapptr')
       convert_saved_pointing_to_pixellization(mytod,mapset.skymap.mapptr)
     end
+    free_tod_pointing_saved(mytod);
+
   end
 
 
@@ -174,14 +178,8 @@ for j=1:length(tods),
       end
       if (sim_1overf)
         mdisp('creating simulated 1 over f data.');
-        if (1) %should now make the simulated data in-place
-          make_fake_1overf_common_mode_data(mytod,myopts);
-        else
-          simdat=make_fake_1overf_common_mode_data(mytod,myopts);
-          push_tod_data(simdat,mytod);
-          clear simdat;
-        end
-
+        %should now make the simulated data in-place
+        make_fake_1overf_common_mode_data(mytod,myopts);
       end
     else
       mdisp('reading tod data here');
@@ -668,8 +666,8 @@ for j=1:length(tods),
     free_tod_storage(mytod);
   end
   if (do_actpol_pointing) %we cached the pointing earlier, now we need to get rid of it.
-    free_tod_pointing_saved(mytod);
-    free_saved_pixellization(mytod);
+    free_tod_pointing_saved(mytod); %should have already been freed, but just in case...
+    free_saved_pixellization(mytod); 
   end
 
   if (monitor_tods)    
@@ -678,7 +676,8 @@ for j=1:length(tods),
     fclose(monitor_fid);
   end
   
-  
+  tt_stop=now();
+  mdisp(['finished processing TOD in ' num2str(86400*(tt_stop-tt_start))])
 end
 mdisp('master has finished his TODs');
 

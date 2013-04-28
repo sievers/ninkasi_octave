@@ -91,6 +91,7 @@ DEFUN_DLD (set_tod_timevec_c, args, nargout, "Store a full time vector, useful f
   for (int i=0;i<mytod->ndata;i++)
     mytod->dt[i]=tt[i];
   printf("first time sample is %16.7e %16.7e %d\n",mytod->dt[0],tt[0],mytod->ndata);
+  mytod->ctime=tt[0];
 
   return octave_value_list();
 }

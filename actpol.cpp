@@ -293,7 +293,7 @@ DEFUN_DLD(set_tod_twogamma_fit_c,args,nargout,"Install a saved twogamma fit to a
   Matrix cosmat=args(2).matrix_value();
   dim_vector dm_sin=sinmat.dims();
   dim_vector dm_cos=cosmat.dims();
-  printf("dims are %d %d, %d %d\n",dm_sin(0),dm_sin(1),dm_cos(0),dm_cos(1));
+  //printf("dims are %d %d, %d %d\n",dm_sin(0),dm_sin(1),dm_cos(0),dm_cos(1));
   if ((dm_sin(0)!=dm_cos(0))||(dm_sin(1)!=dm_cos(1))||(dm_sin(1)!=tod->ndet)) {
     printf("dimesion mismatch in set_tod_twogamma_fit_c.\n");
     return octave_value_list();
@@ -313,9 +313,9 @@ DEFUN_DLD(set_tod_twogamma_fit_c,args,nargout,"Install a saved twogamma fit to a
     pfit->gamma_ctime_sin_coeffs[det]=sinmat(nterm,det);
     pfit->gamma_ctime_cos_coeffs[det]=cosmat(nterm,det);
   }
-  for (int i=0;i<nterm;i++) {
-    printf("first detector fits are %d %14.6g %14.6g\n",i,pfit->gamma_az_sin_coeffs[0][i],pfit->gamma_az_cos_coeffs[0][i]);
-  }
+  //  for (int i=0;i<nterm;i++) {
+  // printf("first detector fits are %d %14.6g %14.6g\n",i,pfit->gamma_az_sin_coeffs[0][i],pfit->gamma_az_cos_coeffs[0][i]);
+  //}
   
   return octave_value_list();
 }

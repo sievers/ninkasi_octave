@@ -25,16 +25,24 @@ for j=1:length(tods),
 
   
   if (do_new_pointing)
-    disp('doing pointing')
+    mdisp('doing pointing')
     precalc_actpol_pointing_exact(mytod);
+    convert_saved_pointing_to_pixellization(mytod,map);
+    free_tod_pointing_saved(mytod);
   end
   
   mdisp('assigned value');
-  tod2map(mytod,map);
+  if (is_map_polarized(map))
+    tod2polmap(mytod,map);
+  else
+    tod2map(mytod,map);
+  end
   mdisp('projected');
   
   if (do_new_pointing)
-    free_tod_pointing_saved(mytod);
+    %free_tod_pointing_saved(mytod);
+    free_saved_pixellization(mytod);
+    
   end
 
 

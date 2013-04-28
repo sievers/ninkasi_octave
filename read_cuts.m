@@ -1,7 +1,12 @@
-function[found]=read_cuts(tods,dirroot)
+function[found]=read_cuts(tods,dirroot,varargin)
 if ~exist('dirroot')
   dirroot='';
 end
+read_octave=false;
+if ~isempty(varargin)
+  read_octave=get_keyval_default('read_octave',false,varargin{:});
+end
+
 
 found=true(size(tods));
 for j=1:length(tods)
@@ -23,7 +28,11 @@ for j=1:length(tods)
 
   if ~isempty(cutname),
     mdisp(['reading cuts ' cutname ' on tod ' get_tod_name(tods(j))]);
-    read_cuts_c(tods(j),cutname);
+    if (read_octave)
+      read_cuts_octave(tods(j),cutname);
+    else
+      read_cuts_c(tods(j),cutname);
+    end
   else
     disp(['unable to find cuts on ' get_tod_name(tods(j))]);
     found(j)=false;

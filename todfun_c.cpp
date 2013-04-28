@@ -2011,9 +2011,11 @@ DEFUN_DLD (assign_tod_time_constants_c, args, nargout, "Assign the time constant
   int nrow=dm(0);
   int ncol=dm(1);
   mytod->time_constants=matrix(nrow,ncol);
-  for (int i=0;i<nrow;i++)
-    for (int j=0;j<nrow;j++)
+  for (int i=0;i<nrow;i++) {
+    //for (int j=0;j<nrow;j++)  //this must be a bug.  grrr
+    for (int j=0;j<ncol;j++)  
       mytod->time_constants[i][j]=taus(i,j);
+  }
   return octave_value_list();
   
 }
@@ -2795,7 +2797,7 @@ DEFUN_DLD (set_tod_pointing_c, args, nargout, "Set the pointing for a TOD.  Retu
       offset->offsetAzCosAlt[i][j]=daz(i,j);      
     }
   //printf("assigned.\n");
-  //printf("Offsets of (0,0) are %14.7f %14.7f\n",offset->offsetAlt[0][0],offset->offsetAzCosAlt[0][0]);
+  printf("Offsets of (0,0) are %14.7f %14.7f\n",offset->offsetAlt[0][0],offset->offsetAzCosAlt[0][0]);
 
   cut_mispointed_detectors(tod);
   //printf("cut mispointed detectors.\n");

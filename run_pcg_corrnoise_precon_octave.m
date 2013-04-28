@@ -97,6 +97,9 @@ if (write_times)
       end
       for k=1:length(tods),
         tod_name=get_tod_name(tods(k));
+        if iscell(tod_name)
+          tod_name=tod_name{1};
+        end
         [rows,cols]=get_tod_rowcol(tods(k));
         %fprintf(fid,'%s %14.4f %6d %8d %s\n',tod_name,tod_times(k),length(rows),get_tod_ndata(tods(k)),getenv('HOSTNAME'));
         fprintf(fid,'%s %14.4f %14.4f %14.4f %14.4f %6d %8d %4d\n',tod_name,tod_times(k,1),tod_times(k,2),tod_times(k,3),tod_times(k,4),length(rows),get_tod_ndata(tods(k)),myid);

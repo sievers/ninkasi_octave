@@ -29,7 +29,7 @@ max_sinerr=max(max(mat*sin_fitp-sin(twogamma)));
 max_coserr=max(max(mat*cos_fitp-cos(twogamma)));
 mdisp(['Max cos/sin errors in set_tod_twogamma_fit are ' num2str([max_coserr max_sinerr])]);
 clear twogamma
-whos
-disp([sin_fitp(:,1) cos_fitp(:,1)])
+
+%disp([sin_fitp(:,1) cos_fitp(:,1)])
 set_tod_twogamma_fit_c(tod,sin_fitp,cos_fitp);
 

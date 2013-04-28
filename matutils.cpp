@@ -11,6 +11,7 @@ extern "C"
 #include <omp.h>
   void dsyrk_(char *uplo, char *trans, int *n, int *k, double *alpha, double *a, int *lda, double *beta, double *c, int *ldc, int uplolen, int translen);
   void dpotrs_(char *uplo, int *n, int *nrhs, double *a, int *lda, double *b, int *ldb, int *info, int uplolen);
+#include <nk_clapack.h>
 #ifdef __cplusplus
 }  /* end extern "C" */
 #endif
@@ -200,6 +201,21 @@ DEFUN_DLD (dsyrk2, args, nargout, "Multiply a matrix by its transposed self..\n"
 }
 
 /*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD(invsafe_c,args,nargout,"Invert a possibly singular matrix.  args are mat,[thresh].  any eigenvalues less than thresh*max are set to zero.\n")
+{
+  Matrix mat=args(0).matrix_value();
+  double thresh=1e-8;
+  if (args.length()>1) {
+    Matrix tmp=args(1).matrix_value();
+    thresh=tmp(0,0);
+    //printf("setting threshold to %14.5g\n",thresh);
+  }
+  double *mm=mat.fortran_vec();
+  dim_vector dm=mat.dims();
+  dinvsafe(mm,dm(1),thresh);
+  return octave_value(mat);
+}
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (scale_rowcol_mat, args, nargout, "Test complex stuff.\n")
 {
