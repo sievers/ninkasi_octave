@@ -146,6 +146,30 @@ DEFUN_DLD (set_tod_pointing_saved_branch,args,nargout,"Set the branch cut on a T
 	mytod->ra_saved[i][j]+=2*3.141592653589793;
   return octave_value_list();
 }
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (free_tod_ra_saved, args, nargout, "Free cached RA.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->ra_saved) {
+    free(mytod->ra_saved[0]);
+    free(mytod->ra_saved);
+    mytod->ra_saved=NULL;
+  }
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (free_tod_dec_saved, args, nargout, "Free cached DEC.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->dec_saved) {
+    free(mytod->dec_saved[0]);
+    free(mytod->dec_saved);
+    mytod->dec_saved=NULL;
+  }
+  return octave_value_list();
+}
+
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (free_tod_pointing_saved, args, nargout, "Read a TOD header, including pointing info etc.\n")
 {
@@ -160,15 +184,27 @@ DEFUN_DLD (free_tod_pointing_saved, args, nargout, "Read a TOD header, including
     free(mytod->dec_saved);
     mytod->dec_saved=NULL;
   }
+  
+ 
 
 #ifdef ACTPOL
-  if (mytod->twogamma_saved) {
-    free(mytod->twogamma_saved[0]);
-    free(mytod->twogamma_saved);
-    mytod->twogamma_saved=NULL;
-  }  
+  int free_twogamma=1;
+  if (args.length()>1) {
+    free_twogamma=(int)get_value(args(1));
+  }
+  if (free_twogamma) {
+    if (mytod->twogamma_saved) {
+      free(mytod->twogamma_saved[0]);
+      free(mytod->twogamma_saved);
+      mytod->twogamma_saved=NULL;
+    }
+  }
+  else
+    printf("Skipping two_gamma free.\n");
+  
+  
 #endif
-
+  
   return octave_value_list();
 }
 

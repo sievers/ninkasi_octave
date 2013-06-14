@@ -312,3 +312,50 @@ DEFUN_DLD (fft_omp, args, nargout, "Take fft along columns w/ openmp.\n")
 
 		       
 }
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(fft2_r2c,args,nargout,"Take the 2-D real to complex FFT.\n")
+{
+  Matrix mat=args(0).matrix_value();
+  dim_vector dm=mat.dims();
+  int nrow=dm(0);
+  int ncol=dm(1);
+  int nn=(nrow/2)+1;
+  //printf("nrow/ncol/nn are %d %d %d\n",nrow,ncol,nn);
+  ComplexMatrix cmat(nn,ncol);
+  double *ptr=mat.fortran_vec();
+  fftw_complex *cptr=(fftw_complex *)cmat.fortran_vec();
+  fftw_plan p=fftw_plan_dft_r2c_2d(ncol,nrow,ptr,cptr,FFTW_ESTIMATE);
+  fftw_execute(p);
+  fftw_destroy_plan(p);
+  return octave_value(cmat);
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(fft2_c2r,args,nargout,"Take the 2-D real to complex FFT.\n")
+{
+  ComplexMatrix cmat=args(0).complex_matrix_value();
+
+  dim_vector dm=cmat.dims();
+  int nn=dm(0);
+  int ncol=dm(1);
+  int nrow=2*(nn-1);
+  if (args.length()>1) {
+    int iseven=get_value(args(1));
+    if (iseven==0) {
+      nrow=2*nn-1;
+    }
+  }
+  printf("nrow/ncol/nn are %d %d %d\n",nrow,ncol,nn);
+  Matrix mat(nrow,ncol);
+  double *ptr=mat.fortran_vec();
+  fftw_complex *cptr=(fftw_complex *)cmat.fortran_vec();
+  fftw_plan p=fftw_plan_dft_c2r_2d(ncol,nrow,cptr,ptr,FFTW_ESTIMATE);
+  fftw_execute(p);
+  fftw_destroy_plan(p);
+  int nelem=nrow*ncol;
+  double fac=1.0/nelem;
+#pragma omp parallel for
+  for (int i=0;i<nelem;i++)
+    ptr[i]*=fac;
+  return octave_value(mat);
+}

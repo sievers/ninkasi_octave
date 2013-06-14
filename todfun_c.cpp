@@ -878,6 +878,19 @@ DEFUN_DLD (assign_tod_value_c, args, nargout, "Assign a value to a tod.  Args ar
   return octave_value_list();  
 }
 /*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (assign_tod_detector_values_c, args, nargout, "Assign a constant value to each detector in a tod.  Args are (tod,value)\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
+  Matrix det_vals=args(1).matrix_value();
+  actData *dd=det_vals.fortran_vec();
+  for (int i=0;i<mytod->ndet;i++) {
+    for (int j=0;j<mytod->ndata;j++)
+      mytod->data[i][j]=dd[i];
+  }
+  return octave_value_list();  
+}
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD (tod_hits_source_c, args, nargout, "Check to see if a tod might hit a source Args are (ra,dec,dist,tod)\n")
 {
   actData ra=get_value(args(0));
@@ -2547,6 +2560,63 @@ DEFUN_DLD (set_tod_pointing_tiled_c, args, nargout, "Set pointing to a tiled fit
   return octave_value_list();
 }
 
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_all_detector_ra_saved_c, args, nargout, "Get saved RA of all detectors.\n")
+{
+  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  Matrix ra_mat(tod->ndata,tod->ndet);
+  //Matrix dec_mat(tod->ndata,tod->ndet);
+  
+  
+  //printf("tod->ra_saved is %ld, tod->dec_saved is %ld\n",(long)tod.ra_saved-(long)tod,(long)tod.dec_saved-(long)tod);
+  //printf("tod->ra_saved is %ld, tod->dec_saved is %ld\n",(long)(&(tod->ra_saved))-(long)tod,(long)(&(tod->dec_saved))-(long)tod);
+
+  if (tod->ra_saved!=NULL) {
+    //printf("returning saved pointing.\n");
+    //printf("ndata and ndet are %d %d\n",tod->ndata,tod->ndet);
+    actData *ra_ptr=ra_mat.fortran_vec();
+    //actData *dec_ptr=dec_mat.fortran_vec();
+    memcpy(ra_ptr,tod->ra_saved[0],tod->ndata*tod->ndet*sizeof(actData));
+    //memcpy(dec_ptr,tod->dec_saved[0],tod->ndata*tod->ndet*sizeof(actData));
+  
+    return octave_value(ra_mat);
+  }
+  else {
+    fprintf(stderr,"Do not have RA cached in get_all_detector_ra_saved_c.\n");
+    return octave_value_list();
+  }
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_all_detector_dec_saved_c, args, nargout, "Get saved DEC of all detectors.\n")
+{
+  mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+  Matrix dec_mat(tod->ndata,tod->ndet);
+  //Matrix dec_mat(tod->ndata,tod->ndet);
+  
+  
+  //printf("tod->ra_saved is %ld, tod->dec_saved is %ld\n",(long)tod.ra_saved-(long)tod,(long)tod.dec_saved-(long)tod);
+  //printf("tod->ra_saved is %ld, tod->dec_saved is %ld\n",(long)(&(tod->ra_saved))-(long)tod,(long)(&(tod->dec_saved))-(long)tod);
+
+  if (tod->dec_saved!=NULL) {
+    //printf("returning saved pointing.\n");
+    //printf("ndata and ndet are %d %d\n",tod->ndata,tod->ndet);
+    actData *dec_ptr=dec_mat.fortran_vec();
+    //actData *dec_ptr=dec_mat.fortran_vec();
+    memcpy(dec_ptr,tod->dec_saved[0],tod->ndata*tod->ndet*sizeof(actData));
+    //memcpy(dec_ptr,tod->dec_saved[0],tod->ndata*tod->ndet*sizeof(actData));
+  
+    return octave_value(dec_mat);
+  }
+  else {
+    fprintf(stderr,"Do not have DEC cached in get_all_detector_dec_saved_c.\n");
+    return octave_value_list();
+  }
+  return octave_value_list();
+}
+
+
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (get_all_detector_radec_c, args, nargout, "Get RA/Dec of a detector.\n")
 {
@@ -2829,8 +2899,24 @@ DEFUN_DLD (get_tod_pointing_offsets_c, args, nargout, "Make a matrix of the TOD 
   int nargin = args.length();
   if (nargin==0)
     return octave_value_list();
-  
+ 
+
   mbTOD  *tod=(mbTOD *)get_pointer(args(0));
+
+  if (tod->actpol_pointing) {
+    printf("Returning actpol pointing offsets.\n");
+    ColumnVector dx(tod->ndet);
+    ColumnVector dy(tod->ndet);
+    for (int i=0;i<tod->ndet;i++) {
+      dx(i)=tod->actpol_pointing->dx[i];
+      dy(i)=tod->actpol_pointing->dy[i];
+    }
+    octave_value_list retval;
+    retval(0)=octave_value(dx);
+    retval(1)=octave_value(dy);
+    return retval;
+  }
+
   printf("Offsets of (0,0) are %14.7f %14.7f\n",tod->pointingOffset->offsetAlt[0][0],tod->pointingOffset->offsetAzCosAlt[0][0]);
   Matrix dalt(33,32);
   Matrix daz(33,32);

@@ -1,3 +1,4 @@
+
 autoload('read_dirfile_tod_data_from_rowcol_list_c',fullfile (fileparts (mfilename ("fullpath")),'todfun_c.oct'));
 %autoload('simple_test_diag_proj_noise_inv',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_noise_to_tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -19,6 +20,7 @@ autoload('tod_has_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfu
 autoload('assign_rotmat_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_time_constants_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_value_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('assign_tod_detector_values_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod_hits_source_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_src2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('add_srcvec2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -66,6 +68,9 @@ autoload('fft_r2c_many',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct
 autoload('fft_omp_r2c_many',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'));
 autoload('fft_c2r_c',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'));
 autoload('fftw_init_threaded',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'));
+autoload('fft2_r2c',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'));
+autoload('fft2_c2r',fullfile(fileparts(mfilename("fullpath")),'fft_utils.oct'));
+
 autoload('filter_tod_noise_c',fullfile(fileparts(mfilename("fullpath")),'noise_fun.oct'));
 autoload('fit_tod_noise_c',fullfile(fileparts(mfilename("fullpath")),'noise_fun.oct'));
 autoload('free_tod_storage_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -192,6 +197,8 @@ autoload('tod2polmap_copy',fullfile(fileparts(mfilename("fullpath")),'todfun_c.o
 autoload('find_max_tod_pointing_err_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_coarse_ind_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_all_detector_radec_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('get_all_detector_ra_saved_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('get_all_detector_dec_saved_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_tod_pointing_offsets_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_alldata_fft_plans_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('query_tod_type',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -223,6 +230,8 @@ autoload('set_tod_pointing_saved',fullfile(fileparts(mfilename("fullpath")),'cre
 autoload('set_tod_pointing_saved_branch',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_data_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('free_tod_pointing_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
+autoload('free_tod_ra_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
+autoload('free_tod_dec_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('free_tod_2gamma_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('free_tod_data_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_radec_lims_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
@@ -253,6 +262,7 @@ autoload('get_map_poltag',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'
 autoload('get_sincos_mat',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('test_ninkasi_linfit',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('fit_hwp_poly_to_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('fit_hwp_az_poly_to_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_demodulated_hwp_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('remodulate_hwp_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('init_demod_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));

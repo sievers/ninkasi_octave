@@ -22,13 +22,17 @@ end
 mat(:,end)=tvec;
 mm=mat'*mat;
 sin_rhs=mat'*sin(twogamma);
-cos_rhs=mat'*cos(twogamma);
 sin_fitp=inv(mm)*sin_rhs;
+clear sin_rhs;
+cos_rhs=mat'*cos(twogamma);
 cos_fitp=inv(mm)*cos_rhs;
-max_sinerr=max(max(mat*sin_fitp-sin(twogamma)));
-max_coserr=max(max(mat*cos_fitp-cos(twogamma)));
-mdisp(['Max cos/sin errors in set_tod_twogamma_fit are ' num2str([max_coserr max_sinerr])]);
-clear twogamma
+clear cos_rhs
+if (0)
+  max_sinerr=max(max(mat*sin_fitp-sin(twogamma)));
+  max_coserr=max(max(mat*cos_fitp-cos(twogamma)));
+  mdisp(['Max cos/sin errors in set_tod_twogamma_fit are ' num2str([max_coserr max_sinerr])]);
+  clear twogamma
+end
 
 %disp([sin_fitp(:,1) cos_fitp(:,1)])
 set_tod_twogamma_fit_c(tod,sin_fitp,cos_fitp);

@@ -4,7 +4,6 @@ function[tags]=get_tod_tags_from_names(tod_names)
 if ischar(tod_names)
   tod_names={tod_names};
 end
-
 if length(tod_names)==1
   tags=parse_tod_name(tod_names{1});
 else

@@ -9,10 +9,15 @@ mpi_barrier;  %make sure directory exists before proceeding.
 froot(end+1)='/';
 for j=1:numel(tods),
   fname=get_tod_name(tods(j));
+  if iscell(fname)
+    fname=fname{1};
+  end
+  
   if isempty(fname)
     tt=num2str(j);
   else
-    tt=get_tod_tags_from_names(get_tod_name(tods(j)));
+    %tt=get_tod_tags_from_names(get_tod_name(tods(j)));
+    tt=get_tod_tags_from_names(fname);
   end
   save_tod_noise_banded_projvec(tods(j),[froot 'noise_' tt]);
 end

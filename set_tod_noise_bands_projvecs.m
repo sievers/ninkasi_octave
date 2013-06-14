@@ -1,6 +1,14 @@
-function[value]=set_tod_noise_bands_projvecs(tod,myopts)
+function[bands]=set_tod_noise_bands_projvecs(tod,myopts)
 mdisp('setting projvec noise.');
+
 bands=myopts.bands; %if not here, we will crash.
+if ischar(bands),
+  if strcmp(bands,'auto'),
+    bands=get_band_edges_auto(tod,myopts);
+  end
+end
+
+
 nband=numel(bands)-1;
 scale_facs=get_struct_mem(myopts,'noise_scale_facs',1); 
 det_mode_thresh=get_struct_mem(myopts,'det_mode_thresh',1);  %if a mode has a single amplitude on a detector greater than this, assume 

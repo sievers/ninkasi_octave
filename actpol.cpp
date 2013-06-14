@@ -829,7 +829,7 @@ DEFUN_DLD(fit_hwp_poly_to_data_c,args,nargout,"Fit sins/cosines/(low-order) poly
     nsine=(int)get_value(args(1));
   if (nargin>2)
     npoly=(int)get_value(args(2));
-  if (1) {
+  if (nargout==0) {
     remove_hwp_poly_from_data(tod,nsine,npoly);
     return octave_value_list();
   }
@@ -840,6 +840,46 @@ DEFUN_DLD(fit_hwp_poly_to_data_c,args,nargout,"Fit sins/cosines/(low-order) poly
   memset(fitp[0],0,sizeof(actData)*tod->ndet*nparam);
 
   fit_hwp_poly_to_data(tod, nsine,npoly,fitp,NULL);
+  Matrix myfitp(nparam,tod->ndet);
+  //printf("doing memcpy now.\n");
+  memcpy(myfitp.fortran_vec(),fitp[0],nparam*tod->ndet*sizeof(actData));
+  //printf("finished.\n");
+  free(fitp[0]);
+  free(fitp);
+  return octave_value(myfitp);
+
+
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(fit_hwp_az_poly_to_data_c,args,nargout,"Fit sins/cosines/(low-order) az/polynomials to tod data.  Args are (tod, nsin, naz,npoly).\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  if ((tod->data==NULL) ||(tod->hwp==NULL)) {
+    fprintf(stderr,"TOD isn't sufficiently populated in fit_hwp_poly_to_data_c.\n");
+    return octave_value_list();
+  }
+  int npoly=1;
+  int naz=1;
+  int nsine=20;
+  int nargin=args.length();
+  if (nargin>1)
+    nsine=(int)get_value(args(1));
+  if (nargin>2)
+    naz=(int)get_value(args(2));
+  if (nargin>3)
+    npoly=(int)get_value(args(3));
+  if (nargout==0) {
+    remove_hwp_az_poly_from_data(tod,nsine,naz,npoly);
+    return octave_value_list();
+  }
+
+
+  int nparam=2*nsine+naz+npoly;
+  actData **fitp=matrix(tod->ndet,nparam);
+  memset(fitp[0],0,sizeof(actData)*tod->ndet*nparam);
+
+  fit_hwp_az_poly_to_data(tod, nsine,naz,npoly,fitp,NULL);
   Matrix myfitp(nparam,tod->ndet);
   //printf("doing memcpy now.\n");
   memcpy(myfitp.fortran_vec(),fitp[0],nparam*tod->ndet*sizeof(actData));

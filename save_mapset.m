@@ -13,7 +13,10 @@ if (myid==1)
 end
 if isfield(mapset,'cutvecs')  
   for j=1:length(tods),
-    tod_name=get_tod_names(tods(j));
+    tod_name=get_tod_name(tods(j));
+    if iscell(tod_name)
+      tod_name=tod_name{1};
+    end
     tag=get_tod_tags_from_names(tod_name);
     fid=fopen([dirname 'cutvecs_' tag],'w');
     if iscell(mapset.cutvecs)

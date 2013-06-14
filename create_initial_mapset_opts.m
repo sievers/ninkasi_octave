@@ -143,12 +143,15 @@ for j=1:length(tods),
   end
 
   if (do_actpol_pointing)
-    precalc_actpol_pointing_exact(mytod);
-    set_tod_twogamma_fit(mytod,'npoly_2gamma',3);
-    
+
+    precalc_actpol_pointing_exact(mytod,1);
     if isfield(mapset.skymap,'mapptr')
       convert_saved_pointing_to_pixellization(mytod,mapset.skymap.mapptr)
     end
+    free_tod_pointing_saved(mytod);
+    
+    precalc_actpol_pointing_exact(mytod,2);
+    set_tod_twogamma_fit(mytod,'npoly_2gamma',3);
     free_tod_pointing_saved(mytod);
 
   end
