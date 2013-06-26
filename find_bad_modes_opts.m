@@ -5,6 +5,7 @@ end
 
 freqs=get_struct_mem(opts,'mode_freqs',[0.25 4 1000]);
 eig_thresh=get_struct_mem(opts,'mode_thresh',4 );
+skip_mean=get_struct_mem(opts,'mode_skip_mean',false);
 nn=length(eig_thresh);
 for j=nn+1:length(freqs)-1,
   eig_thresh(j)=eig_thresh(nn);
@@ -26,17 +27,24 @@ n=get_tod_ndata(tod);
 dt=get_tod_dt(tod);
 nu=(0:(size(datft,1)-1))'/(n*dt);
 
-vecs=ones(size(datft,2),1);  %explicitly project the mean
-for j=1:size(vecs,2),
-  vecs(:,j)=vecs(:,j)/sqrt(sum(vecs(:,j).^2));
+if (~skip_mean)
+  vecs=ones(size(datft,2),1);  %explicitly project the mean
+  for j=1:size(vecs,2),
+    vecs(:,j)=vecs(:,j)/sqrt(sum(vecs(:,j).^2));
+  end
+else
+  vecs=[];
 end
+
 
 for j=1:length(freqs)-1,
   ind=(nu>freqs(j))&(nu<=freqs(j+1));
   crud=datft(ind,:);
   mat=real(crud'*crud);
   mat=mat+mat';
-  mat=project_vecs_from_mat(mat,vecs);
+  if (~isempty(vecs))
+    mat=project_vecs_from_mat(mat,vecs);
+  end
   mat=0.5*(mat+mat');
   [vv,ee]=eig(mat);
   ee=diag(ee);

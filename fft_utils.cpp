@@ -345,7 +345,7 @@ DEFUN_DLD(fft2_c2r,args,nargout,"Take the 2-D real to complex FFT.\n")
       nrow=2*nn-1;
     }
   }
-  printf("nrow/ncol/nn are %d %d %d\n",nrow,ncol,nn);
+  //printf("nrow/ncol/nn are %d %d %d\n",nrow,ncol,nn);
   Matrix mat(nrow,ncol);
   double *ptr=mat.fortran_vec();
   fftw_complex *cptr=(fftw_complex *)cmat.fortran_vec();

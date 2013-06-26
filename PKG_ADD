@@ -146,6 +146,7 @@ autoload('reverse_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.
 autoload('reverse_tod_uncut_regions_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('rotate_tod_data_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('scale_tod_band_noise_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('resize_skymap_cea_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_cea_predef_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_tan_predef_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_healpix_ring_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));

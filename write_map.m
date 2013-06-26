@@ -21,8 +21,9 @@ switch mytype
   write_simple_map_c(map,fname);
  case{'ring'}
   fname=postpend_tag(fname,'.fits');
-  mm=skymap2octave(map);
-  simple_write_healpix(fname,mm,[],'ring');
+  %mm=skymap2octave(map);
+  %simple_write_healpix(fname,mm,[],'ring');
+  write_healpix_ring(fname,map);
  case{'nest'}
   fname=postpend_tag(fname,'.fits');
   mm=skymap2octave(map);

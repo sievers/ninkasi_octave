@@ -29,8 +29,9 @@ for j=1:length(tods),
     assert(numel(myind)==1);  %if this fails, you didn't pass in a well-behaved set of row/columns
     ww(jj)=myweights(myind);
   end
-  assign_tod_detector_values_c(tods,ww);;
-  
+  mdisp(['mean weight inside make_weightmap_bydets_octave is ' num2str(mean(ww))]);
+  assign_tod_detector_values_c(mytod,ww);
+
   if do_window,
     window_data(mytod);
     window_data(mytod);
@@ -43,6 +44,7 @@ for j=1:length(tods),
     convert_saved_pointing_to_pixellization(mytod,map);
     free_tod_pointing_saved(mytod);
   end
+
   
   mdisp('assigned value');
   if (is_map_polarized(map))

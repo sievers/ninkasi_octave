@@ -69,6 +69,11 @@ if strcmp(ar,'ar1_dunner_as_das')
 end
 
 
+if strcmp(ar,'abs_field_A')
+  set_skymap_cea_predef_c(map,-0.10962491,0.10962491,920.0,816.0,0.57785513,1256,561);
+  return
+end
+
 
 if strcmp(ar,'newsouth_fine')  %patching up the header since some data maps out of bounds
   fac=1.5;

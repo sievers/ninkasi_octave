@@ -350,7 +350,7 @@ DEFUN_DLD (set_skymap_healpix_nest_c, args, nargout, "Set map to be a healpix ne
 DEFUN_DLD (set_skymap_cea_predef_c, args, nargout, "Dial in parameters for a CEA map.  Args are (map,radelt,decdelt,rapix,decpix,pv,nra,ndec\n")
 {
   if (args.length()<8) {
-    printf("Need 8 argumetns in set_skymap_cea_predef_c.\n");
+    printf("Need 8 arguments in set_skymap_cea_predef_c.\n");
     return octave_value_list();
   }
   MAP *map=(MAP *)get_pointer(args(0));
@@ -368,7 +368,25 @@ DEFUN_DLD (set_skymap_cea_predef_c, args, nargout, "Dial in parameters for a CEA
   return octave_value_list();
   
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (resize_skymap_cea_c, args, nargout, "Change the size of a CEA skymap, perhaps for e.g. faster FFTs.  Will nuke current map data, so maybe do this early on.\n")
+{
+  MAP *map=(MAP *)get_pointer(args(0));
+  int new_nx=get_value(args(1));
+  int new_ny=get_value(args(2));
+  int new_npix=new_nx*new_ny;
 
+  printf("switching nx from %d to %d, and ny from %d to %d\n",map->nx,new_nx,map->ny,new_ny);
+  map->nx=new_nx;
+  map->ny=new_ny;
+  map->npix=new_npix;
+  map->have_locks=0;
+  free(map->map);
+  map->map=(actData *)malloc_retry(sizeof(actData)*map->npix*get_npol_in_map(map));
+  
+  return octave_value_list();
+
+}
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (set_skymap_tan_explicit_c, args, nargout, "Dial FITS parameters for a TAN map.  Args are (map,rapix,decpix,radelt,decdelt,pv,ra_cent,dec_cent,nra,ndec)\n")
 {
