@@ -4,10 +4,16 @@ fid=fopen(fname,'r');
 [cc,dd]=read_fits_header(fid);
 
 crap=read_fits_bintable (cc,fid);
+
 for j=1:length(cc)
   if strcmp(cc{j,1},'ORDERING')
     ringnest=cc{j,2};
   end
 end
-map=crap.TEMPERATURE;
+try
+  map=crap.TEMPERATURE;
+catch
+  map=crap;
+end
+
 fclose(fid);
