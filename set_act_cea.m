@@ -36,9 +36,21 @@ if strcmp(ar,'allequ')  %Hasselfield's preferred header for all equatorial maps
   return
 end
 
+if strcmp(ar,'allequ_ar3')  %Hasselfield's preferred header for all equatorial maps
+  %set_skymap_cea_predef_c(map,-0.0083336141, 0.0083336141,8558.0,265.0,0.99993261,28672,644);
+  set_skymap_cea_predef_c(map,-0.00825, 0.00825,8150.0,292.0,1.0,38500,611);
+  return
+end
+
 if strcmp(ar,'allequ_round')  %Hasselfield's preferred header for all equatorial maps
   %set_skymap_cea_predef_c(map,-0.0083336141, 0.0083336141,8558.0,265.0,0.99993261,28672,644);
   set_skymap_cea_predef_c(map,-0.00825, 0.00825,7968.0,288.0,1.0,38304,640);
+  return
+end
+
+if strcmp(ar,'allequ_round_ar3')  %Hasselfield's preferred header for all equatorial maps
+  %set_skymap_cea_predef_c(map,-0.0083336141, 0.0083336141,8558.0,265.0,0.99993261,28672,644);
+  set_skymap_cea_predef_c(map,-0.00825, 0.00825,8150.0,288.0,1.0,38500,640);
   return
 end
 
@@ -73,6 +85,13 @@ if strcmp(ar,'abs_field_A')
   set_skymap_cea_predef_c(map,-0.10962491,0.10962491,920.0,816.0,0.57785513,1256,561);
   return
 end
+
+if strcmp(ar,'abs_field_A_fine')
+  fac=1.5/5;
+  set_skymap_cea_predef_c(map,-0.10962491*fac,0.10962491*fac,round(920.0/fac),round(816.0/fac),0.57785513,round(1256/fac),round(561/fac));
+  return
+end
+
 
 
 if strcmp(ar,'newsouth_fine')  %patching up the header since some data maps out of bounds

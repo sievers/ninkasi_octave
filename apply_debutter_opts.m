@@ -1,4 +1,9 @@
 function[value]=apply_debutter_opts(tod,debutter,myopts)
+if ~exist('myopts')
+  myopts.debutter_octave=true;
+end
+
+
 debutter_octave=get_struct_mem(myopts,'debutter_octave');
 myexpt=get_struct_mem(myopts,'debutter_expt','act');
 

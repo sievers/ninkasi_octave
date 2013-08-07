@@ -3,12 +3,15 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdbool.h>
+#include <getdata_v2.h>
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 #include <string.h>
 #include <getdata.h>
+
+
   //#include "/home/nolta/local/include/getdata.h"
 
 #ifdef __cplusplus

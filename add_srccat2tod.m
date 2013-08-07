@@ -1,7 +1,7 @@
-function[value]=add_srccat2tod(tod,srccat)
+function[value]=add_srccat2tod(tod,srccat,varargin)
 if iscell(srccat)
   for j=1:numel(srccat),
-    add_srccat2tod(tod,srccat{j});
+    add_srccat2tod(tod,srccat{j},varargin{:});
   end
   return
 end

@@ -1,5 +1,5 @@
 function[mapset,medians,signal_mapset,data_from_map,data_org]=create_initial_mapset_opts_test(tods,mapset,mapset_in,myopts)
-
+ 
 
 myid=mpi_comm_rank+1;
 nproc=mpi_comm_size;
@@ -22,12 +22,16 @@ dedark=get_struct_mem(myopts,'dedark');
 dark_dirroot=get_struct_mem(myopts,'dark_dirroot','');
 signal_only=get_struct_mem(myopts,'signal_only');
 do_gauss=get_struct_mem(myopts,'gaussian_noise');
+sim_1overf=get_struct_mem(myopts,'sim_1overf',false);
 monitor_tods=get_struct_mem(myopts,'monitor_tods');
 outroot=get_struct_mem(myopts,'outroot',datestr(now,30));
 write_cleaned_data=get_struct_mem(myopts,'write_cleaned_data');
 window_symmetric=get_struct_mem(myopts,'window_symmetric');
 remove_corrnoise=get_struct_mem(myopts,'remove_corrnoise');
 srccat=get_struct_mem(myopts,'srccat',[]);
+do_actpol_pointing=get_struct_mem(myopts,'do_actpol_pointing',false);
+remove_hwp=get_struct_mem(myopts,'remove_hwp',false);
+read_data_new=get_struct_mem(myopts,'read_data_new',false);
 
 abort_before_noise=get_struct_mem(myopts,'abort_before_noise',false);
 skip_mpi=get_struct_mem(myopts,'skip_mpi',false);
@@ -122,13 +126,36 @@ if length(tods)==0,
    disp(['process ' num2str(myid) ' had no tods.']);
 end
 
+if do_actpol_pointing %we're going to do some precalculating of pointing.  If there's no need, then skip it.
+  if ~isfield(mapset,'skymap') %if we don't couple to the sky, why do pointing?
+    do_actpol_pointing=false;
+  end
+end
+
 
 for j=1:length(tods),
+  tt_start=now;
+  mdisp(['master working on TOD ' num2str(j) ' of ' num2str(length(tods))]);
   if length(tods)==1,
     mytod=tods;
   else
     mytod=tods(j);
   end
+
+  if (do_actpol_pointing)
+
+    precalc_actpol_pointing_exact(mytod,1);
+    if isfield(mapset.skymap,'mapptr')
+      convert_saved_pointing_to_pixellization(mytod,mapset.skymap.mapptr)
+    end
+    free_tod_pointing_saved(mytod);
+    
+    precalc_actpol_pointing_exact(mytod,2);
+    set_tod_twogamma_fit(mytod,'npoly_2gamma',3);
+    free_tod_pointing_saved(mytod);
+
+  end
+
 
   if (monitor_tods)
     monitor_tag=get_tod_tags_from_names(get_tod_name(mytod)) ;
@@ -144,20 +171,29 @@ for j=1:length(tods),
     mdisp('creating from input map.');
     mapset2tod_octave(mapset_in,mytod,j);
   else
-    if (do_gauss)
-      tic
-      mdisp(['adding gaussian noise on ' get_tod_name(mytod)]);
-      %crud=get_tod_data(mytod);
-      %crud=randn(size(crud));
-      %push_tod_data(crud,mytod);
-      add_noise_to_tod_gaussian(mytod);
-      if myid==1
-        toc;
+    if ((do_gauss)|(sim_1overf))
+      if (do_gauss)        
+        mdisp(['adding gaussian noise on ' get_tod_name(mytod)]);
+        %crud=get_tod_data(mytod);
+        %crud=randn(size(crud));
+        %push_tod_data(crud,mytod);
+        add_noise_to_tod_gaussian(mytod);
+      end
+      if (sim_1overf)
+        mdisp('creating simulated 1 over f data.');
+        %should now make the simulated data in-place
+        make_fake_1overf_common_mode_data(mytod,myopts);
       end
     else
-      mdisp('reading tod data');
+      mdisp('reading tod data here');
       tic;
-      read_tod_data(mytod);
+        if (read_data_new)
+          mdisp('reading data new style.');
+          read_tod_data_new(mytod);
+        else
+          mdisp('reading data old style.');
+          read_tod_data(mytod);
+        end
       if (myid==1)
         toc;
       end      
@@ -198,11 +234,12 @@ for j=1:length(tods),
       array_detrend(mytod);
       gapfill_data_c(mytod);
       if debutter
-        if debutter_octave
-          debutterworth_octave(mytod);
-        else
-          debutterworth_c(mytod);
-        end
+        debutter_opts(mytod,myopts);
+      %  if debutter_octave
+      %    debutterworth_octave(mytod);
+      %  else
+      %    debutterworth_c(mytod);
+      %  end
       end
       dat=get_tod_data(mytod);
       if (save_seeds)
@@ -255,21 +292,33 @@ for j=1:length(tods),
         end
         if inject_sources,
           mdisp('adding sources into data');
+          a1=sum(sum((get_tod_data(mytod))));
+          if do_actpol_pointing,
+            precalc_actpol_pointing_exact(mytod);
+          end
           add_srccat2tod(mytod,srccat);
-          mdisp('finished.')
+          if do_actpol_pointing,          
+            free_tod_pointing_saved(mytod);
+          end
+          a2=sum(sum((get_tod_data(mytod))));
+          mdisp(['finished.' num2str([a1 a1-a2])])
         end
       end
       
       if (debutter)
-        %mdisp('debutterworthing');
-        if debutter_octave
-          %mdisp('debutterworthing octave')
-          debutterworth_octave(mytod,false);
+        if (1)
+          rebutter_opts(mytod,myopts);
         else
-          %mdisp('debutterworthing c.')
-          rebutterworth_c(mytod);
+          %mdisp('debutterworthing');
+          if debutter_octave
+            %mdisp('debutterworthing octave')
+            debutterworth_octave(mytod,false);
+          else
+            %mdisp('debutterworthing c.')
+            rebutterworth_c(mytod);
+          end
+          %mdisp('debutterworthed');
         end
-        %mdisp('debutterworthed');
       end
 
       if (deconvolve_tau)
@@ -279,7 +328,10 @@ for j=1:length(tods),
       end
       %data_from_map=get_tod_data(mytod);
       %sim_dat=dat; %JLS trying to get 64 bit running
+      a1=sum(sum(dat));
       dat=dat+input_scale_fac*get_tod_data(mytod);
+      a2=sum(sum(dat));
+      mdisp(['sums are ' num2str([a1 a2-a1 input_scale_fac])]);
       push_tod_data(dat,mytod);      
     else
       mdisp('no input mapset or source catalog');
@@ -337,18 +389,46 @@ for j=1:length(tods),
     
   if (debutter)
     mdisp('debutterworthing');
-    if debutter_octave
-      debutterworth_octave(mytod);
+    if (1)
+      debutter_opts(mytod,myopts);
     else
-      debutterworth_c(mytod);
+      if debutter_octave
+        debutterworth_octave(mytod);
+      else
+        debutterworth_c(mytod);
+      end
     end
   end
   if (deconvolve_tau)
     mdisp('deconvolving time constants.');
     deconvolve_tod_time_constants_c(mytod);
   end 
-  window_data(mytod);
 
+  if remove_hwp
+    mdisp('removing half-wave plate')
+    push_hwp_data=get_struct_mem(myopts,'push_hwp_data',false);
+    if (push_hwp_data==false)
+      warning('You have requested HWP removal, however, push_hwp_data is set to false.  You may wish to change this.');
+    end
+    hwp_niter=get_struct_mem(myopts,'hwp_niter',3);
+    hwp_do_c=get_struct_mem(myopts,'do_hwp_az',false);
+    if (hwp_do_c)
+      fit_hwp_az_poly_to_data(mytod,myopts);
+    else
+      for iter=1:hwp_niter
+        gapfill_data_c(mytod);
+        [crap,crud,fitp]=fit_sines_to_hwp(mytod,myopts);
+        mdisp(['on hwp iteration ' num2str(iter) ' summed fitp is ' num2str(sum(sum(abs(fitp))))]);
+        clear crap
+        clear crud
+        clear fitp
+      end
+    end
+  end
+  
+
+  window_data(mytod);
+  
   
   
   
@@ -508,10 +588,14 @@ for j=1:length(tods),
       assign_tod_value(mytod,0);
       mapset2tod_octave(mapset_in,mytod,j);
       if (debutter)
-        if debutter_octave
-          debutterworth_octave(mytod,false);
+        if (1)
+          rebutter_opts(mytod,myopts);
         else
-          rebutterworth_c(mytod);
+          if debutter_octave
+            debutterworth_octave(mytod,false);
+          else
+            rebutterworth_c(mytod);
+          end
         end
       end
       if (deconvolve_tau)
@@ -538,6 +622,7 @@ for j=1:length(tods),
     mdisp('applying noise');
     %apply_banded_noise_model_c(mytod);
     apply_tod_noise_model_c(mytod);
+    return
     if	check_for_nans,
        datamat=get_tod_data(mytod);
        nn=sum(sum(isnan(datamat))); 
@@ -599,6 +684,10 @@ for j=1:length(tods),
   if (~keep_data)
     free_tod_storage(mytod);
   end
+  if (do_actpol_pointing) %we cached the pointing earlier, now we need to get rid of it.
+    free_tod_pointing_saved(mytod); %should have already been freed, but just in case...
+    free_saved_pixellization(mytod); 
+  end
 
   if (monitor_tods)    
     fprintf(monitor_fid,'%s\n',monitor_tag);
@@ -606,7 +695,8 @@ for j=1:length(tods),
     fclose(monitor_fid);
   end
   
-  
+  tt_stop=now();
+  mdisp(['finished processing TOD in ' num2str(86400*(tt_stop-tt_start))])
 end
 mdisp('master has finished his TODs');
 

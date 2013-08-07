@@ -26,6 +26,16 @@ void *get_pointer(octave_value val)
 }
 /*--------------------------------------------------------------------------------*/
 
+actData get_value(octave_value val)
+{
+  NDArray myptr=val.array_value();
+  actData myval=(actData)myptr(0,0);
+  return myval;
+
+}
+
+/*--------------------------------------------------------------------------------*/
+
 DEFUN_DLD (set_skymap_cea_simple_c, args, nargout, "Turn an RA/DEC map into a CEA map.\n")
 {
   MAP *map=(MAP *)get_pointer(args(0));
@@ -36,6 +46,17 @@ DEFUN_DLD (set_skymap_cea_simple_c, args, nargout, "Turn an RA/DEC map into a CE
     set_map_projection_cea_simple(map);
   return octave_value_list();
   
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (set_skymap_cea_simple_predef_c,args, nargout, "Turn an RA/DEC map into a CEA map with pixelsize/pv2_1 defined.\n")
+{
+  MAP *map=(MAP *)get_pointer(args(0));
+  actData pixsize=get_value(args(1));
+  actData pv=get_value(args(2));
+  set_map_projection_cea_simple_predef(map,pixsize,pv);
+  return octave_value_list();
+  
+
 }
 /*--------------------------------------------------------------------------------*/
 

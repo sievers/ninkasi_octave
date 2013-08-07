@@ -276,6 +276,45 @@ DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol 
   return octave_value_list();
 
 }
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(initialize_actpol_pointing_fit_c,args,nargout,"Set up an actpol pointing fit.  Args are tod, (az,alt,t) scaled vecs, ra fit parameters, dec fit parameters.\n")
+{
+
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  ColumnVector az=args(1).column_vector_value();
+  ColumnVector alt=args(2).column_vector_value();
+  ColumnVector t=args(3).column_vector_value();
+  Matrix ra_fit=args(4).matrix_value();
+  Matrix dec_fit=args(5).matrix_value();
+
+  actData *azptr=az.fortran_vec();
+  actData *altptr=alt.fortran_vec();
+  actData *tptr=t.fortran_vec();
+  actData *raptr=ra_fit.fortran_vec();
+  actData *decptr=dec_fit.fortran_vec();
+
+  initialize_actpol_pointing_fit(tod,azptr,altptr,tptr,raptr,decptr);
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(evaluate_actpol_pointing_fit,args,nargout,"Evaluate an actpol pointing fit.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  evaluate_actpol_pointing_fit(tod);
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (does_tod_have_twogamma_fit,args,nargout,"Check to see if a tod already has a twogamma fit saved.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  if (!tod->actpol_pointing) 
+    return octave_value(0);
+  if (tod->actpol_pointing->gamma_az_sin_coeffs) 
+    return octave_value(1);
+  return octave_value(0);
+}
+
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD(set_tod_twogamma_fit_c,args,nargout,"Install a saved twogamma fit to az.\n")
 {
@@ -286,6 +325,15 @@ DEFUN_DLD(set_tod_twogamma_fit_c,args,nargout,"Install a saved twogamma fit to a
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
   if (!tod->actpol_pointing) {
     printf("actpol_pointing not saved in TOD.\n");
+    return octave_value_list();
+  }
+
+  if (!tod->actpol_pointing) {
+    printf("missing pointing structure in set_tod_twogamma_fit_c, aborting.\n");
+    return octave_value_list();
+  }
+  if (tod->actpol_pointing->gamma_az_sin_coeffs) {
+    printf("found twogamma fit in set_tod_twogamma_fit_c already, so skipping.\n");
     return octave_value_list();
   }
 
@@ -323,6 +371,10 @@ DEFUN_DLD(set_tod_twogamma_fit_c,args,nargout,"Install a saved twogamma fit to a
 DEFUN_DLD(precalc_actpol_pointing_exact,args,nargout,"Precalculated stuff for an actpol pointing fit.\n")
 {
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  if (tod->ACTPol_pointing_fit) {
+    evaluate_actpol_pointing_fit(tod);
+    return octave_value_list();
+  }
   int op_flag=NINKASI_DO_RADEC|NINKASI_DO_TWOGAMMA;
   if (args.length()>1)
     op_flag=(int)get_value(args(1));

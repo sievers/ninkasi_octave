@@ -153,6 +153,7 @@ autoload('set_skymap_healpix_ring_c',fullfile(fileparts(mfilename("fullpath")),'
 autoload('set_skymap_healpix_nest_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_tan_explicit_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_cea_simple_c',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
+autoload('set_skymap_cea_simple_predef_c',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('set_tod_noise_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('skymap2octave',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('sum_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -270,6 +271,9 @@ autoload('init_demod_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.o
 autoload('demodulate_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('write_demodulated_detector_text',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('return_data_from_demod_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('evaluate_actpol_pointing_fit',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('initialize_actpol_pointing_fit_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('does_tod_have_twogamma_fit',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 
 
 

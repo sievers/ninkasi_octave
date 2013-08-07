@@ -227,6 +227,7 @@ for j=1:length(tods),
       %calibrate_data(mytod);
       calibrate_data_opts(mytod,myopts);
 
+
     end
     
     if (hilton_noise)
@@ -292,8 +293,16 @@ for j=1:length(tods),
         end
         if inject_sources,
           mdisp('adding sources into data');
+          a1=sum(sum((get_tod_data(mytod))));
+          if do_actpol_pointing,
+            precalc_actpol_pointing_exact(mytod);
+          end
           add_srccat2tod(mytod,srccat);
-          mdisp('finished.')
+          if do_actpol_pointing,          
+            free_tod_pointing_saved(mytod);
+          end
+          a2=sum(sum((get_tod_data(mytod))));
+          mdisp(['finished.' num2str([a1 a1-a2])])
         end
       end
       
@@ -320,12 +329,17 @@ for j=1:length(tods),
       end
       %data_from_map=get_tod_data(mytod);
       %sim_dat=dat; %JLS trying to get 64 bit running
+      a1=sum(sum(dat));
       dat=dat+input_scale_fac*get_tod_data(mytod);
+      a2=sum(sum(dat));
+      mdisp(['sums are ' num2str([a1 a2-a1 input_scale_fac])]);
       push_tod_data(dat,mytod);      
     else
       mdisp('no input mapset or source catalog');
     end
     %mdisp('doobydoobydo.');
+
+
     gapfill_data_c(mytod);
     mdisp('gapfilled.');
 
@@ -364,7 +378,8 @@ for j=1:length(tods),
 
   clear dat
   clear ans
-
+  
+  dat=sum(sum(abs(get_tod_data(mytod))));mdisp(['total sum here is ' num2str(dat)]);clear dat;
   if (do_detrend|do_array_detrend)
     if (do_array_detrend)
       mdisp('array detrending');
@@ -375,6 +390,7 @@ for j=1:length(tods),
       detrend_data_c_c(mytod);
     end
   end
+  dat=sum(sum(abs(get_tod_data(mytod))));mdisp(['total sum here after detrend is ' num2str(dat)]);clear dat;
     
   if (debutter)
     mdisp('debutterworthing');
@@ -400,14 +416,18 @@ for j=1:length(tods),
       warning('You have requested HWP removal, however, push_hwp_data is set to false.  You may wish to change this.');
     end
     hwp_niter=get_struct_mem(myopts,'hwp_niter',3);
-    
-    for iter=1:hwp_niter
-      gapfill_data_c(mytod);
-      [crap,crud,fitp]=fit_sines_to_hwp(mytod,myopts);
-      mdisp(['on hwp iteration ' num2str(iter) ' summed fitp is ' num2str(sum(sum(abs(fitp))))]);
-      clear crap
-      clear crud
-      clear fitp
+    hwp_do_c=get_struct_mem(myopts,'do_hwp_az',false);
+    if (hwp_do_c)
+      fit_hwp_az_poly_to_data(mytod,myopts);
+    else
+      for iter=1:hwp_niter
+        gapfill_data_c(mytod);
+        [crap,crud,fitp]=fit_sines_to_hwp(mytod,myopts);
+        mdisp(['on hwp iteration ' num2str(iter) ' summed fitp is ' num2str(sum(sum(abs(fitp))))]);
+        clear crap
+        clear crud
+        clear fitp
+      end
     end
   end
   

@@ -1,4 +1,9 @@
 function[asdfadf]=set_tod_twogamma_fit(tod,varargin)
+if (does_tod_have_twogamma_fit(tod))
+  disp('tod already has twogamma_fit in set_tod_twogamma_fit');
+  return
+end
+
 
 npoly=get_keyval_default('npoly_2gamma',3,varargin{:});
 

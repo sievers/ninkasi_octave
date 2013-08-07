@@ -21,6 +21,7 @@ end
 %clear data;
 
 datft=get_data_fft_c(tod);
+
 n=get_tod_ndata(tod);
 
 
@@ -39,6 +40,7 @@ end
 
 for j=1:length(freqs)-1,
   ind=(nu>freqs(j))&(nu<=freqs(j+1));
+
   crud=datft(ind,:);
   mat=real(crud'*crud);
   mat=mat+mat';
@@ -46,6 +48,14 @@ for j=1:length(freqs)-1,
     mat=project_vecs_from_mat(mat,vecs);
   end
   mat=0.5*(mat+mat');
+  if sum(sum(~isfinite(mat)))>0
+    crap=get_tod_name(tod);
+    while iscell(crap)
+      crap=crap{1};
+    end
+    disp('we have a problem in find_bad_mode opts: ')
+    disp(crap)
+  end
   [vv,ee]=eig(mat);
   ee=diag(ee);
   if eig_thresh(j)>0,
