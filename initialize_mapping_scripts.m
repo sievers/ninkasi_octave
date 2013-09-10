@@ -1,3 +1,20 @@
+aaa=whos;
+existing_vars={};
+for j=1:length(aaa),
+  myvar=aaa(j);
+  if (strcmp(myvar.name,'ans')==0)&(strcmp(myvar.name,'aaa')==0)
+    if eval(['ischar(' myvar.name ')'])
+      nextline=[myvar.name ' = ''' eval(myvar.name) ''''];
+    else
+      nextline=[myvar.name ' = ' eval(['num2str(' myvar.name ');'])];
+    end
+    existing_vars(end+1)=nextline;
+  end
+end
+
+                
+
+
 #addpath /home/sievers/matlab
 
 more off

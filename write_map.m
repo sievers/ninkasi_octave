@@ -1,4 +1,4 @@
-function[value]=write_map(map,fname)
+function[value]=write_map(map,fname,varargin)
 if isstruct(map)
   octave2skymap(map);
   map=map.mapptr;
@@ -12,7 +12,7 @@ mytype=get_map_type_c(map);
 switch mytype
  case{'cea'}
   fname=postpend_tag(fname,'.fits');
-  write_skymap_cea_fits(map,fname);
+  write_skymap_cea_fits(map,fname,varargin{:});
  case{'tan'}
   fname=postpend_tag(fname,'.fits');
   write_skymap_tan_fits(map,fname);

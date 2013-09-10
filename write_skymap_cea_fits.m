@@ -1,4 +1,4 @@
-function[value]=write_skymap_cea_fits(map,fname)
+function[value]=write_skymap_cea_fits(map,fname,comments)
 
 if isstruct(map)
   assert(isfield(map,'map'));
@@ -40,6 +40,18 @@ vals={};
 [keys,vals]=set_keyval_val('PC1_2',0.0,keys,vals);
 [keys,vals]=set_keyval_val('PC2_1',0.0,keys,vals);
 [keys,vals]=set_keyval_val('PC2_2',1.0,keys,vals);
+if exist('comments')
+  if ischar(comments)
+    comments={comments};
+  end
+  for j=1:length(comments),
+    keys(end+1)='comment';
+    vals(end+1)=comments{j};
+  end
+end
+
+%this is a test.  this is only a test.  please enjoy this.  I really cannot say how ling this line is.  I do hope it exceeds 80 characters, though!';
+
 
 if ~is_map_polarized(map)
   write_fits_cell(fname,mm,keys,vals);

@@ -944,7 +944,26 @@ DEFUN_DLD(fit_hwp_az_poly_to_data_c,args,nargout,"Fit sins/cosines/(low-order) a
 }
 
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (print_detector_offsets_actpol,args,nargout,"Print the detector offsets, angle, etc.  Args are (tod,row,col).\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  int myrow=(int)get_value(args(1));
+  int mycol=(int)get_value(args(2));
+  int det=tod->dets[myrow][mycol];
+  printf("detector number is %d\n",det);
+  printf("Offsets are %g %g with angle %g\n",tod->actpol_pointing->dx[det] ,tod->actpol_pointing->dy[det], tod->actpol_pointing->theta[det]);
+  if (tod->actpol_pointing->gamma_ctime_cos_coeffs) {
+    printf("ctime coefficients are %g %g\n",tod->actpol_pointing->gamma_ctime_cos_coeffs[det],tod->actpol_pointing->gamma_ctime_sin_coeffs[det]);
+    for (int i=0;i<tod->actpol_pointing->n_gamma_az_coeffs;i++) {
+      printf("fit coeffs %d are %g %g\n",i,tod->actpol_pointing->gamma_az_cos_coeffs[det][i],tod->actpol_pointing->gamma_az_sin_coeffs[det][i]);
+    }
+  }
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD (get_sincos_mat,args,nargout,"Fill a matrix with sin/cos(n*hwp).  Args are (tod,n_sin).\n")
+
 {
   int nterm=(int)get_value(args(1));
   mbTOD *tod=(mbTOD *)get_pointer(args(0));

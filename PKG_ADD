@@ -262,6 +262,7 @@ autoload('get_radec_from_altaz_actpol_c_old',fullfile(fileparts(mfilename("fullp
 autoload('get_altaz_from_radec_ctime_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_map_poltag',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_sincos_mat',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('print_detector_offsets_actpol',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('test_ninkasi_linfit',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('fit_hwp_poly_to_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('fit_hwp_az_poly_to_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
