@@ -700,6 +700,15 @@ DEFUN_DLD (detrend_data_c_c, args, nargout, "Set up the uncut regions in a tod.\
   detrend_data(mytod);
   return octave_value_list();
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (array_detrend_c, args, nargout, "Set up the uncut regions in a tod.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  int nsamp=(int)get_value(args(1));
+  array_detrend(mytod,nsamp);
+
+  return octave_value_list();
+}
 
 /*--------------------------------------------------------------------------------*/
 
@@ -1212,11 +1221,12 @@ DEFUN_DLD (apply_calib_facs_c, args, nargout, "Apply calibration factors to a TO
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   if (!mytod->have_data) {
-    fprintf(stderr,"Data must be present in apply_calib_facs_c.\n");
+    
+    //fprintf(stderr,"Data must be present in apply_calib_facs_c.\n");
     return octave_value_list();
   }
   if (mytod->calib_facs_saved) {
-    printf("Using saved calibration factors.\n");
+    //printf("Using saved calibration factors.\n");
     for (int i=0;i<mytod->ndet;i++) {
       actData fac=mytod->calib_facs_saved[mytod->rows[i]][mytod->cols[i]];
       for (int j=0;j<mytod->ndata;j++)
@@ -2701,7 +2711,7 @@ DEFUN_DLD (get_detector_altaz_c, args, nargout, "Get alt/az of a detector.\n")
 {
   int nargin = args.length();
   if (nargin<2) {
-    printf("Only have %d arguments in get_detector_radec_c\n",nargin);
+    printf("Only have %d arguments in get_detector_altaz_c\n",nargin);
     return octave_value_list();
   }
 
@@ -3061,6 +3071,23 @@ DEFUN_DLD (pull_oneband_tod_noise_banded_projvec,args,nargout,"Pull parameters f
   retval(0)=det_noise;
   retval(1)=vecs;
   return retval;
+
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(set_detector_pairs_c,args,nargout,"Set up the mapping to paired detectors so cross-pol'n guys can be differenced/summed in the noise model.\n")
+{
+  if (args.length()<2) {
+    printf("error in set_detector_paris_c.  Need at least 2 arguments, tod and detecor map.\n");
+    return octave_value_list();
+  }
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  ColumnVector map=args(0).column_vector_value();
+  double *mapptr=map.fortran_vec();
+  mytod->paired_detectors=(int *)malloc(sizeof(int)*tod->ndet);
+  for (int i=0;i<tod->ndet;i++)
+    mytod->paired-detectors[i]=mapptr[i];
+  
+  return octave_value_list();
 
 }
 /*--------------------------------------------------------------------------------*/

@@ -626,3 +626,24 @@ DEFUN_DLD(apply_pol_precon_c,args,nargout,"Apply an inverted polarized precondit
 
 }
 #endif
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(divide_map_by_map_c,args,nargout,"Divide a map by another (positive) map.\n  Useful for, e.g., normalizing a map by the weight map.\n  args are(map,weightmap)\n")
+{
+  MAP *map=(MAP *)get_pointer(args(0));
+  MAP *wt=(MAP *)get_pointer(args(1));
+  if ((is_map_polarized(map))||(is_map_polarized(wt))) {
+    fprintf(stderr,"divide_map_by_map_c does not currently support polarized maps.  Investigate apply_pol_precon.\n");
+    return octave_value_list();
+  }
+  if (map->npix!=wt->npix) {
+    fprintf(stderr,"Map sizes don't match.\n");
+    return octave_value_list();
+  }
+  for (int i=0;i<map->npix;i++) {
+    if (wt->map[i]>0) {
+      map->map[i]/=wt->map[i];
+    }
+  }
+  return octave_value_list();
+}

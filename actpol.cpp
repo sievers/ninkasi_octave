@@ -129,7 +129,7 @@ DEFUN_DLD ( ACTpolPointingEvaluate, args, nargout, "Given an ACTpol structure, g
     if (tod->alt[j]>altmax)
       altmax=tod->alt[j];
   }
-  printf("alt/az limits are %14.6f %14.6f %14.6f %14.6f\n",altmin,altmax,azmin,azmax);
+  //printf("alt/az limits are %14.6f %14.6f %14.6f %14.6f\n",altmin,altmax,azmin,azmax);
 
   
   ACTpolState *state = ACTpolState_alloc();
@@ -367,6 +367,50 @@ DEFUN_DLD(set_tod_twogamma_fit_c,args,nargout,"Install a saved twogamma fit to a
   
   return octave_value_list();
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(precalc_actpol_pointing_exact_subsampled_c,args,nargout,"Calculate a subsample of the array pointing.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  int fac=(int)get_value(args(1));
+  int len=tod->ndata/fac;
+
+  dim_vector dm(len,tod->ndet);
+  Matrix ra(dm);
+  Matrix dec(dm);
+  Matrix twogamma(dm);
+
+  double *ravec=ra.fortran_vec();
+  double *decvec=dec.fortran_vec();
+  double *twogammavec=twogamma.fortran_vec();
+  
+  double **ramat=(double **)malloc(sizeof(double *)*tod->ndata);
+  double **decmat=(double **)malloc(sizeof(double *)*tod->ndata);
+  double **twogammamat=(double **)malloc(sizeof(double *)*tod->ndata);
+
+  
+
+  for (int i=0;i<tod->ndet;i++) {
+    ramat[i]=ravec+i*len;
+    decmat[i]=decvec+i*len;
+    twogammamat[i]=twogammavec+i*len;
+  }
+
+
+  precalc_actpol_pointing_exact_subsampled(tod,fac,ramat,decmat,twogammamat);
+  free(ramat);
+  free(decmat);
+  free(twogammamat);
+  octave_value_list retval;
+  retval(0)=ra;
+  retval(1)=dec;
+  retval(2)=twogamma;
+
+  return retval;
+
+
+}
+
+
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD(precalc_actpol_pointing_exact,args,nargout,"Precalculated stuff for an actpol pointing fit.\n")
 {

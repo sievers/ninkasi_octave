@@ -15,5 +15,7 @@ ndec=get_keyword('NAXIS2',names,header);
 
 disp([rapix radelt decpix decdelt pv nra ndec]);
 
+%this appears to be a bug, ndec and nra should be swapped...
+%set_skymap_cea_predef_c(map,radelt,decdelt,rapix,decpix,pv,ndec,nra);
 
-set_skymap_cea_predef_c(map,radelt,decdelt,rapix,decpix,pv,ndec,nra);
+set_skymap_cea_predef_c(map,radelt,decdelt,rapix,decpix,pv,nra,ndec);

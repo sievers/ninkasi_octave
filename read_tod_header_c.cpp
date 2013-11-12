@@ -12,6 +12,7 @@ extern "C"
 
 #include <ninkasi_config.h>
 #include <ninkasi.h>
+#include <getdata.h>
 #include <dirfile.h>
 #include <readtod.h>
 #include <slalib.h>
@@ -405,6 +406,51 @@ DEFUN_DLD (read_dirfile_channel, args, nargout, "Read a dirfile channel.  Allowa
 
   return octave_value(dd);
   
+}
+
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (read_many_dirfile_channels, args, nargout, "Read many dirfile channels.\n")
+{
+
+  if (args.length()<2) {
+    fprintf(stderr,"Error - need at least three arguments (filename, fieldname) in read_dirfile_channel.\n");
+    return octave_value_list();
+  }
+
+  int nfields=args.length();
+
+  octave_value_list retval;
+
+  charMatrix filename=args(0).char_matrix_value();  
+  char *fname=get_char_from_arg(filename);
+  
+  int status;
+  struct FormatType *format = GetFormat( fname, NULL, &status );
+  if (format==NULL) {
+    fprintf(stderr,"Warning - problem reading format from file .%s.\n",fname);
+    return octave_value_list();
+  }
+  
+  for (int i=1;i<nfields;i++) {
+    charMatrix channame=args(i).char_matrix_value();
+    char *cname=get_char_from_arg(channame);
+    int nsamp=0;
+    double *crap=dirfile_read_double_channel(format,cname,&nsamp);
+    ColumnVector vec(nsamp);
+    double *vv=vec.fortran_vec();
+    memcpy(vv,crap,nsamp*sizeof(double));
+
+    free(crap);
+    free(cname);
+    retval(i-1)=vec;    
+  }
+
+  GetDataClose(format);
+  free(format);
+  
+   
+  return retval;
 }
 
 /*--------------------------------------------------------------------------------*/

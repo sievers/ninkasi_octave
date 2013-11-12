@@ -37,9 +37,7 @@ autoload('get_map_polstate_c',fullfile(fileparts(mfilename("fullpath")),'maputil
 autoload('set_map_polstate_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('invert_pol_precon_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('apply_pol_precon_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
-
-
-
+autoload('divide_map_by_map_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 
 autoload('copy_string',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
 autoload('createFFTWplans_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -54,6 +52,7 @@ autoload('deconvolve_tod_time_constants_c',fullfile(fileparts(mfilename("fullpat
 autoload('reconvolve_tod_time_constants_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('destroy_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('detrend_data_c_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('array_detrend_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('scale_rowcol_mat',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('colmult',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
 autoload('dpotrs',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));
@@ -180,6 +179,7 @@ autoload('alt_az_ctime2act_ra_dec_c',fullfile(fileparts(mfilename("fullpath")),'
 autoload('read_tod_header_nopoint_c',fullfile(fileparts(mfilename("fullpath")),'read_tod_header_c.oct'));
 autoload('read_tod_header_abs_nopoint_c',fullfile(fileparts(mfilename("fullpath")),'read_tod_header_c.oct'));
 autoload('read_dirfile_channel',fullfile(fileparts(mfilename("fullpath")),'read_tod_header_c.oct'));
+autoload('read_many_dirfile_channels',fullfile(fileparts(mfilename("fullpath")),'read_tod_header_c.oct'));
 
 autoload('mpi_bcast_array',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
 autoload('get_tod_radec_lims_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -253,6 +253,7 @@ autoload('get_tod_actpol_pointing_offsets_c',fullfile(fileparts(mfilename("fullp
 autoload('precalc_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('set_tod_twogamma_fit_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('precalc_actpol_pointing_exact',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('precalc_actpol_pointing_exact_subsampled_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('precalc_actpol_pointing_free',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('find_tod_radec_lims_actpol_pointing_exact_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_detector_radec_actpol_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));

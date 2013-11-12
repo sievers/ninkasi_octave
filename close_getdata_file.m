@@ -3,4 +3,6 @@ if ischar(df)
   return;
 end
 
-close_getdata_file_c(df);
+for j=1:length(df),
+  close_getdata_file_c(df(j));
+end

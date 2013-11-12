@@ -150,9 +150,11 @@ for j=1:length(tods),
     end
     free_tod_pointing_saved(mytod);
     
-    precalc_actpol_pointing_exact(mytod,2);
-    set_tod_twogamma_fit(mytod,'npoly_2gamma',3);
-    free_tod_pointing_saved(mytod);
+    if (~does_tod_have_twogamma_fit(mytod))
+      precalc_actpol_pointing_exact(mytod,2);
+      set_tod_twogamma_fit(mytod,'npoly_2gamma',3);
+      free_tod_pointing_saved(mytod);
+    end
 
   end
 
@@ -450,6 +452,7 @@ for j=1:length(tods),
 
   if (find_modes) 
     if (find_modes_new)
+
       bad_modes=find_bad_modes_opts(mytod,myopts);
       [pp,r]=qr(bad_modes);
       

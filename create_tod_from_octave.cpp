@@ -288,7 +288,7 @@ DEFUN_DLD (set_tod_rowcol_c, args, nargout, "Read a TOD header, including pointi
   
   int ndet=dm(0)*dm(1);
   mytod->ndet=ndet;
-  printf("setting ndet to %d\n",ndet);
+  //printf("setting ndet to %d\n",ndet);
   mytod->rows=(int *)malloc(sizeof(int)*ndet);
   mytod->cols=(int *)malloc(sizeof(int)*ndet);
   double *rowptr=rows.fortran_vec();
@@ -306,7 +306,7 @@ DEFUN_DLD (set_tod_rowcol_c, args, nargout, "Read a TOD header, including pointi
   }
   mytod->nrow=maxrow+1;
   mytod->ncol=maxcol+1;
-  printf("setting nrow/ncol to %d %d\n",mytod->nrow,mytod->ncol);
+  //printf("setting nrow/ncol to %d %d\n",mytod->nrow,mytod->ncol);
 
   mytod->dets=imatrix(mytod->nrow,mytod->ncol);
   
@@ -521,7 +521,11 @@ DEFUN_DLD(free_tod_hwp_c,args,nargout,"Free the HWP from a TOD.\n")
 DEFUN_DLD(free_tod_pointer_c,args,nargout,"Free a TOD pointer.  Anything still saved in here will be lost!\n")
 {
   mbTOD  *tod=(mbTOD *)get_pointer(args(0));
-  if (tod)
+  if (tod) {
+    destroy_tod(tod);
     free(tod);
+  }
   return octave_value_list();
 }
+
+/*--------------------------------------------------------------------------------*/

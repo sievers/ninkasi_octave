@@ -1,4 +1,6 @@
 function[vecs]=find_bad_modes_opts(tod,opts)
+disp(['welcome to find_bad_modes_opts']);
+
 if ~exist('opts')
   opts.fwee=0;
 end
@@ -10,9 +12,6 @@ nn=length(eig_thresh);
 for j=nn+1:length(freqs)-1,
   eig_thresh(j)=eig_thresh(nn);
 end
-
-
-
 
 
 %data=get_tod_data(tod);
@@ -40,8 +39,9 @@ end
 
 for j=1:length(freqs)-1,
   ind=(nu>freqs(j))&(nu<=freqs(j+1));
-
+  disp([min(find(ind)) max(find(ind))])
   crud=datft(ind,:);
+
   mat=real(crud'*crud);
   mat=mat+mat';
   if (~isempty(vecs))
