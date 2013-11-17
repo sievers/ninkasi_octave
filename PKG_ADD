@@ -8,6 +8,9 @@ autoload('allocate_tod_noise_bands_c',fullfile(fileparts(mfilename("fullpath")),
 autoload('allocate_tod_storage_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('apply_tod_noise_model_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('apply_banded_noise_model_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('print_detector_pairs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('set_detector_pairs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('rotate_data_detpairs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('set_noise_powlaw_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('allocate_tod_noise_banded_projvec',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('read_tod_noise_banded_projvec',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));

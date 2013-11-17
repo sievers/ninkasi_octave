@@ -630,7 +630,9 @@ for j=1:length(tods),
     mdisp('applying noise');
     %apply_banded_noise_model_c(mytod);
     apply_tod_noise_model_c(mytod);
+    mdisp('applied.');
     if	check_for_nans,
+      mdisp('checking for nans.');
        datamat=get_tod_data(mytod);
        nn=sum(sum(isnan(datamat))); 
 
@@ -644,11 +646,12 @@ for j=1:length(tods),
        end
        clear datamat
      end
-
+     
     %filter_tod_noise_c(mytod);
   end
   
   if window_symmetric,
+    mdisp('windowing.');
     window_data(mytod);
   end
 

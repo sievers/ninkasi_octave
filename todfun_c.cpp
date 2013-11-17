@@ -2273,11 +2273,22 @@ DEFUN_DLD (apply_banded_noise_model_c, args, nargout, "Debutterworth the data.\n
   return octave_value_list();
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (rotate_data_detpairs_c, args, nargout, "rotate into sum/difference of paired detectors.\n")
+{
+  if (args.length()>0) {
+    mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+    rotate_data_detpairs(mytod);
+  }
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (apply_tod_noise_model_c, args, nargout, "Apply the noise.\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  printf("in apply_tod_noise_model_c.\n");
   apply_noise(mytod);
+  printf("done here.\n");
 
   return octave_value_list();
 }
@@ -3074,6 +3085,23 @@ DEFUN_DLD (pull_oneband_tod_noise_banded_projvec,args,nargout,"Pull parameters f
 
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD(print_detector_pairs_c,args,nargout,"Print the horns that have been paired with each other.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (!mytod->paired_detectors) {
+    printf("paired detectors not found in print_detector_pairs_c.\n");
+    return octave_value_list();
+  }
+  for (int i=0;i<mytod->ndet;i++) {
+    if (mytod->paired_detectors[i]>i) {
+      int j=mytod->paired_detectors[i];
+      //printf("match, inds %3d %3d\n",i,j);
+      printf("match at %2d %2d, %2d %2d, inds %3d %3d\n",mytod->rows[i],mytod->cols[i],mytod->rows[j],mytod->cols[j],i,j);
+    }
+  }
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD(set_detector_pairs_c,args,nargout,"Set up the mapping to paired detectors so cross-pol'n guys can be differenced/summed in the noise model.\n")
 {
   if (args.length()<2) {
@@ -3081,11 +3109,14 @@ DEFUN_DLD(set_detector_pairs_c,args,nargout,"Set up the mapping to paired detect
     return octave_value_list();
   }
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
-  ColumnVector map=args(0).column_vector_value();
+  ColumnVector map=args(1).column_vector_value();
   double *mapptr=map.fortran_vec();
-  mytod->paired_detectors=(int *)malloc(sizeof(int)*tod->ndet);
-  for (int i=0;i<tod->ndet;i++)
-    mytod->paired-detectors[i]=mapptr[i];
+  mytod->paired_detectors=(int *)malloc(sizeof(int)*mytod->ndet);
+  for (int i=0;i<mytod->ndet;i++) {
+    mytod->paired_detectors[i]=mapptr[i];
+    //if (mytod->paired_detectors[i]>0)
+    // printf("matched %d %d\n",i,mytod->paired_detectors[i]);
+  }
   
   return octave_value_list();
 
