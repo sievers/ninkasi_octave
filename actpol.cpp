@@ -22,7 +22,7 @@ extern "C"
 }  /* end extern "C" */
 #endif
 
-
+//#define ACTPOL_NEW
 
 
 /*--------------------------------------------------------------------------------*/
@@ -112,7 +112,11 @@ DEFUN_DLD ( ACTpolPointingEvaluate, args, nargout, "Given an ACTpol structure, g
   double *ra=ra_mat.fortran_vec();
   double *dec=dec_mat.fortran_vec();
   ACTpolArrayCoords *coords = ACTpolArrayCoords_alloc(array);
+#ifdef ACTPOL_NEW
+  ACTpolArrayCoords_init(coords,ACTPOL_COORDSYS_RA_DEC);
+#else
   ACTpolArrayCoords_init(coords);
+#endif
 
   double azmin,azmax,altmin,altmax;
   azmin=tod->az[0];
@@ -156,13 +160,22 @@ DEFUN_DLD ( ACTpolPointingEvaluate, args, nargout, "Given an ACTpol structure, g
   for (int isamp=0;isamp<tod->ndata;isamp++) {
     double ctime=tod->ctime+((double)isamp)*(tod->deltat);
     ACTpolState_update(state, ctime, tod->alt[isamp],tod->az[isamp]);
+#ifdef ACTPOL_NEW
+    ACTpolArrayCoords_update(coords, state);
+#else
     ACTpolArrayCoords_update_fast(coords, state);
+#endif
     double *ra=raptr+isamp*(long)ndet;
     double *dec=decptr+isamp*(long)ndet;
     for (int k=0;k<ndet;k++) {
       ACTpolFeedhornCoords *fc = coords->horn + k;
+#ifdef ACTPOL_NEW
+      ra[k]=fc->a;
+      dec[k]=acos(fc->b);
+#else
       ra[k]=fc->ra;
       dec[k]=fc->sindec;
+#endif
       //ra[k]=coords->horn[k].ra;
       //dec[k]=coords->horn[k].sindec;
       
@@ -583,7 +596,11 @@ DEFUN_DLD (get_radec_from_altaz_actpol_c,args,nargout,"Convert az, el, and ctime
   
   
   ACTpolArrayCoords *coords = ACTpolArrayCoords_alloc(array);
+#ifdef ACTPOL_NEW
+  ACTpolArrayCoords_init(coords,ACTPOL_COORDSYS_RA_DEC);
+#else
   ACTpolArrayCoords_init(coords);
+#endif
 
   ACTpolState *state = ACTpolState_alloc();
   ACTpolState_init(state);
@@ -597,8 +614,14 @@ DEFUN_DLD (get_radec_from_altaz_actpol_c,args,nargout,"Convert az, el, and ctime
       ACTpolArrayCoords_update(coords, state);
       for (int j=0;j<nhorns;j++) {
 	ACTpolFeedhornCoords *fc = &(coords->horn[j]);
+
+#ifdef ACTPOL_NEW
+	ra[i+j*nelem]=fc->a;
+	dec[i+j*nelem]=acos(fc->b);
+#else
 	ra[i+j*nelem]=fc->ra;
 	dec[i+j*nelem]=fc->dec;
+#endif
 	sin2gamma[i+j*nelem]=fc->sin2gamma;
 	cos2gamma[i+j*nelem]=fc->cos2gamma;
       }
@@ -682,7 +705,11 @@ DEFUN_DLD (get_radec_from_altaz_actpol_c_old,args,nargout,"Convert az, el, and c
 
 
   ACTpolArrayCoords *coords = ACTpolArrayCoords_alloc(array);
+#ifdef ACTPOL_NEW
+  ACTpolArrayCoords_init(coords,ACTPOL_COORDSYS_RA_DEC);
+#else
   ACTpolArrayCoords_init(coords);
+#endif
 
   ACTpolState *state = ACTpolState_alloc();
   ACTpolState_init(state);
@@ -696,8 +723,13 @@ DEFUN_DLD (get_radec_from_altaz_actpol_c_old,args,nargout,"Convert az, el, and c
       ACTpolState_update(state, tvec[i],el[i],az[i]);
       ACTpolArrayCoords_update(coords, state);
       ACTpolFeedhornCoords *fc = coords->horn;
+#ifdef ACTPOL_NEW
+      ra[i]=fc->a;
+      dec[i]=acos(fc->b);
+#else
       ra[i]=fc->ra;
       dec[i]=fc->dec;
+#endif
       sin2gamma[i]=fc->sin2gamma;
       cos2gamma[i]=fc->cos2gamma;
     }
@@ -821,7 +853,11 @@ DEFUN_DLD (get_radec_from_altaz_actpol_test,args,nargout,"Convert az, el, and ct
   
   
   ACTpolArrayCoords *coords = ACTpolArrayCoords_alloc(array);
+#ifdef ACTPOL_NEW
+  ACTpolArrayCoords_init(coords,ACTPOL_COORDSYS_RA_DEC);
+#else
   ACTpolArrayCoords_init(coords);
+#endif
 
   ACTpolState *state = ACTpolState_alloc();
   ACTpolState_init(state);
@@ -835,8 +871,13 @@ DEFUN_DLD (get_radec_from_altaz_actpol_test,args,nargout,"Convert az, el, and ct
       ACTpolArrayCoords_update(coords, state);
       for (int j=0;j<nhorns;j++) {
 	ACTpolFeedhornCoords *fc = &(coords->horn[j]);
+#ifdef ACTPOL_NEW
+	ra[i+j*nelem]=fc->a;
+	dec[i+j*nelem]=acos(fc->b);
+#else
 	ra[i+j*nelem]=fc->ra;
 	dec[i+j*nelem]=fc->dec;
+#endif
 	sin2gamma[i+j*nelem]=fc->sin2gamma;
 	cos2gamma[i+j*nelem]=fc->cos2gamma;
       }

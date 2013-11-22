@@ -2286,9 +2286,9 @@ DEFUN_DLD (rotate_data_detpairs_c, args, nargout, "rotate into sum/difference of
 DEFUN_DLD (apply_tod_noise_model_c, args, nargout, "Apply the noise.\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
-  printf("in apply_tod_noise_model_c.\n");
+  //printf("in apply_tod_noise_model_c.\n");
   apply_noise(mytod);
-  printf("done here.\n");
+  //printf("done here.\n");
 
   return octave_value_list();
 }
