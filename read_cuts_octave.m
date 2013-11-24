@@ -1,11 +1,11 @@
-function[value]=read_cuts_octave(tod,cutsname)
+function[n_samp,samp_offset]=read_cuts_octave(tod,cutsname)
 %C code was seg faulting on seemingly OK input, it was fragile to the presence of whitespace.  this should fix that...
 ll=read_text_file(cutsname);
 tags=strsplit(ll{1},' =',true)
 
 if numel(tags)>=2
   if (strcmp(tags{1},'format'))&(strcmp(tags{2},'''TODCuts'''))
-    parse_cuts_octave_format(tod,ll);
+    [n_samp,samp_offset]=parse_cuts_octave_format(tod,ll);
     return
   end
 end

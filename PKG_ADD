@@ -222,6 +222,7 @@ autoload('alloc_tod_cuts_c',fullfile(fileparts(mfilename("fullpath")),'create_to
 autoload('set_tod_dt_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_timevec_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_ndata_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
+autoload('set_tod_nsamp_offset_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_rowcol_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_altaz_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_hwp_angle_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));

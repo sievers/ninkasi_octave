@@ -106,7 +106,14 @@ DEFUN_DLD (set_tod_ndata_c, args, nargout, "Read a TOD header, including pointin
   mytod->ndata=ndata;
   return octave_value_list();
 }
-
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (set_tod_nsamp_offset_c, args, nargout, "Set the offset number of samples of a TOD.  Args are (tod,nsample).\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  int myoff=(int)get_value(args(1));
+  mytod->start_offset=myoff;
+  return octave_value_list();  
+}
 /*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (set_tod_pointing_saved, args, nargout, "Read a TOD header, including pointing info etc.\n")
