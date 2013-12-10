@@ -10,6 +10,7 @@ tod_name=_strip_zips(tod_name);
 %/project/r/rbond/sievers/actpol/calib/actpol1_2013_c1_cal1_atm
 calib_dir=get_keyval_default('calib_dir','',varargin{:});
 calib_tail=get_keyval_default('calib_tail','calib.txt',varargin{:});
+calfile=get_keyval_default('calib_file','',varargin{:});
 tod_offsets=get_keyval_default('tod_offsets',[],varargin{:});
 offsets=get_keyval_default('offsets',[],varargin{:});
 cuts=get_keyval_default('cuts','',varargin{:});
@@ -96,7 +97,7 @@ try
   initialize_actpol_pointing(tod,dy+tod_dy,dx+tod_dx,theta,148.0,1);
 
   if ~isempty(calib_dir)
-    tod_name
+    
     tt=tod_name;
     ii=find(tt=='/');
     if ~isempty(ii)
@@ -108,7 +109,9 @@ try
     end
     %calfile=[calib_dir '/' tt '/calib.txt'];
     %calfile=[calib_dir '/' tt '.calib.txt'];
-    calfile=[calib_dir '/' tt '.' calib_tail];
+    if isempty(calfile)
+      calfile=[calib_dir '/' tt '.' calib_tail]
+    end
 
     cals=read_python_dict(calfile);
     cals.rr=floor(cals.det_uid/32);

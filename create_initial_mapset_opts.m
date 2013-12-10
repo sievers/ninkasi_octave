@@ -22,6 +22,7 @@ dedark=get_struct_mem(myopts,'dedark');
 dark_dirroot=get_struct_mem(myopts,'dark_dirroot','');
 signal_only=get_struct_mem(myopts,'signal_only');
 do_gauss=get_struct_mem(myopts,'gaussian_noise');
+gauss_amp=get_struct_mem(myopts,'gauss_amp',1.0);
 sim_1overf=get_struct_mem(myopts,'sim_1overf',false);
 monitor_tods=get_struct_mem(myopts,'monitor_tods');
 outroot=get_struct_mem(myopts,'outroot',datestr(now,30));
@@ -179,6 +180,7 @@ for j=1:length(tods),
         %crud=get_tod_data(mytod);
         %crud=randn(size(crud));
         %push_tod_data(crud,mytod);
+
         add_noise_to_tod_gaussian(mytod);
       end
       if (sim_1overf)
@@ -232,6 +234,15 @@ for j=1:length(tods),
 
     end
     
+
+    if (gauss_amp~=1)
+      dat=get_tod_data(mytod);
+      dat=dat+randn(size(dat))*gauss_amp;
+      push_tod_data(dat,mytod);
+      clear dat;
+    end
+
+
     if (hilton_noise)
       mdisp('adding hilton noise');
       array_detrend(mytod);
