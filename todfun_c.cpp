@@ -3150,18 +3150,21 @@ DEFUN_DLD (set_oneband_tod_noise_banded_projvec,args,nargout,"Set up a single ba
   //printf("dims are %d %d\n",dm(0),dm(1));
   
   actData *nvec=noises.fortran_vec();
+  int ndet=mytod->ndet;
+  if (mytod->demod)
+    ndet*=get_demod_nchannel(mytod->demod);
   for (int i=0;i<mytod->ndet;i++)
     mytod->band_vecs_noise->noises[myband][i]=nvec[i];
-
+  
   double *vecptr=vecs.fortran_vec();
   mytod->band_vecs_noise->nvecs[myband]=dm(1);
-
-  mytod->band_vecs_noise->vecs[myband]=matrix(mytod->band_vecs_noise->nvecs[myband],mytod->ndet);
+  
+  mytod->band_vecs_noise->vecs[myband]=matrix(mytod->band_vecs_noise->nvecs[myband],ndet);
 
   
   for (int i=0;i<mytod->band_vecs_noise->nvecs[myband];i++)
-    for (int j=0;j<mytod->ndet;j++)
-      mytod->band_vecs_noise->vecs[myband][i][j]=vecptr[i*mytod->ndet+j];
+    for (int j=0;j<ndet;j++)
+      mytod->band_vecs_noise->vecs[myband][i][j]=vecptr[i*ndet+j];
   
 
   return octave_value_list();
@@ -3243,7 +3246,9 @@ DEFUN_DLD (read_tod_noise_banded_projvec,args,nargout,"Read the banded_projvec n
 DEFUN_DLD (allocate_tod_noise_banded_projvec,args,nargout,"Set the TOD noise model to be in bands with non-completely projected vectors.\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
-  
+  int ndet=mytod->ndet;
+  if (mytod->demod)
+    ndet*=get_demod_nchannel(mytod->demod);
   Matrix bands=args(1).matrix_value();
   dim_vector dm=bands.dims();
   int nband=dm(0);
@@ -3253,7 +3258,7 @@ DEFUN_DLD (allocate_tod_noise_banded_projvec,args,nargout,"Set the TOD noise mod
 
   mytod->band_vecs_noise=(mbNoiseStructBandsVecs *)malloc(sizeof(mbNoiseStructBandsVecs));
 
-  mytod->band_vecs_noise->ndet=mytod->ndet;
+  mytod->band_vecs_noise->ndet=ndet;
   mytod->band_vecs_noise->nband=nband;
   mytod->band_vecs_noise->band_edges=(int *)malloc(sizeof(int)*(nband+1));
   double *bb=bands.fortran_vec();
@@ -3264,7 +3269,7 @@ DEFUN_DLD (allocate_tod_noise_banded_projvec,args,nargout,"Set the TOD noise mod
   mytod->band_vecs_noise->nvecs=(int *)malloc(sizeof(int)*(nband));
   
 
-  mytod->band_vecs_noise->noises=matrix(nband,mytod->ndet);
+  mytod->band_vecs_noise->noises=matrix(nband,ndet);
   mytod->band_vecs_noise->vecs=(actData ***)malloc(sizeof(actData **)*nband);
   
   

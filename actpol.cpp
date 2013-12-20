@@ -1219,6 +1219,7 @@ DEFUN_DLD (init_demod_data_c, args, nargout, "Set up a demod data structure and 
   int64NDArray myptr(1);
 
   myptr(0)=(long)demod;
+  tod->demod=demod;
   
   return octave_value(myptr);
 }
@@ -1228,7 +1229,9 @@ DEFUN_DLD (init_demod_data_c, args, nargout, "Set up a demod data structure and 
 DEFUN_DLD(demodulate_data_c,args,nargout,"Demodulate data using HWP and a demod structure.  Args are (tod,demod).\n")
 {
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
-  DemodData *demod=(DemodData *)get_pointer(args(1));
+  DemodData *demod=tod->demod;
+  if (demod==NULL)
+    demod=(DemodData *)get_pointer(args(1));
   demodulate_data(tod,demod);
   return octave_value_list();
 }
@@ -1237,7 +1240,9 @@ DEFUN_DLD(demodulate_data_c,args,nargout,"Demodulate data using HWP and a demod 
 DEFUN_DLD(remodulate_data_c,args,nargout,"Remodulate data using HWP and a demod structure.  Args are (tod,demod).\n")
 {
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
-  DemodData *demod=(DemodData *)get_pointer(args(1));
+  DemodData *demod=tod->demod;
+  if (demod==NULL)
+    demod=(DemodData *)get_pointer(args(1));
   remodulate_data(tod,demod);
   return octave_value_list();
 }
@@ -1269,33 +1274,41 @@ DEFUN_DLD(write_demodulated_detector_text,args,nargout,"Write a text file with d
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD(return_data_from_demod_c,args,nargout,"Return the demodulated data stored in a demod C structure.  Args are (tod,demod).\n")
 {
-  if (args.length()<2) {
-    printf("need at least (tod,demod) inputs in return_data_from_demod_c.\n");
+  if (args.length()<1) {
+    printf("need at least (tod) inputs in return_data_from_demod_c.\n");
     return octave_value_list();
   }
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
-  DemodData *demod=(DemodData *)get_pointer(args(1));
+  DemodData *demod=tod->demod;
+  if ((demod==NULL)||(args.length()>1))
+    demod=(DemodData *)get_pointer(args(1));
   if (demod->data==NULL) {
     printf("do not have demodulated data stored in return_data_from_demod_c.\n");
     return octave_value_list();
   }
   int ncol=get_demod_nchannel(demod);
   ComplexMatrix cmat(demod->nmode,ncol*tod->ndet);
-  memcpy(cmat.fortran_vec(),&(demod->data[0][0][0]),ncol*demod->nmode*tod->ndet*sizeof(actComplex));
+  //memcpy(cmat.fortran_vec(),&(demod->data[0][0][0]),ncol*demod->nmode*tod->ndet*sizeof(actComplex));
+  memcpy(cmat.fortran_vec(),(demod->data[0]),ncol*demod->nmode*tod->ndet*sizeof(actComplex));
   return octave_value(cmat);
 
 }
 
 /*--------------------------------------------------------------------------------*/
-DEFUN_DLD(push_data_to_demod_c,args,nargout,"Push demodulated data into the demod structure.  Args are (tod,demod,data).\n")
+DEFUN_DLD(push_data_to_demod_c,args,nargout,"Push demodulated data into the demod structure.  Args are (tod,data).\n")
 {
-  if (args.length()<3) {
-    printf("need at least (tod,demod,data) inputs in push_data_to_demod_c.\n");
+  if (args.length()<2) {
+    printf("need at least (tod,data) inputs in push_data_to_demod_c.\n");
     return octave_value_list();
   }
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
-  DemodData *demod=(DemodData *)get_pointer(args(1));
-  ComplexMatrix cmat=args(2).complex_matrix_value();
+  DemodData *demod=tod->demod;
+  if (demod==NULL) {
+    fprintf(stderr,"Demod data not present in push_data_to_demod_c.\n");
+    return octave_value_list();
+  }
+  
+  ComplexMatrix cmat=args(1).complex_matrix_value();
   if (demod->data==NULL) {
     printf("do not have demodulated data stored in return_data_from_demod_c.\n");
     return octave_value_list();
@@ -1306,4 +1319,22 @@ DEFUN_DLD(push_data_to_demod_c,args,nargout,"Push demodulated data into the demo
   memcpy(&(demod->data[0][0][0]),cmat.fortran_vec(),ncol*demod->nmode*tod->ndet*sizeof(actComplex));
   return octave_value_list();
 
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(free_demod_c,args,nargout,"Free data stored in a demod structure.  Args are (tod).\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  DemodData *demod=tod->demod;
+  free_demod_data(tod->demod);
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(destroy_demod_c,args,nargout,"Destroy data stored in a demod structure.  Args are (tod).\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  DemodData *demod=tod->demod;
+  destroy_demod_data(tod->demod);
+  tod->demod=NULL;
+  return octave_value_list();
 }
