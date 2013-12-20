@@ -2044,6 +2044,19 @@ DEFUN_DLD (assign_tod_time_constants_c, args, nargout, "Assign the time constant
 }
 
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (cut_bad_time_constants_c, args, nargout, "Cut detectors with zer time constants.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  for (int i=0;i<mytod->ndet;i++) {
+    int rr=mytod->rows[i];
+    int cc=mytod->cols[i];
+    if (mytod->time_constants[rr][cc]<=0)
+      mbCutsSetAlwaysCut(mytod->cuts,rr,cc);
+  }
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD (apply_real_filter_to_data, args, nargout, "Apply a real-valued filter to the data.\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));

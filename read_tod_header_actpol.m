@@ -10,7 +10,6 @@ tod_name=_strip_zips(tod_name);
 %/project/r/rbond/sievers/actpol/calib/actpol1_2013_c1_cal1_atm
 calib_dir=get_keyval_default('calib_dir','',varargin{:});
 calib_tail=get_keyval_default('calib_tail','calib.txt',varargin{:});
-calfile=get_keyval_default('calib_file','',varargin{:});
 tod_offsets=get_keyval_default('tod_offsets',[],varargin{:});
 offsets=get_keyval_default('offsets',[],varargin{:});
 cuts=get_keyval_default('cuts','',varargin{:});
@@ -21,7 +20,8 @@ if size(offsets,2)<4
   error(['must have row,col,dx,dy in offsets']);
 end
 
-try
+
+%try
 
   %if we don't have polarization info, set angles to zero.
   if size(offsets,2)==4,
@@ -37,7 +37,7 @@ try
 
   [cpu_s,cpu_us,az_raw,el_raw,flags]=read_many_dirfile_channels(tod_name,'cpu_s','cpu_us','az','el','enc_flags');
   if ~isempty(cuts)
-    [nsamp,samp_offset]=read_cuts_octave([],cuts)
+    [nsamp,samp_offset]=read_cuts_octave([],cuts,varargin{:})
 
     cpu_s=cpu_s(samp_offset+1:samp_offset+nsamp);
 
@@ -50,6 +50,15 @@ try
   end
 
   ct=cpu_s+1e-6*cpu_us;
+  if sum(ct==0)>0
+    ii=find(ct==0);
+    ct=_repair_ct(ct);
+    %the samples with ctime=0 seem to also have az=0 and el=0
+    %and they don't seem to be getting picked up by the flags
+    az_raw(ii)=median(az_raw);
+    el_raw(ii)=median(el_raw);
+  end
+
   az=az_raw*2.682209174765e-06 - 1.825699070000e+01;
   el=el_raw*-2.682209174765e-06 + 2.119976743000e+02;
   badinds=find(((flags==8)|(flags==24)));
@@ -97,7 +106,7 @@ try
   initialize_actpol_pointing(tod,dy+tod_dy,dx+tod_dx,theta,148.0,1);
 
   if ~isempty(calib_dir)
-    
+    tod_name
     tt=tod_name;
     ii=find(tt=='/');
     if ~isempty(ii)
@@ -109,9 +118,7 @@ try
     end
     %calfile=[calib_dir '/' tt '/calib.txt'];
     %calfile=[calib_dir '/' tt '.calib.txt'];
-    if isempty(calfile)
-      calfile=[calib_dir '/' tt '.' calib_tail]
-    end
+    calfile=[calib_dir '/' tt '.' calib_tail];
 
     cals=read_python_dict(calfile);
     cals.rr=floor(cals.det_uid/32);
@@ -131,7 +138,8 @@ try
     
   end
   isok=true;
-catch
+%catch
+if (0)
   warning(['tod ' tod_name ' failed in read_tod_header_actpol for some reason.']);
   if exist('tod')
     destroy_tod(tod);
@@ -150,3 +158,12 @@ if ischar(tod_name)
     disp(tod_name);
   end
 end
+
+function[vec]=_repair_ct(vec)
+ii=find(vec==0);
+dt=median(diff(vec));
+assert(ii(1)>1);
+for j=1:length(ii),
+  vec(ii(j))=vec(ii(j)-1)+dt;
+end
+

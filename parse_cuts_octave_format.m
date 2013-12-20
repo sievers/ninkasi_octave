@@ -1,9 +1,17 @@
-function[n_samp,samp_offset]=parse_cuts_octave_format(tod,lines)
+function[n_samp,samp_offset]=parse_cuts_octave_format(tod,lines,varargin)
+max_prime=get_keyval_default('max_prime',0,varargin{:});
 j=1;
 while (strcmp(strtrim(lines{j}),'END')==0)
   eval([lines{j} ';']);
   j=j+1;
 end
+if max_prime>0,
+  facs=find_good_fft_lens(n_samp,max_prime);
+  n_samp_good=max(facs);
+  mdisp(['going from ' num2str(n_samp) ' to ' num2str(n_samp_good) ' samples.'])
+  n_samp=n_samp_good;
+end
+
 
 %if we don't have a TOD, you can just get the offsets here without having to actually put in the cuts.
 if isempty(tod)

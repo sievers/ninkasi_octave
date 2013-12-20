@@ -22,6 +22,7 @@ autoload('save_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c
 autoload('tod_has_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_rotmat_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_time_constants_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('cut_bad_time_constants_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_value_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_detector_values_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod_hits_source_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -275,8 +276,10 @@ autoload('get_demodulated_hwp_data_c',fullfile(fileparts(mfilename("fullpath")),
 autoload('remodulate_hwp_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('init_demod_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('demodulate_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('remodulate_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('write_demodulated_detector_text',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('return_data_from_demod_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('push_data_to_demod_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('evaluate_actpol_pointing_fit',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('initialize_actpol_pointing_fit_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('does_tod_have_twogamma_fit',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));

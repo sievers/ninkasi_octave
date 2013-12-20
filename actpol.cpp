@@ -22,7 +22,7 @@ extern "C"
 }  /* end extern "C" */
 #endif
 
-//#define ACTPOL_NEW
+#define ACTPOL_NEW
 
 
 /*--------------------------------------------------------------------------------*/
@@ -171,7 +171,8 @@ DEFUN_DLD ( ACTpolPointingEvaluate, args, nargout, "Given an ACTpol structure, g
       ACTpolFeedhornCoords *fc = coords->horn + k;
 #ifdef ACTPOL_NEW
       ra[k]=fc->a;
-      dec[k]=acos(fc->b);
+      //dec[k]=acos(fc->b);
+      dec[k]=(fc->b);
 #else
       ra[k]=fc->ra;
       dec[k]=fc->sindec;
@@ -617,7 +618,8 @@ DEFUN_DLD (get_radec_from_altaz_actpol_c,args,nargout,"Convert az, el, and ctime
 
 #ifdef ACTPOL_NEW
 	ra[i+j*nelem]=fc->a;
-	dec[i+j*nelem]=acos(fc->b);
+	//dec[i+j*nelem]=acos(fc->b);
+	dec[i+j*nelem]=(fc->b);
 #else
 	ra[i+j*nelem]=fc->ra;
 	dec[i+j*nelem]=fc->dec;
@@ -725,7 +727,8 @@ DEFUN_DLD (get_radec_from_altaz_actpol_c_old,args,nargout,"Convert az, el, and c
       ACTpolFeedhornCoords *fc = coords->horn;
 #ifdef ACTPOL_NEW
       ra[i]=fc->a;
-      dec[i]=acos(fc->b);
+      //dec[i]=acos(fc->b);
+      dec[i]=(fc->b);
 #else
       ra[i]=fc->ra;
       dec[i]=fc->dec;
@@ -873,7 +876,8 @@ DEFUN_DLD (get_radec_from_altaz_actpol_test,args,nargout,"Convert az, el, and ct
 	ACTpolFeedhornCoords *fc = &(coords->horn[j]);
 #ifdef ACTPOL_NEW
 	ra[i+j*nelem]=fc->a;
-	dec[i+j*nelem]=acos(fc->b);
+	//dec[i+j*nelem]=acos(fc->b);
+	dec[i+j*nelem]=(fc->b);
 #else
 	ra[i+j*nelem]=fc->ra;
 	dec[i+j*nelem]=fc->dec;
@@ -1188,7 +1192,7 @@ DEFUN_DLD(remodulate_hwp_data_c,args,nargout,"Turn demodulated T/pol data back i
 }
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (init_demod_data_c, args, nargout, "Set up a demod data structure and return it.  Args are tod,freqs,[hwp_freq]\n")
+DEFUN_DLD (init_demod_data_c, args, nargout, "Set up a demod data structure and return it.  Args are tod,freqs,[hwp_freq,bottom_freq,top_freq]\n")
 {
   
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
@@ -1202,7 +1206,14 @@ DEFUN_DLD (init_demod_data_c, args, nargout, "Set up a demod data structure and 
   actData hwp_freq=0;
   if (args.length()>=3)
     hwp_freq=get_value(args(2));
-  DemodData *demod=init_demod_data(tod,hwp_freq,2,0,0,0);
+  actData low_pass=2;
+  if (args.length()>=4)
+    low_pass=get_value(args(3));
+  actData high_pass=0;
+  if (args.length()>=5)
+    high_pass=get_value(args(4));
+
+  DemodData *demod=init_demod_data(tod,hwp_freq,low_pass,0,high_pass,0);
   set_demod_freqs(demod,freqs.fortran_vec(),nfreq);
 
   int64NDArray myptr(1);
@@ -1219,6 +1230,15 @@ DEFUN_DLD(demodulate_data_c,args,nargout,"Demodulate data using HWP and a demod 
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
   DemodData *demod=(DemodData *)get_pointer(args(1));
   demodulate_data(tod,demod);
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD(remodulate_data_c,args,nargout,"Remodulate data using HWP and a demod structure.  Args are (tod,demod).\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  DemodData *demod=(DemodData *)get_pointer(args(1));
+  remodulate_data(tod,demod);
   return octave_value_list();
 }
 
@@ -1263,5 +1283,27 @@ DEFUN_DLD(return_data_from_demod_c,args,nargout,"Return the demodulated data sto
   ComplexMatrix cmat(demod->nmode,ncol*tod->ndet);
   memcpy(cmat.fortran_vec(),&(demod->data[0][0][0]),ncol*demod->nmode*tod->ndet*sizeof(actComplex));
   return octave_value(cmat);
+
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(push_data_to_demod_c,args,nargout,"Push demodulated data into the demod structure.  Args are (tod,demod,data).\n")
+{
+  if (args.length()<3) {
+    printf("need at least (tod,demod,data) inputs in push_data_to_demod_c.\n");
+    return octave_value_list();
+  }
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  DemodData *demod=(DemodData *)get_pointer(args(1));
+  ComplexMatrix cmat=args(2).complex_matrix_value();
+  if (demod->data==NULL) {
+    printf("do not have demodulated data stored in return_data_from_demod_c.\n");
+    return octave_value_list();
+  }
+  int ncol=get_demod_nchannel(demod);
+  //ComplexMatrix cmat(demod->nmode,ncol*tod->ndet);
+  //memcpy(cmat.fortran_vec(),&(demod->data[0][0][0]),ncol*demod->nmode*tod->ndet*sizeof(actComplex));
+  memcpy(&(demod->data[0][0][0]),cmat.fortran_vec(),ncol*demod->nmode*tod->ndet*sizeof(actComplex));
+  return octave_value_list();
 
 }
