@@ -245,6 +245,7 @@ autoload('set_tod_radec_lims_c',fullfile(fileparts(mfilename("fullpath")),'creat
 autoload('cuts_extend_c',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 
 autoload('convert_fits_bintable',fullfile(fileparts(mfilename("fullpath")),'fits_utils.oct'));
+autoload('convert_char_to_num_fits',fullfile(fileparts(mfilename("fullpath")),'fits_utils.oct'));
 
 
 autoload('ACTpolArray_init',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
@@ -280,6 +281,10 @@ autoload('remodulate_data_c',fullfile(fileparts(mfilename("fullpath")),'actpol.o
 autoload('write_demodulated_detector_text',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('return_data_from_demod_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('push_data_to_demod_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('free_demod_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('destroy_demod_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('does_tod_have_demod',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+
 autoload('evaluate_actpol_pointing_fit',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('initialize_actpol_pointing_fit_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('does_tod_have_twogamma_fit',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));

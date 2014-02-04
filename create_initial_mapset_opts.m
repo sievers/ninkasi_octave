@@ -560,6 +560,10 @@ for j=1:length(tods),
         set_tod_noise_bands_projvecs(mytod,myopts);
       end
     end
+    if strcmp(noise_class,'cbass_north')
+      set_tod_noise_bands_cbass_north(mytod,myopts);
+    end
+
     if (strcmp(noise_class,'banded'))
       mdisp('setting noise to banded.');
       allocate_tod_noise_bands_c(mytod,bands);

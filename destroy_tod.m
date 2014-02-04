@@ -7,5 +7,8 @@ free_tod_timevec_c(tod);
 free_tod_altaz_c(tod);
 free_tod_hwp_c(tod);
 
+%some more things to clean up - JLS 23/1/14
+free_saved_pixellization(tod);
+free_tod_data_saved(tod);
 
 free_tod_pointer_c(tod);  %better be the last call!

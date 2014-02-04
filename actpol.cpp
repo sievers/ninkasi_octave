@@ -1338,3 +1338,13 @@ DEFUN_DLD(destroy_demod_c,args,nargout,"Destroy data stored in a demod structure
   tod->demod=NULL;
   return octave_value_list();
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(does_tod_have_demod,args,nargout,"Report if a TOD has a demod struture in it.  Arg is (tod).\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  if (tod->demod)
+    return octave_value(1);
+  else return octave_value(0);
+  
+  return octave_value_list();  //never get here.
+}

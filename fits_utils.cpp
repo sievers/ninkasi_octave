@@ -80,6 +80,34 @@ double convert_val(const char *c, int fmt)
 
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (convert_char_to_num_fits, args, nargout, "Convert a block of unsigned chars into floats/doubles/ints etc..\n")
+{
+  charMatrix cm=args(0).char_matrix_value();
+  char *c=cm.fortran_vec();
+  int myformat=(int)get_value(args(1));
+  int nb=myformat;
+  if (nb<0)
+    nb*=-1;
+
+  dim_vector dm=cm.dims();
+  //printf("dimensions are %d %d\n",dm(0),dm(1));
+  dim_vector dd(2);
+  int nrow=dm(0)/nb;
+  int ncol=dm(1);
+  dd(0)=nrow;
+  dd(1)=ncol;
+  Matrix mat(dd);
+  double *mm=mat.fortran_vec();
+
+  int nelem=nrow*ncol;
+  for (int i=0;i<nelem;i++)
+    mm[i]=convert_val(c+i*nb,myformat);
+
+  return octave_value(mat);
+
+}
+
+/*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (convert_fits_bintable, args, nargout, "Read TOD data into memory.\n")
 {
