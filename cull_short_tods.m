@@ -15,7 +15,10 @@ for j=1:length(tods),
 end
 
 tods=tods(ind);
-tod_names=tod_names(ind);
+if ~isempty(tod_names)
+  tod_names=tod_names(ind);
+end
+
 if sum(~ind)
   disp(['culling ' num2str(sum(~ind)) ' short TODs']);
 end

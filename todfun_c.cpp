@@ -735,6 +735,22 @@ DEFUN_DLD(tod2polmap,args,nargout," Project a tod into a polmap.  Args are (tod,
 
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD(ground2tod,args,nargout," Project ground into a tod.  Args are (tod,map)\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  MAP *mymap=(MAP *)get_pointer(args(1));
+  ground2tod(mymap,mytod);
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(tod2ground,args,nargout," Project ground into a tod.  Args are (tod,map)\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  MAP *mymap=(MAP *)get_pointer(args(1));
+  tod2ground(mymap,mytod);
+  return octave_value_list();
+}
+/*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (tod_times_map, args, nargout, "Multiply and sum a tod by a map.  Args are (tod,map)\n")
 {
@@ -1262,6 +1278,22 @@ DEFUN_DLD (tod_has_calib_facs_c, args, nargout, "Does a TOD have calibration fac
   else
     return octave_value(0);
   return octave_value_list(); //never get here.
+}
+
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (rescale_calib_facs_c, args, nargout, "Rescale tod calibration factors.  Args are (tod,scale_fac)\n")
+{
+
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+
+  actData scale_fac=get_value(args(1));
+  for (int i=0;i<mytod->nrow;i++)
+    for (int j=0;j<mytod->ncol;j++)
+      mytod->calib_facs_saved[i][j] *= scale_fac;
+
+  return octave_value_list();
+
 }
 
 /*--------------------------------------------------------------------------------*/

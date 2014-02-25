@@ -184,6 +184,13 @@ if isfield(mapset,'skymap')
   end
 end
 
+if isfield(mapset,'ground')
+  if ~skip_mpi
+    mpi_reduce_map(mapset.ground.groundptr);
+  end
+end
+
+
 if isfield(mapset,'srccat')
   if ~skip_mpi
     if iscell(new_mapset.srccat)

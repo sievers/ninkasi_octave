@@ -1,8 +1,13 @@
-function[value]=align_cea_maps(maplist,outlist)
+function[value]=align_cea_maps(maplist,outlist,varargin)
+fac=get_keyval_default('scale_fac',1.0,varargin{:});
+
 mpi_init;
 nmap=length(maplist);
 for j=1:nmap,
   [myproj,mymap]=get_fits_projection_params(maplist{j});
+  if (fac~=1)
+    mymap=mymap*fac;
+  end
   [myra1,mydec1]=pix2radec_fits(1,1,myproj);
   [myra2,mydec2]=pix2radec_fits(size(mymap,1),size(mymap,2),myproj);
   lims(j,:)=[min(myra1,myra2) max(myra1,myra2) min(mydec1,mydec2) max(mydec1,mydec2)];

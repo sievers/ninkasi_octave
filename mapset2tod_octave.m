@@ -21,6 +21,11 @@ if isfield(mapset,'skymap')
 end
 
 
+if isfield(mapset,'ground')
+  ground2tod(tod,mapset.ground.groundptr);
+end
+
+
 if (mytype==0)
   if isfield(mapset,'cutvecs')
     if iscell(mapset.cutvecs),    

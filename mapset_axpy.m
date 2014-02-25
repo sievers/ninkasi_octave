@@ -14,6 +14,8 @@ if ~exist('a'),
 end
 
 x.skymap.map=x.skymap.map+a*y.skymap.map;
+if isfield(x,'ground')
+
 if isfield(x,'corrnoise'),
   for j=1:length(x.corrnoise),
     x.corrnoise(j).map=x.corrnoise(j).map+a*y.corrnoise(j).map;

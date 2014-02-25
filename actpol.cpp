@@ -271,6 +271,18 @@ DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol 
 {
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
 
+  if (args.length()==1)    {
+    ACTpolPointingFit *fit=tod->actpol_pointing;
+    if (!fit) {
+      fprintf(stderr,"Unable to update pointing as it doesn't exist, and you haven't given me any more information.\n");
+      return octave_value_list();
+
+    }
+    update_actpol_pointing(tod,NULL,NULL,NULL,150,1);
+    return octave_value_list();
+    
+  }
+
   ColumnVector x=args(1).column_vector_value();
   actData *dx=x.fortran_vec();
   ColumnVector y=args(2).column_vector_value();
