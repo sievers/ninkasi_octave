@@ -256,6 +256,8 @@ autoload('ACTpolPointingEvaluate',fullfile(fileparts(mfilename("fullpath")),'act
 autoload('FindTodPixLimits',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('tod2map_actpol',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('initialize_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('destroy_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('destroy_actpol_pointing_fit',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('update_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_detector_offsets_actpol',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_tod_actpol_pointing_offsets_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));

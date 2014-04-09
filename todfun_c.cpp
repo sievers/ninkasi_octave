@@ -701,10 +701,13 @@ DEFUN_DLD (detrend_data_c_c, args, nargout, "Set up the uncut regions in a tod.\
   return octave_value_list();
 }
 /*--------------------------------------------------------------------------------*/
-DEFUN_DLD (array_detrend_c, args, nargout, "Set up the uncut regions in a tod.\n")
+DEFUN_DLD (array_detrend_c, args, nargout, "Detrend with a common slope.  Args are (tod,nelem).\n")
+
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
-  int nsamp=(int)get_value(args(1));
+  int nsamp=1;
+  if (args.length()>1)
+    nsamp=(int)get_value(args(1));
   array_detrend(mytod,nsamp);
 
   return octave_value_list();

@@ -761,6 +761,14 @@ if (signal_only)
   end
 end
 
+if isfield(mapset,'ground')
+  if ~skip_mpi
+    mpi_reduce_map(mapset.ground.groundptr);
+  end
+  mapset.ground.ground=skymap2octave(mapset.ground.groundptr);
+end
+
+
 mdisp('maps have been reduced');
 
 if (save_seeds)

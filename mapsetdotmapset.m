@@ -21,7 +21,11 @@ if isfield(a,'skymap')
 end
 
 if isfield(a,'ground')
-  val=val+map_times_map(a.ground.groundptr,b.ground.groundptr);
+  %val=val+map_times_map(a.ground.groundptr,b.ground.groundptr);
+  myval=sum(sum(sum(a.ground.ground.*b.ground.ground)));
+
+  val=val+mpi_allreduce(myval);
+
 end
 
 

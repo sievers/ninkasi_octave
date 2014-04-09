@@ -81,6 +81,7 @@ allocate_tod_noise_banded_projvec(tod,ibands);
 
 %nband
 ncut=0;
+
 %now loop over frequency bins and get the noise properties in each
 for j=nband:-1:1,  
   myblock=dataft(ibands(j)+1:ibands(j+1),:);

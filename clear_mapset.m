@@ -17,6 +17,18 @@ if isfield(mapset,'skymap')
 end
 
 
+if isfield(mapset,'ground')
+  if copyptr
+    mapset.ground.groundptr=make_map_copy(mapset.ground.groundptr);
+  end
+  clear_map(mapset.ground.groundptr);
+  if isfield(mapset.ground,'ground')
+    mapset.ground.ground=0*mapset.ground.ground;
+  end
+
+end
+
+
 if isfield(mapset,'cutvecs')
   if iscell(mapset.cutvecs)
     for j=1:numel(mapset.cutvecs),

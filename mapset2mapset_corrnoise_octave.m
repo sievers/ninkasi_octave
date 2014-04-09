@@ -38,6 +38,10 @@ end
 if isfield(mapset,'skymap')
   octave2skymap(mapset.skymap);
 end
+if isfield(mapset,'ground')
+  octave2skymap(mapset.ground.ground,mapset.ground.groundptr);
+end
+
 
 
 %tod_times=zeros(size(tods));
@@ -185,9 +189,16 @@ if isfield(mapset,'skymap')
 end
 
 if isfield(mapset,'ground')
+  %mdisp(['current ground tot is ' num2str(sum(sum(sum(abs(skymap2octave(new_mapset.ground.groundptr))))))]);
   if ~skip_mpi
-    mpi_reduce_map(mapset.ground.groundptr);
+    mpi_reduce_map(new_mapset.ground.groundptr);
   end
+  new_mapset.ground.ground=skymap2octave(new_mapset.ground.groundptr);
+  if isempty(new_mapptr)
+    destroy_map(new_mapset.ground.groundptr);
+    new_mapset.ground.groundptr=mapset.ground.groundptr;
+  end
+
 end
 
 

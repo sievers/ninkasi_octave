@@ -50,6 +50,7 @@ for j=1:length(tods),
   %disp('freed');
 end
 
+
 if (do_reduce)
   mdisp('reducing')
   weight=skymap2octave(map);
