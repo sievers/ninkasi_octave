@@ -6,6 +6,7 @@ end
 tod_names_small=get_ctime_part(tod_names);
 blacklist=get_ctime_part(blacklist);
 
+
 use_list=true(size(tod_names));
 n1=length(tod_names);
 n2=length(blacklist);
@@ -31,6 +32,9 @@ for j=1:length(names),
   ii=ind(nm=='/');
   if length(ii>0),
     nm=nm(max(ii)+1:end);
+  end
+  if strcmp(nm(end-3:end),'.zip')
+    nm=nm(1:end-4);
   end
   names(j)={nm};
 end
