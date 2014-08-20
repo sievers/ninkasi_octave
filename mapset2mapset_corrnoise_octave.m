@@ -70,7 +70,6 @@ for j=1:length(tods),
   %mtoc
   t1a=now;
   mapset2tod_octave(mapset,mytod,j);
-
   t1b=now;
   
 

@@ -47,6 +47,9 @@ if (myid==1)
   disp(['maxiter is ' num2str(maxiter)]);
 end
 
+mpi_barrier;
+mdisp('made it past barrier.');
+
 
 if exist('priorfun')
   if isempty(priorfun)
