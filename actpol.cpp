@@ -271,6 +271,18 @@ DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol 
 {
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
 
+  if (args.length()==1)    {
+    ACTpolPointingFit *fit=tod->actpol_pointing;
+    if (!fit) {
+      fprintf(stderr,"Unable to update pointing as it doesn't exist, and you haven't given me any more information.\n");
+      return octave_value_list();
+
+    }
+    update_actpol_pointing(tod,NULL,NULL,NULL,150,1);
+    return octave_value_list();
+    
+  }
+
   ColumnVector x=args(1).column_vector_value();
   actData *dx=x.fortran_vec();
   ColumnVector y=args(2).column_vector_value();
@@ -291,6 +303,47 @@ DEFUN_DLD(initialize_actpol_pointing,args,nargout,"Initialize a TOD with actpol 
 
 }
 
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(destroy_actpol_pointing,args,nargout,"Destroy an actpol pointing fit.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  if (tod->actpol_pointing) {
+    ACTpolPointingFit *fit=tod->actpol_pointing;
+    free(fit->ipiv);
+    ACTpolArray_free(fit->array);
+    free(fit->dx);
+    free(fit->dy);
+    free(fit->theta);
+    free(fit);
+    tod->actpol_pointing=NULL;
+  }
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(destroy_actpol_pointing_fit,args,nargout,"Destroy an actpol pointing fit structure.\n")
+{
+  mbTOD *tod=(mbTOD *)get_pointer(args(0));
+  if (tod->ACTPol_pointing_fit) {
+    ACTPolPointingFit2 *fit=tod->ACTPol_pointing_fit;
+    free(fit->az_scale);
+    free(fit->alt_scale);
+    free(fit->t_scale);
+    free(fit->ra_fitp[0][0]);
+    free(fit->ra_fitp[0]);
+    free(fit->ra_fitp);
+    free(fit->dec_fitp[0][0]);
+    free(fit->dec_fitp[0]);
+    free(fit->dec_fitp);
+    free(fit);
+    tod->ACTPol_pointing_fit=NULL;
+  }
+  else
+    fprintf(stderr,"Warning - fit not found in destroy_actpol_pointing.\n");
+  return octave_value_list();
+
+
+}
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD(initialize_actpol_pointing_fit_c,args,nargout,"Set up an actpol pointing fit.  Args are tod, (az,alt,t) scaled vecs, ra fit parameters, dec fit parameters.\n")
 {
@@ -996,7 +1049,8 @@ DEFUN_DLD(fit_hwp_poly_to_data_c,args,nargout,"Fit sins/cosines/(low-order) poly
 DEFUN_DLD(fit_hwp_az_poly_to_data_c,args,nargout,"Fit sins/cosines/(low-order) az/polynomials to tod data.  Args are (tod, nsin, naz,npoly).\n")
 {
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
-  if ((tod->data==NULL) ||(tod->hwp==NULL)) {
+  //if ((tod->data==NULL) ||(tod->hwp==NULL)) {
+  if ((tod->data==NULL)) {
     fprintf(stderr,"TOD isn't sufficiently populated in fit_hwp_poly_to_data_c.\n");
     return octave_value_list();
   }

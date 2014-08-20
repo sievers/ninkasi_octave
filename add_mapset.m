@@ -17,6 +17,10 @@ if isfield(a,'cutvecs')
   end
 end
 
+if isfield(a,'ground')
+  a.ground.ground=a.ground.ground+fac*b.ground.ground;
+end
+
 
 
 if (isfield(a,'corrnoise')),

@@ -20,6 +20,15 @@ if isfield(a,'skymap')
   val=val+sum(sum(sum(a.skymap.map.*b.skymap.map)));
 end
 
+if isfield(a,'ground')
+  %val=val+map_times_map(a.ground.groundptr,b.ground.groundptr);
+  myval=sum(sum(sum(a.ground.ground.*b.ground.ground)));
+
+  val=val+mpi_allreduce(myval);
+
+end
+
+
 
 if isfield(a,'cutvecs')
   tot=0;

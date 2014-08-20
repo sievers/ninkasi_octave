@@ -77,7 +77,7 @@ end
 
   tod=allocate_tod_c();
   
-    
+  
   set_tod_ndata_c(tod,length(az));
   set_tod_nsamp_offset_c(tod,samp_offset);
   set_tod_altaz_c(tod,el*pi/180,az*pi/180);

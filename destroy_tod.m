@@ -1,6 +1,8 @@
 function[value]=destroy_tod(tod)
 %try to clean up as much as possible from a TOD
 
+destroy_actpol_pointing(tod);
+destroy_actpol_pointing_fit(tod);
 free_tod_storage(tod);
 free_tod_pointing_saved(tod);
 free_tod_timevec_c(tod);

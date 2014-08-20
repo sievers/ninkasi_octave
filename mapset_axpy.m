@@ -1,4 +1,5 @@
 function[x]=mapset_axpy(x,y,a,b)
+
 if exist('b'),
   x.skymap.map=x.skymap.map*b;
   if isfield(x,'corrnoise'),
@@ -6,6 +7,8 @@ if exist('b'),
       x.corrnoise(j).map=x.corrnoise(j).map*b;
     end
   end
+else
+  b=1;
 end
 
 
@@ -14,6 +17,11 @@ if ~exist('a'),
 end
 
 x.skymap.map=x.skymap.map+a*y.skymap.map;
+if isfield(x,'ground')
+  x.ground.ground=b*x.ground.ground+a*y.ground.ground;
+end
+
+
 if isfield(x,'corrnoise'),
   for j=1:length(x.corrnoise),
     x.corrnoise(j).map=x.corrnoise(j).map+a*y.corrnoise(j).map;

@@ -28,6 +28,17 @@ if isfield(mapset,'skymap')
 end
 
 
+if isfield(mapset,'ground')
+  if isfield(precon,'ground')
+    
+    octave2skymap(precon.ground.ground,precon.ground.groundptr);
+    octave2skymap(mapset.ground.ground,mapset.ground.groundptr);
+    apply_pol_precon_c(mapset.ground.groundptr,precon.ground.groundptr);
+    mapset.ground.ground=skymap2octave(mapset.ground.groundptr);
+  end
+end
+
+
 
 %since we often cut windows, then use a preconditioner for the cut section.
 if isfield(mapset,'cutvecs')

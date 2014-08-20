@@ -1,5 +1,5 @@
-function[vecs]=find_bad_modes_opts(tod,opts)
-disp(['welcome to find_bad_modes_opts']);
+function[vecs,mat]=find_bad_modes_opts(tod,opts)
+mdisp(['welcome to find_bad_modes_opts']);
 
 if ~exist('opts')
   opts.fwee=0;
@@ -39,7 +39,8 @@ end
 
 for j=1:length(freqs)-1,
   ind=(nu>freqs(j))&(nu<=freqs(j+1));
-  disp([min(find(ind)) max(find(ind))])
+  ind_lims=[min(find(ind)) max(find(ind))];
+  mdisp(num2str(ind_lims));
   crud=datft(ind,:);
 
   mat=real(crud'*crud);
@@ -48,6 +49,7 @@ for j=1:length(freqs)-1,
     mat=project_vecs_from_mat(mat,vecs);
   end
   mat=0.5*(mat+mat');
+
   if sum(sum(~isfinite(mat)))>0
     crap=get_tod_name(tod);
     while iscell(crap)
@@ -58,8 +60,17 @@ for j=1:length(freqs)-1,
   end
   [vv,ee]=eig(mat);
   ee=diag(ee);
+  %put in a check so that if our frequency bin is too narrow we don't puke
+  nind=ind_lims(2)-ind_lims(1)+1;  
+  if nind<length(ee)
+    mdisp(['not enough modes in band 1, using ' num2str(nind) ' modes in find_bad_modes_opts.m']);
+    ee_med=median(ee(end-nind+1:end));
+  else
+    ee_med=median(ee);
+  end
+
   if eig_thresh(j)>0,
-    val=eig_thresh(j)*median(ee);
+    val=eig_thresh(j)*ee_med;
     ind=ee>val;
   else
     ind=false(size(ee));

@@ -19,6 +19,7 @@ autoload('set_oneband_tod_noise_banded_projvec',fullfile(fileparts(mfilename("fu
 autoload('pull_oneband_tod_noise_banded_projvec',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('apply_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('save_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('rescale_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod_has_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_rotmat_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_time_constants_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -167,6 +168,8 @@ autoload('test_omp_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'))
 autoload('test_solve_posdef',fullfile(fileparts(mfilename("fullpath")),'corrnoise_utils.oct'));
 autoload('tod2map',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod2polmap',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('ground2tod',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('tod2ground',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod_times_map',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod2vecs',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod2vecs_blas',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
@@ -253,6 +256,8 @@ autoload('ACTpolPointingEvaluate',fullfile(fileparts(mfilename("fullpath")),'act
 autoload('FindTodPixLimits',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('tod2map_actpol',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('initialize_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('destroy_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
+autoload('destroy_actpol_pointing_fit',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('update_actpol_pointing',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_detector_offsets_actpol',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
 autoload('get_tod_actpol_pointing_offsets_c',fullfile(fileparts(mfilename("fullpath")),'actpol.oct'));
