@@ -5,6 +5,6 @@ max_npol=set_map_polstate_c;
 if length(pol)<max_npol
   pol(max_npol)=0;
 end
-pol
+
 set_map_polstate_c(map,pol);
 
