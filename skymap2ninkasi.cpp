@@ -220,7 +220,7 @@ DEFUN_DLD (skymap2octave, args, nargout, "Turn a ninkasi skymap into an octave o
 
   //dim_vector dims(mymap->nx,mymap->ny,get_npol_in_map(mymap));
   int npol=get_npol_in_map(mymap);
-  printf("npol is %d\n",npol);
+  //printf("npol is %d\n",npol);
   if (npol==1) {
     dim_vector dims(mymap->nx,mymap->ny);
     NDArray map(dims);
@@ -229,7 +229,7 @@ DEFUN_DLD (skymap2octave, args, nargout, "Turn a ninkasi skymap into an octave o
     return octave_value(map);
   }
   else {
-    printf("map dims are %d %d %d\n",mymap->nx,mymap->ny,mymap->npix);
+    //printf("map dims are %d %d %d\n",mymap->nx,mymap->ny,mymap->npix);
     dim_vector dims(npol,mymap->nx,mymap->ny);    
     NDArray map(dims);
     double *mapvec=map.fortran_vec();
