@@ -115,7 +115,7 @@ DEFUN_DLD (test_omp_c, args, nargout, "Read TOD data into memory.\n")
     printf("Setting threads to %d\n",n);
     omp_set_num_threads(n);
   }
-
+  
 
 #pragma omp parallel
   printf("I am %d of %d\n",omp_get_thread_num(),omp_get_num_threads());

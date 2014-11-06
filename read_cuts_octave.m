@@ -4,7 +4,7 @@ ll=read_text_file(cutsname);
 tags=strsplit(ll{1},' =',true);
 
 if numel(tags)>=2
-  if (strcmp(tags{1},'format'))&(strcmp(tags{2},'''TODCuts'''))
+  if (strcmp(tags{1},'format'))&(strcmp(strtrim(tags{2}),'''TODCuts'''))
     [n_samp,samp_offset]=parse_cuts_octave_format(tod,ll,varargin{:});
     return
   end
