@@ -31,6 +31,7 @@ window_symmetric=get_struct_mem(myopts,'window_symmetric');
 remove_corrnoise=get_struct_mem(myopts,'remove_corrnoise');
 srccat=get_struct_mem(myopts,'srccat',[]);
 do_actpol_pointing=get_struct_mem(myopts,'do_actpol_pointing',false);
+free_2gamma=get_struct_mem(myopts,'free_2gamma',1);
 remove_hwp=get_struct_mem(myopts,'remove_hwp',false);
 read_data_new=get_struct_mem(myopts,'read_data_new',false);
 
@@ -149,12 +150,12 @@ for j=1:length(tods),
     if isfield(mapset.skymap,'mapptr')
       convert_saved_pointing_to_pixellization(mytod,mapset.skymap.mapptr)
     end
-    free_tod_pointing_saved(mytod);
+    free_tod_pointing_saved(mytod,free_2gamma);
     
     if (~does_tod_have_twogamma_fit(mytod))
       precalc_actpol_pointing_exact(mytod,2);
       set_tod_twogamma_fit(mytod,'npoly_2gamma',3);
-      free_tod_pointing_saved(mytod);
+      free_tod_pointing_saved(mytod,free_2gamma);
     end
 
   end
@@ -312,7 +313,7 @@ for j=1:length(tods),
           end
           add_srccat2tod(mytod,srccat);
           if do_actpol_pointing,          
-            free_tod_pointing_saved(mytod);
+            free_tod_pointing_saved(mytod,free_2gamma);
           end
           a2=sum(sum((get_tod_data(mytod))));
           mdisp(['finished.' num2str([a1 a1-a2])])
@@ -710,7 +711,7 @@ for j=1:length(tods),
     free_tod_storage(mytod);
   end
   if (do_actpol_pointing) %we cached the pointing earlier, now we need to get rid of it.
-    free_tod_pointing_saved(mytod); %should have already been freed, but just in case...
+    free_tod_pointing_saved(mytod,free_2gamma); %should have already been freed, but just in case...
     free_saved_pixellization(mytod); 
   end
 
