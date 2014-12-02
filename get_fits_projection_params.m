@@ -3,7 +3,10 @@ function[params,map]=get_fits_projection_params(fname)
 [map,header,names]=fits_image_read(fname);
 fittype=get_keyword_string('CTYPE1',names,header);
 fittype(fittype=='''')=' ';
+fittype(fittype==0)=' ';
 fittype=strtrim(fittype);
+
+strcmp(lower(fittype),'ra---cea')
 switch lower(fittype)
   case {'ra---cea'}
    params=parse_cea_params(names,header);

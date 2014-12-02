@@ -9,6 +9,7 @@
 #include <healpix_cxx/arr.h>
 #include <healpix_cxx/alm.h>
 #include <healpix_cxx/alm_healpix_tools.h>
+#include <healpix_cxx/pointing.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -99,6 +100,9 @@ DEFUN_DLD (test_healpix_arr, args, nargout, "Test healpix c++ array functionalit
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (map2alm_intensity_c, args, nargout, "Transform healpix ring map into alms.\n")
 {
+
+  double t1=omp_get_wtime();
+
   Matrix map=args(0).matrix_value();
   int lmax=(int)get_value(args(1));
   int mmax=(int)get_value(args(2));
@@ -114,16 +118,18 @@ DEFUN_DLD (map2alm_intensity_c, args, nargout, "Transform healpix ring map into 
   
   
   double *myptr=map.fortran_vec();
-  arr<double> x(myptr,nelem);
   double *wtptr=weights.fortran_vec();
+  //printf("did octave stuff at %12.6f\n",omp_get_wtime()-t1);
+  arr<double> x(myptr,nelem);
   arr<double> wt(wtptr,nelem);
 
   Healpix_Map <double> crap(x,RING);
   Alm < xcomplex < double > > my_alms(lmax,mmax);
-  double t1=omp_get_wtime();
+  //printf("did healpix allocs at %12.6f\n",omp_get_wtime()-t1);
   map2alm(crap,my_alms,wt,false);
-  double t2=omp_get_wtime();
-  printf("map2alm took %12.4f seconds.\n",t2-t1);
+  //printf("did alm transform at %12.6f\n",omp_get_wtime()-t1);
+  //double t2=omp_get_wtime();
+  //printf("map2alm took %12.4f seconds.\n",t2-t1);
   const arr <xcomplex < double > > vals=my_alms.Alms();
   //copyToPtr
   long nalm=vals.size();
@@ -132,5 +138,46 @@ DEFUN_DLD (map2alm_intensity_c, args, nargout, "Transform healpix ring map into 
   complex<double> *ans_ptr=myans.fortran_vec();
   void *beg=(void *)vals.begin();
   memcpy(ans_ptr,beg,nalm*sizeof(complex<double>));
+  //printf("finishing up at %12.6f\n",omp_get_wtime()-t1);
   return octave_value(myans);
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (pix2ang_c,args,nargout,"Interface to healpix c++ pix2ang.\n")
+{
+  int nside=(int)get_value(args(0));
+  int32NDArray pix=args(1).array_value();
+  dim_vector dm=pix.dims();
+  
+  int nelem=1;
+  for (int i=0;i<dm.length();i++)
+    nelem*=dm(i);
+  
+  printf("array has %d dimensions and %d members.\n",dm.length(),nelem);
+  NDArray phi(dm);
+  NDArray theta(dm);
+  
+  pointing tmp2(0.5,1.5);
+  printf("pointing is %12.6f %12.6f\n",tmp2.theta,tmp2.phi);
+  int *pixptr=(int *)pix.fortran_vec();
+  double *phiptr=phi.fortran_vec();
+  double *thetaptr=phi.fortran_vec();
+  
+
+  //T_Healpix_Base < int > base1 (nside,RING,nside);
+  const int zero=0;
+  //T_Healpix_Base < int > base1 (nside,RING,zero);
+  T_Healpix_Base < int > base1 (nside,RING);
+
+  for (int i=0;i<nelem;i++) {
+    pointing tmp=base1.pix2ang(pixptr[i]);
+    phiptr[i]=tmp.phi;
+    thetaptr[i]=tmp.theta;
+  }
+
+  octave_value_list retval;
+  retval(0)=theta;
+  retval(1)=phi;
+  return retval;
+
 }

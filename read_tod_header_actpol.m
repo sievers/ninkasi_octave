@@ -40,12 +40,26 @@ end
   if ~isempty(cuts)
     [nsamp,samp_offset]=read_cuts_octave([],cuts,varargin{:})
 
-    cpu_s=cpu_s(samp_offset+1:samp_offset+nsamp);
-
-    cpu_us=cpu_us(samp_offset+1:samp_offset+nsamp);
-    az_raw=az_raw(samp_offset+1:samp_offset+nsamp);
-    el_raw=el_raw(samp_offset+1:samp_offset+nsamp);
-    flags=flags(samp_offset+1:samp_offset+nsamp);
+    
+    last_samp=samp_offset+nsamp;
+    if last_samp>numel(cpu_s)
+      warning('too many samples coming out of cuts.  Truncating.')
+      last_samp=numel(cpu_s);
+    end
+    %this block should be good to use, leave bottom just in case
+    if (1)
+      cpu_s=cpu_s(samp_offset+1:last_samp);
+      cpu_us=cpu_us(samp_offset+1:last_samp);
+      az_raw=az_raw(samp_offset+1:last_samp);
+      el_raw=el_raw(samp_offset+1:last_samp);
+      flags=flags(samp_offset+1:last_samp);     
+    else
+      cpu_s=cpu_s(samp_offset+1:samp_offset+nsamp);
+      cpu_us=cpu_us(samp_offset+1:samp_offset+nsamp);
+      az_raw=az_raw(samp_offset+1:samp_offset+nsamp);
+      el_raw=el_raw(samp_offset+1:samp_offset+nsamp);
+      flags=flags(samp_offset+1:samp_offset+nsamp);
+    end
   else
     samp_offset=0;
   end

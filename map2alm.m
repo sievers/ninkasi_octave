@@ -1,4 +1,4 @@
-function[alms]=map2alm(map,wt,lmax,mmax)
+function[alms]=map2alm(map,lmax,mmax,wt)
 nside=sqrt(length(map)/12);
 assert(nside==round(nside));
 if ~exist('wt')

@@ -306,3 +306,4 @@ autoload('close_getdata_file_c',fullfile(fileparts(mfilename("fullpath")),'octge
 autoload('map2alm_simple_c',fullfile(fileparts(mfilename("fullpath")),'healpix_utils.oct'));
 autoload('test_healpix_arr',fullfile(fileparts(mfilename("fullpath")),'healpix_utils.oct'));
 autoload('map2alm_intensity_c',fullfile(fileparts(mfilename("fullpath")),'healpix_utils.oct'));
+autoload('pix2ang_c',fullfile(fileparts(mfilename("fullpath")),'healpix_utils.oct'));
