@@ -2,6 +2,7 @@ function[value]=make_weightmap_octave(tods,map,do_window,varargin)
 
 do_new_pointing=get_keyval_default('do_new_pointing',false,varargin{:})
 do_reduce=get_keyval_default('mpi_reduce',false,varargin{:});
+free_2gamma=get_keyval_default('free_2gamma',true,varargin{:});
 
 clear_map(map);
 
@@ -28,7 +29,7 @@ for j=1:length(tods),
     mdisp('doing pointing')
     precalc_actpol_pointing_exact(mytod);
     convert_saved_pointing_to_pixellization(mytod,map);
-    free_tod_pointing_saved(mytod);
+    free_tod_pointing_saved(mytod,free_2gamma);
   end
   
   mdisp('assigned value');
