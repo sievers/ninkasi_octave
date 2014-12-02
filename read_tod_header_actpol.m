@@ -1,5 +1,6 @@
 function[tod,isok]=read_tod_header_actpol(tod_name,varargin)
-if iscell(tod_name),
+split_cells=get_keyval_default('split_cell_names',true,varargin{:});
+if (iscell(tod_name)&(split_cells)),
   for j=1:length(tod_name),
     [tod(j),isok(j)]=read_tod_header_actpol(tod_name{j},varargin{:});
   end
@@ -85,6 +86,7 @@ end
   set_tod_dt_c(tod,median(diff(ct)));
   set_tod_rowcol_c(tod,rr,cc);
   set_tod_filename(tod,tod_name);
+  if iscell(tod_name), tod_name=tod_name{1};end;
   alloc_tod_cuts_c(tod);
   
   %tod_offsets=read_text_file_comments(['/home/mhasse/depot/TODOffsets/' field_tag '_130916/offsets.txt']);

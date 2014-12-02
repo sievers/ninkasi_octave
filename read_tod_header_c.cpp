@@ -410,7 +410,7 @@ DEFUN_DLD (read_dirfile_channel, args, nargout, "Read a dirfile channel.  Allowa
 
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (read_many_dirfile_channels, args, nargout, "Read many dirfile channels.\n")
+DEFUN_DLD (read_many_dirfile_channels_c, args, nargout, "Read many dirfile channels.\n")
 {
 
   if (args.length()<2) {
