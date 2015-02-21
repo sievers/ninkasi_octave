@@ -1,4 +1,4 @@
-function[newmap]=make_cea_submap(map,ramin,ramax,decmin,decmax,do_copy)
+ffunction[newmap]=make_cea_submap(map,ramin,ramax,decmin,decmax,do_copy)
 if ~exist('do_copy')
   do_copy=false;
 end
