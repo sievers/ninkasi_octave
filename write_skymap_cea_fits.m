@@ -16,17 +16,24 @@ mm=skymap2octave(map);
 keys={};
 vals={};
 
-[keys,vals]=set_keyval_val('SIMPLE','T',keys,vals);
+%[keys,vals]=set_keyval_val('SIMPLE','T',keys,vals);
+[keys,vals]=set_keyval_val('SIMPLE',true,keys,vals);
 [keys,vals]=set_keyval_val('BITPIX',-64,keys,vals);
 [keys,vals]=set_keyval_val('NAXIS',2,keys,vals);
 [keys,vals]=set_keyval_val('NAXIS1',size(map,1),keys,vals);
 [keys,vals]=set_keyval_val('NAXIS2',size(map,2),keys,vals);
-[keys,vals]=set_keyval_val('EXTEND','T',keys,vals);
+%[keys,vals]=set_keyval_val('EXTEND','T',keys,vals);
+[keys,vals]=set_keyval_val('EXTEND',true,keys,vals);
 
-[keys,vals]=set_keyval_val('CTYPE1','''RA---CEA''',keys,vals);
-[keys,vals]=set_keyval_val('CTYPE2','''DEC--CEA''',keys,vals);
-[keys,vals]=set_keyval_val('CUNIT1','''        ''',keys,vals);
-[keys,vals]=set_keyval_val('CUNIT2','''        ''',keys,vals);
+%[keys,vals]=set_keyval_val('CTYPE1','''RA---CEA''',keys,vals);
+%[keys,vals]=set_keyval_val('CTYPE2','''DEC--CEA''',keys,vals);
+%[keys,vals]=set_keyval_val('CUNIT1','''        ''',keys,vals);
+%[keys,vals]=set_keyval_val('CUNIT2','''        ''',keys,vals);
+
+[keys,vals]=set_keyval_val('CTYPE1','RA---CEA',keys,vals);
+[keys,vals]=set_keyval_val('CTYPE2','DEC--CEA',keys,vals);
+[keys,vals]=set_keyval_val('CUNIT1','        ',keys,vals);
+[keys,vals]=set_keyval_val('CUNIT2','        ',keys,vals);
 
 [keys,vals]=set_keyval_val('CRVAL1',0,keys,vals);
 [keys,vals]=set_keyval_val('CRVAL2',0,keys,vals);

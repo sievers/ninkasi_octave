@@ -13,6 +13,7 @@ end
 crap=strsplit(tod_name,'/',true);
 crud=strsplit(crap{end},'.',true);
 myct=str2num(crud{1});
+myarr=str2num(crud{end}(end));
 ii=find(myct==offsets.ctime);
 
 %set offsets to nan if ctime isn't found
@@ -22,8 +23,13 @@ if isempty(ii)
   return
 end
 if numel(ii)~=1
-  sprintf('extreme oddness in get_tod_offset on %d.',myct)
-  ii=ii(1);
+  %if number of matches is bigger than one, extend the check to search for focal plane array matching
+  %only do this check here in case e.g.offset files don't have arrays/switch to having single offset per ctime
+  ii=find( (myct==offsets.ctime)&(myarr==offsets.arr));
+  if numel(ii)~=1
+    sprintf('extreme oddness in get_tod_offset on %d.',myct)
+    ii=ii(1);
+  end
 end
 
 assert(numel(ii)==1);

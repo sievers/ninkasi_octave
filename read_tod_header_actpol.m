@@ -10,6 +10,8 @@ tod_name=_strip_zips(tod_name);
 %/project/r/rbond/sievers/actpol/calib/actpol1_2013_c1_cal1_atm
 calib_dir=get_keyval_default('calib_dir','',varargin{:});
 calib_tail=get_keyval_default('calib_tail','calib.txt',varargin{:});
+calib_fmt=get_keyval_default('calib_fmt','',varargin{:});
+
 tod_offsets=get_keyval_default('tod_offsets',[],varargin{:});
 offsets=get_keyval_default('offsets',[],varargin{:});
 cuts=get_keyval_default('cuts','',varargin{:});
@@ -38,6 +40,16 @@ end
   [cpu_s,cpu_us,az_raw,el_raw,flags]=read_many_dirfile_channels(tod_name,'cpu_s','cpu_us','az','el','enc_flags');
   if ~isempty(cuts)
     [nsamp,samp_offset]=read_cuts_octave([],cuts,varargin{:})
+    if (nsamp<numel(cpu_s))
+      warning(['too few samples in cuts file ' cuts])
+      nsamp=numel(cpu_s);
+    end
+    if (nsamp>numel(cpu_s))
+      warning(['too many samples in cuts file ' cuts])
+      nsamp=numel(cpu_s);
+    end
+    %hard-wire in that shit will pass
+    nsamp=numel(cpu_s)-samp_offset;
 
     cpu_s=cpu_s(samp_offset+1:samp_offset+nsamp);
 
@@ -118,7 +130,11 @@ end
     end
     %calfile=[calib_dir '/' tt '/calib.txt'];
     %calfile=[calib_dir '/' tt '.calib.txt'];
-    calfile=[calib_dir '/' tt '.' calib_tail];
+    if isempty(calib_fmt)
+      calfile=[calib_dir '/' tt '.' calib_tail];
+    else
+      calfile=get_actpol_cutsname([tt '.' calib_tail],[calib_dir '/'],'date_format',calib_fmt);
+    end
 
     cals=read_python_dict(calfile);
     cals.rr=floor(cals.det_uid/32);

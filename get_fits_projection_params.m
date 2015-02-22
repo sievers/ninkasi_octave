@@ -1,4 +1,4 @@
-function[params,map]=get_fits_projection_params(fname)
+function[params,map,header,names]=get_fits_projection_params(fname)
 
 [map,header,names]=fits_image_read(fname);
 fittype=get_keyword_string('CTYPE1',names,header);
