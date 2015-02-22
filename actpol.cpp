@@ -18,6 +18,7 @@ extern "C"
 #include <slalib.h>
 #include <actpol/actpol.h>
 #include <assert.h>
+#include <omp.h>
 #ifdef __cplusplus
 }  /* end extern "C" */
 #endif

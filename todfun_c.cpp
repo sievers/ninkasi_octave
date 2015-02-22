@@ -115,7 +115,7 @@ DEFUN_DLD (test_omp_c, args, nargout, "Read TOD data into memory.\n")
     printf("Setting threads to %d\n",n);
     omp_set_num_threads(n);
   }
-
+  
 
 #pragma omp parallel
   printf("I am %d of %d\n",omp_get_thread_num(),omp_get_num_threads());
@@ -778,8 +778,11 @@ DEFUN_DLD (map2tod, args, nargout, "Project map into a tod.  Args are (map,tod).
     
     map2tod(mymap,mytod,(PARAMS *)&scale_fac);
   }
-  else
+  else {
+    //printf("calling map2tod.\n");
     map2tod(mymap,mytod,NULL);
+    //printf("back.\n");
+  }
   return octave_value_list();  
 }
 /*--------------------------------------------------------------------------------*/
@@ -1108,7 +1111,8 @@ DEFUN_DLD (read_dirfile_tod_data_from_rowcol_list_c, args, nargout, "Get the dat
   actData *vec=data.fortran_vec();
   for (int i=0;i<ndet;i++)
     dd[i]=vec+i*tod->ndata;
-  read_dirfile_tod_data_from_rowcol_list(tod,rows,cols,ndet,dd);
+  int nout;
+  read_dirfile_tod_data_from_rowcol_list(tod,rows,cols,ndet,dd,&nout);
 #else
   fprintf(stderr,"Single precision not yet implemented.\n");
 #endif

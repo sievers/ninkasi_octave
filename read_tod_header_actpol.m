@@ -1,5 +1,6 @@
 function[tod,isok]=read_tod_header_actpol(tod_name,varargin)
-if iscell(tod_name),
+split_cells=get_keyval_default('split_cell_names',true,varargin{:});
+if (iscell(tod_name)&(split_cells)),
   for j=1:length(tod_name),
     [tod(j),isok(j)]=read_tod_header_actpol(tod_name{j},varargin{:});
   end
@@ -51,12 +52,26 @@ end
     %hard-wire in that shit will pass
     nsamp=numel(cpu_s)-samp_offset;
 
-    cpu_s=cpu_s(samp_offset+1:samp_offset+nsamp);
-
-    cpu_us=cpu_us(samp_offset+1:samp_offset+nsamp);
-    az_raw=az_raw(samp_offset+1:samp_offset+nsamp);
-    el_raw=el_raw(samp_offset+1:samp_offset+nsamp);
-    flags=flags(samp_offset+1:samp_offset+nsamp);
+    
+    last_samp=samp_offset+nsamp;
+    if last_samp>numel(cpu_s)
+      warning('too many samples coming out of cuts.  Truncating.')
+      last_samp=numel(cpu_s);
+    end
+    %this block should be good to use, leave bottom just in case
+    if (1)
+      cpu_s=cpu_s(samp_offset+1:last_samp);
+      cpu_us=cpu_us(samp_offset+1:last_samp);
+      az_raw=az_raw(samp_offset+1:last_samp);
+      el_raw=el_raw(samp_offset+1:last_samp);
+      flags=flags(samp_offset+1:last_samp);     
+    else
+      cpu_s=cpu_s(samp_offset+1:samp_offset+nsamp);
+      cpu_us=cpu_us(samp_offset+1:samp_offset+nsamp);
+      az_raw=az_raw(samp_offset+1:samp_offset+nsamp);
+      el_raw=el_raw(samp_offset+1:samp_offset+nsamp);
+      flags=flags(samp_offset+1:samp_offset+nsamp);
+    end
   else
     samp_offset=0;
   end
@@ -97,6 +112,7 @@ end
   set_tod_dt_c(tod,median(diff(ct)));
   set_tod_rowcol_c(tod,rr,cc);
   set_tod_filename(tod,tod_name);
+  if iscell(tod_name), tod_name=tod_name{1};end;
   alloc_tod_cuts_c(tod);
   
   %tod_offsets=read_text_file_comments(['/home/mhasse/depot/TODOffsets/' field_tag '_130916/offsets.txt']);

@@ -18,6 +18,7 @@ if (1)
   check_empty=get_struct_mem(myopts,'check_empty',false);
   new_mapptr=get_struct_mem(myopts,'new_mapptr',[]);
   do_actpol_pointing=get_struct_mem(myopts,'do_actpol_pointing',false);
+  free_2gamma=get_struct_mem(myopts,'free_2gamma',1);
 else
   
   do_noise=get_keyval_default('do_noise',false,varargin{:});
@@ -65,7 +66,7 @@ for j=1:length(tods),
         convert_saved_pointing_to_pixellization(mytod,mapset.skymap.mapptr)
       end
     end
-    free_tod_pointing_saved(mytod);
+    free_tod_pointing_saved(mytod,free_2gamma);
   end
   
   allocate_tod_storage(mytod);
@@ -74,7 +75,6 @@ for j=1:length(tods),
   %mtoc
   t1a=now;
   mapset2tod_octave(mapset,mytod,j);
-
   t1b=now;
   
 

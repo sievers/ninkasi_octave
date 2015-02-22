@@ -257,7 +257,6 @@ DEFUN_DLD (get_pix_from_radec_c, args, nargout, "Say where ra/dec should be in p
 
 }
 
-
 /*--------------------------------------------------------------------------------*/
 /*
 DEFUN_DLD (get_pix_from_radec_c, args, nargout, "Say what x/y coordinates an ra/dec location is in a map.")

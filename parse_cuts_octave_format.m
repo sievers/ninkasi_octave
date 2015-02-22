@@ -1,5 +1,8 @@
 function[n_samp,samp_offset]=parse_cuts_octave_format(tod,lines,varargin)
 max_prime=get_keyval_default('max_prime',0,varargin{:});
+offset=get_keyval_default('cuts_offset',0,varargin{:});
+
+
 j=1;
 while (strcmp(strtrim(lines{j}),'END')==0)
   eval([lines{j} ';']);
@@ -24,7 +27,7 @@ strip_tag=' rc:(),';
 [rr,cc]=get_tod_rowcol(tod);
 found_cuts=false(size(rr));
 for j=jstart:length(lines),
-  det_cuts=cellstr2mat(strsplit(lines{j},strip_tag,true));
+  det_cuts=cellstr2mat(mystrsplit(lines{j},strip_tag,true));
   myind=find((det_cuts(2)==rr)&(det_cuts(3)==cc));
   if ~isempty(myind)
     found_cuts(myind)=true;
@@ -36,7 +39,7 @@ for j=jstart:length(lines),
         cut_detector_c(tod,myrow,mycol);
       else
         for k=1:2:length(mycuts),
-          cuts_extend_c(tod,mycuts(k),mycuts(k+1),myrow,mycol);
+          cuts_extend_c(tod,mycuts(k)+offset,mycuts(k+1)+offset,myrow,mycol);
         end
       end
     end

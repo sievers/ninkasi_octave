@@ -12,9 +12,16 @@ extern "C"
 
 #include <ninkasi_config.h>
 #include <ninkasi.h>
-#include <getdata.h>
-#include <dirfile.h>
 #include <readtod.h>
+
+  //#ifdef ACTPOL_DIRFILE
+  //#include <actpol/dirfile.h>
+  //#include <actpol/getdata.h>
+  //#else
+  //#include <getdata.h>
+  //#include <dirfile.h>
+  //#endif
+
 #include <slalib.h>
 #ifdef __cplusplus
 }  /* end extern "C" */
@@ -410,7 +417,7 @@ DEFUN_DLD (read_dirfile_channel, args, nargout, "Read a dirfile channel.  Allowa
 
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (read_many_dirfile_channels, args, nargout, "Read many dirfile channels.\n")
+DEFUN_DLD (read_many_dirfile_channels_c, args, nargout, "Read many dirfile channels.\n")
 {
 
   if (args.length()<2) {
@@ -426,7 +433,14 @@ DEFUN_DLD (read_many_dirfile_channels, args, nargout, "Read many dirfile channel
   char *fname=get_char_from_arg(filename);
   
   int status;
+
+#ifdef ACTPOL_DIRFILE
+  ACTpolDirfile *format = ACTpolDirfile_open(fname);
+#else
   struct FormatType *format = GetFormat( fname, NULL, &status );
+#endif
+
+
   if (format==NULL) {
     fprintf(stderr,"Warning - problem reading format from file .%s.\n",fname);
     return octave_value_list();
@@ -446,8 +460,14 @@ DEFUN_DLD (read_many_dirfile_channels, args, nargout, "Read many dirfile channel
     retval(i-1)=vec;    
   }
 
+
+
+#ifdef ACTPOL_DIRFILE
+  ACTpolDirfile_close(format);
+#else
   GetDataClose(format);
   free(format);
+#endif
   
    
   return retval;

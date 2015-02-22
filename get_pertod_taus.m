@@ -1,12 +1,17 @@
 function[taus]=get_pertod_taus(tod,varargin)
 dirroot=get_keyval_default('dirroot','/home/r/rbond/egrace/depot/tau_ar1_v2/',varargin{:});
 tailtag=get_keyval_default('tailtag','.ar1.tau',varargin{:});
+skip_ct2=get_keyval_default('skip_ct2',false,varargin{:});
 nrow=get_keyval_default('nrow',32,varargin{:});
 ncol=get_keyval_default('ncol',32,varargin{:});
 todname=get_tod_name(tod);
 [ct1,ct2]=get_tod_ctimes_from_names(todname);
 dr2=sprintf('%d',ct1);dr2=dr2(1:5);
-tauname=[dirroot '/' dr2 '/' sprintf('%d',ct1) '.' sprintf('%d',ct2) tailtag];
+if skip_ct2
+  tauname=[dirroot '/' dr2 '/' sprintf('%d',ct1) tailtag];
+else
+  tauname=[dirroot '/' dr2 '/' sprintf('%d',ct1) '.' sprintf('%d',ct2) tailtag];
+end
 
 
 
