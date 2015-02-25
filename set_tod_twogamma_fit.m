@@ -15,9 +15,16 @@ if (downsamp>1),
   [alt,az]=get_tod_altaz(tod);
   ndata=get_tod_ndata(tod);
   tvec=(0:(ndata-1))'/ndata;
-  tvec=tvec(1:downsamp:(end-downsamp+1));
-  az=az(1:downsamp:(end-downsamp+1));
-  alt=alt(1:downsamp:(end-downsamp+1));
+
+  %tvec=tvec(1:downsamp:(end-downsamp+1));
+  %az=az(1:downsamp:(end-downsamp+1));
+  %alt=alt(1:downsamp:(end-downsamp+1));
+
+
+  tvec=tvec(1:downsamp:end);
+  az=az(1:downsamp:end);
+  alt=alt(1:downsamp:end);
+
   mat=ones(length(tvec),2+npoly);
   mat(:,1)=1;
   for j=1:npoly,

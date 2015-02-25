@@ -440,8 +440,9 @@ DEFUN_DLD(precalc_actpol_pointing_exact_subsampled_c,args,nargout,"Calculate a s
 {
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
   int fac=(int)get_value(args(1));
-  int len=tod->ndata/fac;
-
+  int len=(tod->ndata+fac-1)/fac;
+  //printf("len is %d %d %d\n",len,tod->ndata,fac);
+  
   dim_vector dm(len,tod->ndet);
   Matrix ra(dm);
   Matrix dec(dm);
