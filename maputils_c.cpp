@@ -8,7 +8,7 @@ extern "C"
 #endif
 #include <ninkasi_config.h>
 #include <ninkasi.h>
-#include <dirfile.h>
+  //#include <dirfile.h>
 #include <readtod.h>
 #include <ninkasi_projection.h>
 #ifdef USE_HEALPIX

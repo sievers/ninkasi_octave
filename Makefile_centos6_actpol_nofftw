@@ -27,10 +27,10 @@ ACTPOL=/project/r/rbond/nolta/actpol/libactpol/1.1.0/
 
 #NINKASI_INC=-I${HOME}/local_centos6/include/ -I${HOME}/local_centos6/src/ninkasi/include/   -I${MKL}/include/ -I${HEALPIX}/include -I${HOME}/local_centos6/src/octave-3.4.3 -I${ACTPOL_LOCAL}/include -I${ACTPOL}/include -D_MKL -DUSE_HEALPIX -DACTPOL 
 
-NINKASI_INC=-I${HOME}/local_centos6/include/ -I${HOME}/local_centos6/src/ninkasi/include/   -I${MKL}/include/ -I${HEALPIX}/include -I${HOME}/local_centos6/src/octave-3.4.3 -I${ACTPOL}/include/ -I${ACTPOL_LOCAL}/include  -D_MKL -DUSE_HEALPIX  -DACTPOL -DNO_FFTW
+NINKASI_INC=-I${HOME}/local_centos6/include/ -I${HOME}/local_centos6/src/ninkasi/include/   -I${MKL}/include/ -I${MKL}/include/fftw/ -I${HEALPIX}/include -I${HOME}/local_centos6/src/octave-3.4.3 -I${ACTPOL}/include/ -I${ACTPOL_LOCAL}/include  -D_MKL -DUSE_HEALPIX  -DACTPOL -DNO_FFTW
 #NINKASI_INC=-I${HOME}/local_centos6/include/ -I${HOME}/local_centos6/src/ninkasi/include/   -I${MKL}/include/ -I${HEALPIX}/include -I${HOME}/local_centos6/src/octave-3.4.3 -D_MKL -DUSE_HEALPIX 
 
-NINKASI_INC=-I${LOCAL}/includle
+#NINKASI_INC=-I${LOCAL}/include
 
 
 
@@ -41,7 +41,7 @@ NINKASI_INC=-I${LOCAL}/includle
 NINKASI_LIBS2= -L${ACTPOL_LOCAL}/lib -L${ACTPOL}/lib -L${HOME}/local_centos6/lib/  -lninkasi -lactpol  -lslalib -lsofa_c -lwcs -lzzip -lslim   -L${HEALPIX}/lib -lchealpix -lcfitsio  -lgomp -L${MKLROOT}/lib/intel64 -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core   -lpthread -lm
 
 
-NINKASI_LIBS2=-L${LOCAL}/lib -lfftw3_threads -lfftw3 -lfftw3f_threads -lfftw3f -lpthread -lm -lgomp
+#NINKASI_LIBS2=-L${LOCAL}/lib -lfftw3_threads -lfftw3 -lfftw3f_threads -lfftw3f -lpthread -lm -lgomp
 
 #-Wl,--rpath -Wl,/cita/d/raid-sievers/sievers/act/ninkasi//lib
 

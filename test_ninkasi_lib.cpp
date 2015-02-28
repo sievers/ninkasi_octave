@@ -8,7 +8,7 @@ extern "C"
 {
 #endif
 #include <ninkasi.h>
-#include <dirfile.h>
+  //#include <dirfile.h>
 #ifdef __cplusplus
 }  /* end extern "C" */
 #endif
