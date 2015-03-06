@@ -3144,6 +3144,15 @@ DEFUN_DLD(print_detector_pairs_c,args,nargout,"Print the horns that have been pa
     printf("paired detectors not found in print_detector_pairs_c.\n");
     return octave_value_list();
   }
+  if (nargout>0) {
+    dim_vector dm(mytod->ndet,1);
+    int32NDArray dat(dm);
+    for (int i=0;i<mytod->ndet;i++) {
+      dat(i)=mytod->paired_detectors[i];
+    }
+    return octave_value(dat);
+    
+  }
   for (int i=0;i<mytod->ndet;i++) {
     if (mytod->paired_detectors[i]>i) {
       int j=mytod->paired_detectors[i];
