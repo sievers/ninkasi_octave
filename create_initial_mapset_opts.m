@@ -564,6 +564,9 @@ for j=1:length(tods),
     if strcmp(noise_class,'cbass_north')
       set_tod_noise_bands_cbass_north(mytod,myopts);
     end
+    if strcmp(noise_class,'mustang15')
+      set_tod_noise_mustang15(mytod,myopts);
+    end
 
     if (strcmp(noise_class,'banded'))
       mdisp('setting noise to banded.');

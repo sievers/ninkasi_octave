@@ -15,7 +15,7 @@ end
 
 if strcmp(fmt.types{ii},'LINCOM')
   value=0;
-  tags=strsplit(fmt.vals{ii},' ',true);
+  tags=strsplit(strtrim(fmt.vals{ii}),' ',true);
   nterm=str2num(tags{1});
   tags=tags(2:end);
   for j=1:nterm,

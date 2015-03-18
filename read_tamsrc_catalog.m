@@ -11,7 +11,11 @@ ra=zeros(numel(cat),1);
 dec=zeros(numel(cat),1);
 amps=zeros(numel(cat),1);
 for j=1:length(cat),
-  tags=strsplit(cat{j},' ',true);
+  tags=strsplit(strtrim(cat{j}),' ',true);  
+  %if isempty(tags{1})
+  %  tags=tags(2:end);
+  %end
+  %tags=strsplit(cat{j},sprintf('\t '),true);
 
   tt=tags{racol};
   if ~isempty(find(tt==':'))
@@ -46,7 +50,7 @@ end
 
 
 function[value]=convert_rastr(tt)
-tags=strsplit(tt,':',true);
+tags=strsplit(strtrim(tt),':',true);
 ss=1;
 if max(find(tags{1}=='-'))>0
   ss=-1;

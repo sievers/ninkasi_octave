@@ -10,8 +10,8 @@ if iscell(tod_name),
   return
 end
 
-crap=strsplit(tod_name,'/',true);
-crud=strsplit(crap{end},'.',true);
+crap=strsplit(strtrim(tod_name),'/',true);
+crud=strsplit(strtrim(crap{end}),'.',true);
 myct=str2num(crud{1});
 myarr=str2num(crud{end}(end));
 ii=find(myct==offsets.ctime);

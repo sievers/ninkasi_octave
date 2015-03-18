@@ -4,7 +4,7 @@ nl=length(lines);
 
 for ii=nl:-1:1,
   ll=lines{ii};
-  tags=strsplit(ll,' ',true);
+  tags=strsplit(strtrim(ll),' ',true);
   cat.todname(ii)=tags(1);
   cat.uranus_ra(ii)=str2num(tags{8});
   cat.uranus_dec(ii)=str2num(tags{9});

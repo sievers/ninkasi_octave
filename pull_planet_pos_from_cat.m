@@ -10,7 +10,7 @@ end
 %end
 
 nn=length(cat.todname);
-fwee=strsplit(todname,'/',true);
+fwee=strsplit(strtrim(todname),'/',true);
 mytail=fwee{end};
 mylen=numel(mytail);
 for ii=1:nn,
