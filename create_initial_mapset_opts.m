@@ -1,4 +1,4 @@
-function[mapset,medians,signal_mapset,data_from_map,data_org]=create_initial_mapset_opts(tods,mapset,mapset_in,myopts)
+function[mapset,medians,signal_mapset,data_from_map,data_org]=create_initial_mapset_opts_partitioned(tods,mapset,mapset_in,myopts)
  
 
 myid=mpi_comm_rank+1;
@@ -134,6 +134,9 @@ if do_actpol_pointing %we're going to do some precalculating of pointing.  If th
   end
 end
 
+if isfield(mapset,'skymap')
+  mapset.skymap=rmfield(mapset.skymap,'map');
+end
 
 for j=1:length(tods),
   tt_start=now;
@@ -730,10 +733,15 @@ end
 mdisp('master has finished his TODs');
 
 if isfield(mapset,'skymap')
-  if ~skip_mpi
-    mapset.skymap.map=mpi_allreduce(mapset.skymap.map);
+  if isfield(mapset.skymap,'partition')
+    mapset.skymap=skymap2octave(mapset.skymap);
+    octave2skymap(mapset.skymap);  %not sure if one needs this
+  else
+    if ~skip_mpi
+      mapset.skymap.map=mpi_allreduce(mapset.skymap.map);
+    end
+    octave2skymap(mapset.skymap);
   end
-  octave2skymap(mapset.skymap);
 end
 
 if isfield(mapset,'srccat')

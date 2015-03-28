@@ -64,7 +64,7 @@ octave_value pointer_to_value(void *ptr)
 
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (clear_map, args, nargout, "Clear a skymap.\n")
+DEFUN_DLD (clear_map_c, args, nargout, "Clear a skymap.\n")
 {
   MAP  *map=(MAP *)get_pointer(args(0));
   clear_map(map);
@@ -74,7 +74,7 @@ DEFUN_DLD (clear_map, args, nargout, "Clear a skymap.\n")
 
 /*--------------------------------------------------------------------------------*/
 
-DEFUN_DLD (make_map_copy, args, nargout, "Copy a sky map.\n")
+DEFUN_DLD (make_map_copy_c, args, nargout, "Copy a sky map.\n")
 {
   MAP  *map=(MAP *)get_pointer(args(0));
   MAP *copy=make_map_copy(map);

@@ -214,7 +214,7 @@ DEFUN_DLD (make_weightmap_ninkasi, args, nargout, "Make a weight map.\n")
 
 }
 /*--------------------------------------------------------------------------------*/
-DEFUN_DLD (skymap2octave, args, nargout, "Turn a ninkasi skymap into an octave one.\n")
+DEFUN_DLD (skymap2octave_c, args, nargout, "Turn a ninkasi skymap into an octave one.\n")
 {
   MAP *mymap=(MAP *)get_pointer(args(0));
 

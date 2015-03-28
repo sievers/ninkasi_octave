@@ -2819,6 +2819,11 @@ DEFUN_DLD (tod2polmap_copy,args,nargout,"Project a polmap into a TOD.  pointing 
 
 DEFUN_DLD (convert_saved_pointing_to_pixellization, args, nargout, "Convert a TOD's saved RA/Dec to a map pixellization, freeing the RA/Dec storage..\n")
 {
+  int nargin=args.length();
+  if (nargin<2) {
+    printf("need tod and map in convert_saved_pointing_to_pixellization.\n");
+    return octave_value_list();    
+  }
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   MAP *mymap=(MAP *)get_pointer(args(1));
   convert_saved_pointing_to_pixellization(mytod,mymap);

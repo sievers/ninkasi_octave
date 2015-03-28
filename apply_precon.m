@@ -17,9 +17,26 @@ if isfield(mapset,'skymap')
       if (~is_map_polarized(mapset.skymap.mapptr))
         mapset.skymap.map(precon.skymap.map>0)=mapset.skymap.map(precon.skymap.map>0)./precon.skymap.map(precon.skymap.map>0);
       else
-        octave2skymap(mapset.skymap);
-        apply_pol_precon_c(mapset.skymap.mapptr,precon.skymap.mapptr);
-        mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
+        if isfield(mapset.skymap,'partition')
+          %have to make a map here because the C version of the preconditioner
+          %will cover a different patch of sky than the C version of the regular map
+          %(but should be the same region as the octave version of the regular map)
+
+          tmp=make_map_copy(precon.skymap.mapptr);
+          set_map_polstate_c(tmp,get_map_polstate_c(mapset.skymap.mapptr));
+          octave2skymap(mapset.skymap.map,tmp);
+          apply_pol_precon_c(tmp,precon.skymap.mapptr);
+
+          mapset.skymap.map=skymap2octave(tmp);
+          destroy_map(tmp);
+
+          
+          
+        else
+          octave2skymap(mapset.skymap);
+          apply_pol_precon_c(mapset.skymap.mapptr,precon.skymap.mapptr);
+          mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
+        end
       end
       
       %mapset.skymap.map=mapset.skymap.map.*precon.skymap.map;

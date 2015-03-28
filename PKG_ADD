@@ -35,7 +35,7 @@ autoload('add_matrix_to_tod_data',fullfile(fileparts(mfilename("fullpath")),'tod
 autoload('assign_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('pull_bad_timestreams',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('check_data_fft_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
-autoload('clear_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('clear_map_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('get_map_npol',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('is_map_polarized',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('get_map_polstate_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
@@ -120,7 +120,7 @@ autoload('get_tod_kept_regions_c',fullfile(fileparts(mfilename("fullpath")),'tod
 autoload('highpass_tod_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('how_many_dets_are_kept',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('is_det_always_cut',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
-autoload('make_map_copy',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('make_map_copy_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('deres_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('upres_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('make_weightmap_ninkasi',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
@@ -130,6 +130,9 @@ autoload('map_axpy',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'))
 autoload('map_times_map',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('merge_cuts_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('mpi_allreduce',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
+autoload('mpi_reduce',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
+autoload('mpi_send',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
+autoload('mpi_recv',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
 autoload('mpi_allgather_c',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
 autoload('mpi_barrier',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
 autoload('mpi_bcast_string',fullfile(fileparts(mfilename("fullpath")),'octave_mpi_utils.oct'));
@@ -159,7 +162,7 @@ autoload('set_skymap_tan_explicit_c',fullfile(fileparts(mfilename("fullpath")),'
 autoload('set_skymap_cea_simple_c',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('set_skymap_cea_simple_predef_c',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('set_tod_noise_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
-autoload('skymap2octave',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
+autoload('skymap2octave_c',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('sum_tod_data',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('test_apply_banded_rotations_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('test_complex',fullfile(fileparts(mfilename("fullpath")),'matutils.oct'));

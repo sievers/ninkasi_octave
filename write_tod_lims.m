@@ -1,9 +1,18 @@
 function[asdf]=write_tod_lims(tod_names,pfile,outfile)
 
+
 ntod=numel(tod_names);
 
+if (strcmp(class(tod_names),'int64'))
+  tods=tod_names;
+  all_lims=zeros(ntod,4);
+  for j=1:length(tods),
+    all_lims(j,:)=get_tod_radec_lims(tods(j));
+  end
 
-[tods,lims,all_lims]=read_all_tod_headers_vararg(tod_names,'pointing',pfile);
+else
+  [tods,lims,all_lims]=read_all_tod_headers_vararg(tod_names,'pointing',pfile);
+end
 ii=all_lims(:,2)<all_lims(:,1);
 all_lims(ii,2)=all_lims(ii,2)+2*pi;
 all_lims=all_lims*180/pi;

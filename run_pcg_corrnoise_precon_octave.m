@@ -1,4 +1,4 @@
-function[x]=run_pcg_corrnoise_precon_octave(tods,x,b,precon,fun,priorfun,varargin)
+function[x]=run_pcg_corrnoise_precon_octave_partitioned(tods,x,b,precon,fun,priorfun,varargin)
 %function[x,best]=run_pcg_corrnoise_precon_octave(tods,x,b,precon,fun,priorfun,varargin)
 
 %x is a mapset, could be clear
@@ -79,11 +79,16 @@ end
 
 
 [ax,tod_times,node_times]=mapset2mapset_corrnoise_octave(tods,x,varargin{:});
-if myid==1
-  if isfield(ax,'skymap')
+
+if isfield(ax,'skymap')
+  if isfield(ax.skymap,'partition')
     write_map(ax.skymap,[save_tag '_ax']);
+  else
+    if myid==1
+      write_map(ax.skymap,[save_tag '_ax']);
+    end
+    fieldnames(ax)
   end
-  fieldnames(ax)
 end
 
 
@@ -327,6 +332,11 @@ while ((rMr>r0sqr*tol)&(iter<maxiter)),
       alpha=rMr/dAd;
       x=add_mapset(x,d,alpha);
       r=add_mapset(r,Ad,-alpha);
+      if isfield(Ad,'skymap')
+        if isfield(Ad.skymap,'partition')
+          destroy_map(Ad.skymap.mapptr);
+        end
+      end
       clear Ad;
       if do_precon,
         Mr=feval(fun,r,precon);
@@ -354,37 +364,54 @@ while ((rMr>r0sqr*tol)&(iter<maxiter)),
         fprintf(logid,'\n');
         fflush(logid);
       end
+
+
+
+      
+
+      do_print=false;
+      if length(save_interval)==1
+        if save_interval>0,
+          if rem(iter,save_interval)==0,
+            do_print=true;
+          end
+        end
+      else
+        if sum(iter==save_interval)>0
+          do_print=true;
+        end
+      end
+      if (do_print)
+        if isfield(x,'skymap')
+          
+          if isfield(x.skymap,'partition')
+            write_map(x.skymap,[save_tag num2str(iter)])
+          else
+            if myid==1
+              octave2skymap(x.skymap);
+              write_map(x.skymap.mapptr,[save_tag num2str(iter)]);
+              %write_simple_map_c(x.skymap.mapptr,[save_tag num2str(iter) '.map']);          
+            end
+          end
+        end
+      end
+      
+      
+
+
       if (myid==1)
         %disp([iter rMr dAd beta]);
 
         printf('%4d %14.5g %14.5g %14.5g %9.2f %9.2f %4d %9.2f %9.2f\n',iter,rMr,dAd,beta,86400*(bb-aa),86400*(cc-aa),bad_id,slowest_time,total_time/nproc);
-        do_print=false;
-        if length(save_interval)==1
-          if save_interval>0,
-            if rem(iter,save_interval)==0,
-              do_print=true;
-            end
-          end
-        else
-          if sum(iter==save_interval)>0
-            do_print=true;
-          end
-        end
-        if (do_print)
-          if isfield(x,'skymap')
-            octave2skymap(x.skymap);
-            write_map(x.skymap.mapptr,[save_tag num2str(iter)]);
-            %write_simple_map_c(x.skymap.mapptr,[save_tag num2str(iter) '.map']);          
-          end
+        if do_print
           if isfield(x,'ground')
             octave2skymap(x.ground.ground,x.ground.groundptr);
             write_map(x.ground.groundptr,[save_tag num2str(iter) '_ground']);
           end
-
           if isfield(x,'srccat')
             write_srccat_mapset(x.srccat,[save_tag num2str(iter) '_srccat.txt']);
           end
-
+          
         end
       end
       old_dAd=dAd;

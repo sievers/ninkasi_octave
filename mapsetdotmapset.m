@@ -17,7 +17,11 @@ end
 
 
 if isfield(a,'skymap')
-  val=val+sum(sum(sum(a.skymap.map.*b.skymap.map)));
+  tmp=sum(sum(sum(a.skymap.map.*b.skymap.map)));
+  if isfield(a.skymap.map,'partition')
+    tmp=mpi_allreduce(tmp);
+  end
+  val=val+tmp;
 end
 
 if isfield(a,'ground')

@@ -37,6 +37,15 @@ double get_value(octave_value val)
 }
 
 /*--------------------------------------------------------------------------------*/
+void *get_pointer(octave_value val)
+{
+  int64NDArray myptr=val.array_value();
+  long myptr2=myptr(0,0);
+  return (void *)myptr2;
+
+}
+
+/*--------------------------------------------------------------------------------*/
 
 
 MPI_Op get_op(octave_value mystr)
@@ -114,6 +123,182 @@ DEFUN_DLD (mpi_allreduce, args, nargout, "Reduce .\n")
 
 #endif
 
+
+/*--------------------------------------------------------------------------------*/
+
+#if 1
+
+DEFUN_DLD (mpi_reduce, args, nargout, "Reduce.  Args are (array, destination, operator, communicator) (\n")
+{
+  
+  NDArray  val=args(0).array_value();
+  dim_vector dm=val.dims();
+  NDArray reduced(dm);
+  dim_vector dm2=reduced.dims();
+  double *valptr=val.fortran_vec();
+  double *reducedptr=reduced.fortran_vec();
+  
+  long numel=1;
+  long numel2=1;
+  assert(dm.length()==dm2.length());
+  for (int i=0;i<dm.length();i++) {
+      numel*=dm(i);
+      numel2*=dm2(i);
+  }
+  assert(numel==numel2);
+  //printf("Have %ld elements.\n",numel);
+  long numel_min,numel_max;
+  MPI_Allreduce(&numel,&numel_min,1,MPI_LONG,MPI_MIN,MPI_COMM_WORLD);
+  MPI_Allreduce(&numel,&numel_max,1,MPI_LONG,MPI_MAX,MPI_COMM_WORLD);
+  assert(numel_min==numel);
+  assert(numel_max==numel);
+  
+  int mpi_target=0;
+  //find the target - octave is unit-offset, so shift down by 1
+  if (args.length()>1)
+    mpi_target=(int)get_value(args(1))-1;
+  
+  
+  
+  MPI_Op op=MPI_SUM;
+  if (args.length()>2)
+    op=get_op(args(2));
+  MPI_Comm comm=MPI_COMM_WORLD;
+  if (args.length()>3) {
+    MPI_Comm *myptr=(MPI_Comm *)get_pointer(args(3));
+    comm=*myptr;
+  }
+  
+  
+
+  if (MPI_Reduce (valptr,reducedptr,numel,MPI_DOUBLE,op,mpi_target,comm)) {
+    fprintf(stderr,"Error in MPI_Reduce.\n");
+    return octave_value_list();
+  }
+  
+  int myrank=-1;
+  MPI_Comm_rank(comm,&myrank);
+  if (myrank==mpi_target)
+    return octave_value(reduced);
+  else {
+    Matrix my_empty;
+    //return octave_value_list();
+    return octave_value(my_empty);
+  }
+  
+}
+
+#endif
+
+
+
+
+
+
+/*--------------------------------------------------------------------------------*/
+//int MPI_Send(const void *buf, int count, MPI_Datatype datatype, int dest,	     int tag, MPI_Comm comm)
+DEFUN_DLD(mpi_send,args,nargout,"MPI Send.  args are data, destination, <tag>, <communicator>\n")
+{
+  
+  if (args.length()<2) {
+    printf("Need at least 2 arguments in mpi_send.  only got %d\n",args.length());
+    return octave_value_list();
+  }
+  int dest=(int)get_value(args(1))-1;
+  int tag=0;
+  if (args.length()>2)
+    tag=get_value(args(2));
+
+  MPI_Comm comm=MPI_COMM_WORLD;
+  if (args.length()>3) {
+    MPI_Comm *myptr=(MPI_Comm *)get_pointer(args(3));
+    comm=*myptr;
+  }
+   
+  NDArray  val=args(0).array_value();
+  dim_vector dm=val.dims();
+  int ndim=dm.length();
+
+  int dims[ndim];
+  int nelem=1;
+  for (int i=0;i<ndim;i++) {
+    nelem*=dm(i);
+    dims[i]=dm(i);
+  }
+  
+  MPI_Send(&ndim,1,MPI_INT,dest,tag,comm);
+  MPI_Send(dims,ndim,MPI_INT,dest,tag,comm);
+
+  MPI_Send(val.fortran_vec(),nelem,MPI_DOUBLE,dest,tag,comm);
+
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+
+//int MPI_Recv(void *buf, int count, MPI_Datatype datatype,	     int source, int tag, MPI_Comm comm, MPI_Status *status)
+
+
+DEFUN_DLD(mpi_recv,args,nargout,"MPI Receive.  args are source, <tag>, <communicator>\n")
+{
+  
+  if (args.length()<1) {
+    printf("Need at least 1 argument in mpi_recv (source).  only got %d\n",args.length());
+    return octave_value_list();
+  }
+  MPI_Status mystatus;
+  int source=(int)get_value(args(0))-1;
+  int tag=0;
+  if (args.length()>1)
+    tag=get_value(args(1));
+  
+  MPI_Comm comm=MPI_COMM_WORLD;
+  if (args.length()>2) {
+    MPI_Comm *myptr=(MPI_Comm *)get_pointer(args(2));
+    comm=*myptr;
+  }
+   
+  int ndim;
+  MPI_Recv(&ndim,1,MPI_INT,source,tag,comm,&mystatus);
+  int dims[ndim];
+  MPI_Recv(dims,ndim,MPI_INT,source,tag,comm,&mystatus);
+  //according to the header file, this is how to get n-dimensional dim_vectors assembled.
+  dim_vector dm;
+  if (ndim==1) {
+    dim_vector dm_tmp(dims[0]);
+    dm=dm_tmp;
+  }
+
+  if (ndim==2) {
+    dim_vector dm_tmp(dims[0],dims[1]);
+    dm=dm_tmp;
+  }
+
+  if (ndim==3) {
+    dim_vector dm_tmp(dims[0],dims[1],dims[2]);
+    dm=dm_tmp;
+  }
+
+  if (ndim==4) {
+    dim_vector dm_tmp(dims[0],dims[1],dims[2],dims[3]);
+    dm=dm_tmp;
+  }
+  int nelem=1;
+  for (int i=0;i<ndim;i++) {
+    dm(i)=dims[i];
+    nelem*=dm(i);
+  }
+  NDArray val(dm);
+  dim_vector dm2=val.dims();
+
+  double *myptr=val.fortran_vec();
+  //memset(myptr,0,sizeof(double)*nelem);
+
+  MPI_Recv(val.fortran_vec(),nelem,MPI_DOUBLE,source,tag,comm,&mystatus);
+  return octave_value(val);
+}
+
+
 /*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (mpi_barrier, args, nargout, "Barrier .\n")
@@ -155,6 +340,7 @@ DEFUN_DLD (mpi_bcast_string, args, nargout, "Broadcast .\n")
   else
     tosend=ch2.fortran_vec();
   MPI_Bcast(tosend,len,MPI_CHAR,from_whom,MPI_COMM_WORLD);
+  
   
   if (rank==from_whom)
     return octave_value(ch,true);
