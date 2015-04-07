@@ -1,4 +1,4 @@
-function[mapset,medians,signal_mapset,data_from_map,data_org]=create_initial_mapset_opts(tods,mapset,mapset_in,myopts)
+function[mapset,medians,signal_mapset,data_from_map,data_org]=create_initial_mapset_opts_partitioned(tods,mapset,mapset_in,myopts)
  
 
 myid=mpi_comm_rank+1;
@@ -737,12 +737,7 @@ if isfield(mapset,'skymap')
     mapset.skymap=skymap2octave(mapset.skymap);
     octave2skymap(mapset.skymap);  %not sure if one needs this
   else
-    %in case the map field got nuked, put it back here.
-    if ~isfield(mapset.skymap,'map')
-      mapset.skymap.map=skymap2octave(mapset.skymap.mapptr);
-    end
     if ~skip_mpi
-      
       mapset.skymap.map=mpi_allreduce(mapset.skymap.map);
     end
     octave2skymap(mapset.skymap);
