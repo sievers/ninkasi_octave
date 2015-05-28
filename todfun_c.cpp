@@ -1302,7 +1302,27 @@ DEFUN_DLD (rescale_calib_facs_c, args, nargout, "Rescale tod calibration factors
   return octave_value_list();
 
 }
-
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (return_saved_calib_facs_c,args,nargout,"Return calibration factors stored inside a TOD.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->calib_facs_saved==NULL) {
+    printf("No calibration factors saved on requested TOD in return_saved_calib_facs_c.\n");
+    return octave_value_list();
+  }
+  Matrix mat(mytod->nrow,mytod->ncol);
+  memset(mat.fortran_vec(),0,sizeof(double)*mytod->nrow*mytod->ncol);
+  //for (int i=0;i<mytod->nrow;i++)
+  //for (int j=0;j<mytod->ncol;j++)
+  //  mat(i,j)=mytod->calib_facs_saved[i][j];
+  for (int i=0;i<mytod->ndet;i++) {
+    int rr=mytod->rows[i];
+    int cc=mytod->cols[i];
+    mat(rr,cc)=mytod->calib_facs_saved[rr][cc];
+  }
+    
+  return octave_value(mat);
+}
 /*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (save_calib_facs_c, args, nargout, "Save calibration factors into a TOD.  args are (tod,facs).\n")
