@@ -10,6 +10,10 @@ extern "C"
 {
 #endif
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
+
 #include <ninkasi_config.h>
 #include <ninkasi.h>
 #include <readtod.h>
@@ -473,4 +477,85 @@ DEFUN_DLD (read_many_dirfile_channels_c, args, nargout, "Read many dirfile chann
   return retval;
 }
 
+
+/*--------------------------------------------------------------------------------*/
+template <typename T> void  read_sie_raw(T mytype, char *fname, int n, long *isamp, double *val)
+{
+  FILE *fid=fopen(fname,"r");
+  for (int i=0;i<n;i++) {
+    long ind;
+    T val_in;
+    fread(&ind,sizeof(long),1,fid);
+    fread(&val_in,sizeof(val_in),1,fid);
+    isamp[i]=ind;
+    val[i]=val_in;    
+  }
+  fclose(fid);
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(read_getdata_sie_c,args,nargout,"Read a sample index-encoded dirfile file.\n")
+{
+  int nargin=args.length();
+  if (nargin==0)
+    return octave_value_list();
+  char *myfroot=get_char_from_arg(args(0).char_matrix_value());
+  struct stat filestatus;
+  stat(myfroot,&filestatus);
+  //printf("file %s had %d bytes.\n",myfroot,filestatus.st_size);
+  long nb=filestatus.st_size;
+  int dtype=8;  //default to unsigned char
+  if (nargin>1)
+    dtype=(int)get_value(args(1));
+  int isfloat=0;
+  if (dtype<0)
+    isfloat=1;
+  
+  int dsize=dtype;
+  if (isfloat)
+    dsize=-1*dtype;
+  dsize=dsize/8; //bits to bytes
+  long nelem=nb/(8+dsize);
+  printf("expecting %ld entries.\n",nelem);
+  if (nelem*(8+dsize)!=nb) {
+    printf("detected a size mismatch in read_getdata_sie_c on %s.\n",myfroot);
+    return octave_value_list();
+  }
+
+  
+  
+  ColumnVector vals(nelem);
+  dim_vector dm=vals.dims();
+  int64NDArray isamp(dm);
+
+  //if (dtype==8)
+  //read_sie_raw((char)0,myfroot,isamp.fortran_vec(),vals.fortran_vec());
+  
+  switch(dtype) {
+  case -32:
+    read_sie_raw((float)0,(char *)myfroot,nelem,(long *)isamp.fortran_vec(),(double *)vals.fortran_vec());
+    break;
+  case -64:
+    read_sie_raw((double)0,(char *)myfroot,nelem,(long *)isamp.fortran_vec(),(double *)vals.fortran_vec());
+    break;
+  case 8:
+    read_sie_raw((char)0,(char *)myfroot,nelem,(long *)isamp.fortran_vec(),(double *)vals.fortran_vec());
+    break;
+  case 32:
+    read_sie_raw((int)0,(char *)myfroot,nelem,(long *)isamp.fortran_vec(),(double *)vals.fortran_vec());
+    break;
+  case 64:
+    read_sie_raw((long)0,(char *)myfroot,nelem,(long *)isamp.fortran_vec(),(double *)vals.fortran_vec());
+    break;
+  default:
+    fprintf(stderr,"dtype %d not recognized in read_getdata_sie_c.\n",dtype);
+    return octave_value_list();
+  }
+  
+  
+  octave_value_list retval;
+  retval(0)=isamp;
+  retval(1)=vals;
+  return retval;
+
+}
 /*--------------------------------------------------------------------------------*/

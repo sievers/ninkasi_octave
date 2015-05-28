@@ -87,6 +87,7 @@ autoload('get_data_correlation_c',fullfile(fileparts(mfilename("fullpath")),'tod
 autoload('get_data_fft_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('push_data_fft_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('get_map_type_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('read_getdata_sie_c',fullfile(fileparts(mfilename("fullpath")),'read_tod_header_c.oct'));
 autoload('get_median_altaz',fullfile(fileparts(mfilename("fullpath")),'read_tod_header_c.oct'));
 autoload('get_pix_from_radec_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('get_radec_from_pix_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
@@ -311,3 +312,6 @@ autoload('map2alm_simple_c',fullfile(fileparts(mfilename("fullpath")),'healpix_u
 autoload('test_healpix_arr',fullfile(fileparts(mfilename("fullpath")),'healpix_utils.oct'));
 autoload('map2alm_intensity_c',fullfile(fileparts(mfilename("fullpath")),'healpix_utils.oct'));
 autoload('pix2ang_c',fullfile(fileparts(mfilename("fullpath")),'healpix_utils.oct'));
+
+autoload('qp_init_c',fullfile(fileparts(mfilename("fullpath")),'octave_qpoint.oct'));
+autoload('qp_detector_pointing_c',fullfile(fileparts(mfilename("fullpath")),'octave_qpoint.oct'));
