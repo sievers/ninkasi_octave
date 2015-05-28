@@ -50,7 +50,7 @@ end
 
 
 function[value]=safesplit(line,varargin)
-tags=strsplit(line,varargin{:});
+tags=strsplit(strtrim(line),varargin{:});
 keep=true(size(tags));
 for j=1:length(tags),
   tags{j}=strtrim(tags{j});

@@ -8,7 +8,7 @@ for j=1:dims(1),
   end
 end
 
-tags=strsplit(ll{2},'rc:(), ',true);
+tags=strsplit(strtrim(ll{2}),'rc:(), ',true);
 if ~isempty(tags)
   cuts.global_cuts=cellstr2mat(tags);
 else
@@ -16,7 +16,7 @@ else
 end
 
 for j=3:length(ll),
-  tags=strsplit(ll{j},'rc:(), ',true);
+  tags=strsplit(strtrim(ll{j}),'rc:(), ',true);
   vec=cellstr2mat(tags);
   det_cuts(vec(1)+1,vec(2)+1)={vec(3:end)};
 

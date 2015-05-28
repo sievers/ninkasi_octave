@@ -6,7 +6,7 @@ if iscell(tod_names),
   for j=1:length(tod_names),
     %tt=strsplit(tod_names{j},[' ' sprintf('\t')],true);
 
-    tt=strsplit(tod_names{j},[sprintf('\t')],true);
+    tt=strsplit(strtrim(tod_names{j}),[sprintf('\t')],true);
 
     a=tt{1};
     tmp=[froot '/' a(1:5) '/' a];

@@ -2839,6 +2839,11 @@ DEFUN_DLD (tod2polmap_copy,args,nargout,"Project a polmap into a TOD.  pointing 
 
 DEFUN_DLD (convert_saved_pointing_to_pixellization, args, nargout, "Convert a TOD's saved RA/Dec to a map pixellization, freeing the RA/Dec storage..\n")
 {
+  int nargin=args.length();
+  if (nargin<2) {
+    printf("need tod and map in convert_saved_pointing_to_pixellization.\n");
+    return octave_value_list();    
+  }
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
   MAP *mymap=(MAP *)get_pointer(args(1));
   convert_saved_pointing_to_pixellization(mytod,mymap);
@@ -3164,6 +3169,15 @@ DEFUN_DLD(print_detector_pairs_c,args,nargout,"Print the horns that have been pa
     printf("paired detectors not found in print_detector_pairs_c.\n");
     return octave_value_list();
   }
+  if (nargout>0) {
+    dim_vector dm(mytod->ndet,1);
+    int32NDArray dat(dm);
+    for (int i=0;i<mytod->ndet;i++) {
+      dat(i)=mytod->paired_detectors[i];
+    }
+    return octave_value(dat);
+    
+  }
   for (int i=0;i<mytod->ndet;i++) {
     if (mytod->paired_detectors[i]>i) {
       int j=mytod->paired_detectors[i];
@@ -3370,6 +3384,95 @@ DEFUN_DLD (get_generic_tod_pointer,args,nargout,"Pull the generic pointer out of
 
   return retval;
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (convert_radec_deaberrated_c, args, nargout, "Convert coordinate matrices (RA, Dec) to deaberrated versions.\n")
+{
+
+  Matrix ra_mat = args(0).matrix_value();
+  Matrix dec_mat = args(1).matrix_value();
+  double beta_mag = (double) get_value(args(2));
+  Matrix beta_mat = args(3).matrix_value();
+
+  double *ra = ra_mat.fortran_vec();
+  double *dec = dec_mat.fortran_vec();
+  dim_vector radim = ra_mat.dims();
+  dim_vector decdim = dec_mat.dims();
+  int ra_elem = radim(0)*radim(1);
+  int dec_elem = decdim(0)*decdim(1);
+
+  assert(ra_elem == dec_elem);
+
+  double *beta_radec = beta_mat.fortran_vec();
+  dim_vector bdim = beta_mat.dims();
+  int belem = bdim(0)*bdim(1);
+
+  assert(belem == 2);
+
+  // Convert beta to cartesian coordinates
+
+  double btheta = M_PI/2 - beta_radec[1];
+  double bphi = beta_radec[0];
+
+  if (bphi < 0)
+    bphi =  bphi + 2*M_PI;
+
+  double beta[3];
+
+  beta[0] = beta_mag*sin(btheta)*sin(bphi);
+  beta[1] = beta_mag*sin(btheta)*cos(bphi);
+  beta[2] = beta_mag*cos(btheta);
+
+  double beta2 = pow(beta[0],2) + pow(beta[1],2) + pow(beta[2],2);
+  double gam = 1/sqrt(1-beta2);
+
+  #pragma omp parallel for shared(ra,dec,radim,beta,beta2,gam) default(none)
+  for (int i=0; i<radim(1); i++) {
+    for (int j=0; j<radim(0); j++) {
+      int idx = j+i*radim(0);
+
+      // Use standard spherical coordinate conventions
+
+      double theta = M_PI/2 - dec[idx];
+      double phi = ra[idx];
+
+      if (phi < 0)
+        phi =  phi + 2*M_PI;
+
+      // Convert to cartesian
+
+      double x = sin(theta)*sin(phi);
+      double y = sin(theta)*cos(phi);
+      double z = cos(theta);
+
+      // Deboost the coordinates
+
+      double ndotb = x*beta[0] + y*beta[1] + z*beta[2];
+      double a1 = gam*beta2+(1-gam)*ndotb;
+      double a2 = gam*beta2*(ndotb-1);
+
+      x = (beta[0]*a1-beta2*x)/a2;
+      y = (beta[1]*a1-beta2*y)/a2;
+      z = (beta[2]*a1-beta2*z)/a2;
+
+      // Convert back to spherical
+      
+      theta = acos(z);
+      phi = atan2(x,y);
+
+      // Use ninkasi pointing conventions
+
+      dec[idx] = M_PI/2 - theta;
+      ra[idx] = phi;
+    }
+  }
+
+  octave_value_list retval;
+  retval(0)=octave_value(ra_mat);
+  retval(1)=octave_value(dec_mat);
+
+  return retval;
+}
+
 
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (test_legendre_fit,args,nargout,"Do a Legendre polynomial fit from ninkasi.  args are (vec,order)")
@@ -3399,3 +3502,4 @@ DEFUN_DLD (test_legendre_fit,args,nargout,"Do a Legendre polynomial fit from nin
   retval(2)=octave_value(projp);
   return retval;
 }
+

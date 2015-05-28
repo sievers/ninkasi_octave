@@ -4,12 +4,12 @@ dx=tod_ctimes;
 dy=tod_ctimes;
 arr=tod_ctimes;
 for j=1:length(tod_offsets),
-  flub=strsplit(tod_offsets{j},' ',true);
+  flub=strsplit(strtrim(tod_offsets{j}),' ',true);
   if strcmp(flub{1},'None')
     continue
   end
 
-  fwee=strsplit(flub{1},'.',true);
+  fwee=strsplit(strtrim(flub{1}),'.',true);
   tod_ctimes(j)=str2num(fwee{1});
   dx(j)=str2num(flub{end-1});
   dy(j)=str2num(flub{end});

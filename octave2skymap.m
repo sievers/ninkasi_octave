@@ -6,7 +6,12 @@ if isstruct(map)
   if ~isfield(map,'mapptr')
     error('need a mapptr inside the struct in octave2skymap');
   end
-  octave2skymap_c(map.map,map.mapptr);
+  if isfield(map,'partition')
+    my_patch=get_local_map_piece(map);
+    octave2skymap_c(my_patch,map.mapptr);
+  else
+    octave2skymap_c(map.map,map.mapptr);
+  end
 else
   assert(class(mapptr)=='int64');
   octave2skymap_c(map,mapptr);

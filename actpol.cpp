@@ -1091,6 +1091,10 @@ DEFUN_DLD(fit_hwp_az_poly_to_data_c,args,nargout,"Fit sins/cosines/(low-order) a
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (print_detector_offsets_actpol,args,nargout,"Print the detector offsets, angle, etc.  Args are (tod,row,col).\n")
 {
+  if (args.length()<3) {
+    printf("Need at least 3 arguments to print_detector_offsets_actpol (tod,row,col).\n");
+    return octave_value_list();
+  }
   mbTOD *tod=(mbTOD *)get_pointer(args(0));
   int myrow=(int)get_value(args(1));
   int mycol=(int)get_value(args(2));

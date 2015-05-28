@@ -1,8 +1,23 @@
-function[value]=make_weightmap_octave(tods,map,do_window,varargin)
+function[map]=make_weightmap_octave(tods,map,do_window,varargin)
 
 do_new_pointing=get_keyval_default('do_new_pointing',false,varargin{:})
 do_reduce=get_keyval_default('mpi_reduce',false,varargin{:});
 free_2gamma=get_keyval_default('free_2gamma',true,varargin{:});
+
+
+
+if isstruct(map)
+  if isfield(map,'partition')
+    clear_map(map.mapptr);
+    make_weightmap_octave(tods,map.mapptr,do_window,'mpi_reduce',false,varargin{:});
+    if do_reduce
+      map=mpi_reduce_map(map);
+    end
+    return;
+  end
+end
+
+
 
 clear_map(map);
 

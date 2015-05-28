@@ -5,7 +5,7 @@ ra=zeros(n,1);
 dec=zeros(n,1);
 amps=zeros(n,1);
 for j=1:n,
-  tags=strsplit(lines{j},' ',true);
+  tags=strsplit(strtrim(lines{j}),' ',true);
   nn=length(tags);
   if nn==3,
     ra(j)=str2num(tags{1});

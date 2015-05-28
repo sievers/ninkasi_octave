@@ -19,6 +19,7 @@ if (1)
   new_mapptr=get_struct_mem(myopts,'new_mapptr',[]);
   do_actpol_pointing=get_struct_mem(myopts,'do_actpol_pointing',false);
   free_2gamma=get_struct_mem(myopts,'free_2gamma',1);
+  delete_map=get_struct_mem(myopts,'delete_map',false);
 else
   
   do_noise=get_keyval_default('do_noise',false,varargin{:});
@@ -34,6 +35,13 @@ if ~isempty(new_mapptr)
   new_mapset.skymap.mapptr=make_map_copy(new_mapptr);
   clear_map(new_mapset.skymap.mapptr);
   new_mapset.skymap.map=skymap2octave(new_mapset.skymap.mapptr);
+end
+
+if isfield(new_mapset,'skymap')
+  if delete_map
+    %disp('deleting map')
+    new_mapset.skymap=rmfield(new_mapset.skymap,'map');
+  end
 end
 
 if isfield(mapset,'skymap')
@@ -167,24 +175,29 @@ node_time=86400*(now-node_start);
 mpi_time=0;
 %need to make sure we don't memory leak...
 if isfield(mapset,'skymap')
-  new_mapset.skymap.map=skymap2octave(new_mapset.skymap.mapptr);
-  aa=now;
-
-  if (~skip_mpi)
-    global weight_template
-    if ~isempty(weight_template)
-      fwee=mpi_allreduce(new_mapset.skymap.map(weight_template));
-      new_mapset.skymap.map(weight_template)=fwee;
-    else
-      new_mapset.skymap.map=mpi_allreduce(new_mapset.skymap.map);
+  if isfield(mapset.skymap,'partition')
+    new_mapset.skymap=skymap2octave(new_mapset.skymap);
+  else
+    
+    new_mapset.skymap.map=skymap2octave(new_mapset.skymap.mapptr);
+    aa=now;
+    
+    if (~skip_mpi)
+      global weight_template
+      if ~isempty(weight_template)
+        fwee=mpi_allreduce(new_mapset.skymap.map(weight_template));
+        new_mapset.skymap.map(weight_template)=fwee;
+      else
+        new_mapset.skymap.map=mpi_allreduce(new_mapset.skymap.map);
+      end
     end
-  end
-  mpi_time=86400*(now-aa);
-
-  %if we are projecting into a new map pointer, don't free stuff
-  if isempty(new_mapptr)
-    destroy_map(new_mapset.skymap.mapptr);
-    new_mapset.skymap.mapptr=mapset.skymap.mapptr;
+    mpi_time=86400*(now-aa);
+    
+    %if we are projecting into a new map pointer, don't free stuff
+    if isempty(new_mapptr)
+      destroy_map(new_mapset.skymap.mapptr);
+      new_mapset.skymap.mapptr=mapset.skymap.mapptr;
+    end
   end
 end
 

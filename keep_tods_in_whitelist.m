@@ -42,8 +42,8 @@ for j=length(names):-1:1,
   if nm(end)=='/',
     nm=nm(1:end-1);
   end
-  crap=strsplit(nm,'/');
-  crud=strsplit(crap{end},'.');
+  crap=strsplit(strtrim(nm),'/');
+  crud=strsplit(strtrim(crap{end}),'.');
   vals(j)=str2num(crud{1})+i*str2num(crud{2});
 end
   
@@ -51,7 +51,7 @@ end
 function[vals]=mycell2complex(names)
 vals=zeros(size(names));
 for j=1:length(names),
-  crud=strsplit(names{j},'.');
+  crud=strsplit(strtrim(names{j}),'.');
   vals(j)=str2num(crud{1})+i*str2num(crud{2});
 end
 

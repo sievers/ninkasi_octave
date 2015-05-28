@@ -6,5 +6,9 @@ if length(pol)<max_npol
   pol(max_npol)=0;
 end
 
-set_map_polstate_c(map,pol);
+if isstruct(map)
+  set_map_polstate_c(map.mapptr,pol);
+else
+  set_map_polstate_c(map,pol);
+end
 

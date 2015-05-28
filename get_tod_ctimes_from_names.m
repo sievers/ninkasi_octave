@@ -30,7 +30,7 @@ else
   [aa,tag,bb]=fileparts(tod_name);
   %fwee=min(find(tag=='.'));
   %tag=str2num(tag(1:fwee-1));
-  tags=strsplit(tag,'.');
+  tags=strsplit(strtrim(tag),'.');
   tag=str2num(tags{1});
   tag2=str2num(tags{2});
 

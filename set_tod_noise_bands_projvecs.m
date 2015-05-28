@@ -16,6 +16,7 @@ end
 mdisp('setting projvec noise.');
 
 
+do_rot=get_struct_mem(myopts,'rotate_detpairs',false);
 
 bands=myopts.bands; %if not here, we will crash.
 if ischar(bands),
@@ -49,7 +50,11 @@ find_modes_new=get_struct_mem(myopts,'find_modes_new',false);
 
 if (find_modes_new)
   %this is the usual path.  Just finding the array patterns here
-  vecs=find_bad_modes_opts(tod,myopts);
+  if do_rot,
+    vecs=find_bad_modes_detrot_opts(tod,myopts);
+  else
+    vecs=find_bad_modes_opts(tod,myopts);
+  end
   to_keep=max(abs(vecs))<det_mode_thresh;  %find modes that are too single-detector
   if min(to_keep)==0,
     %whos vecs
@@ -58,7 +63,14 @@ if (find_modes_new)
     %whos vecs
   end
   nvecs=size(vecs,2);
+  if do_rot
+    rotate_data_detpairs_c (tod);
+  end
   dataft=get_data_fft_c(tod);
+  if do_rot
+    rotate_data_detpairs_c (tod);
+  end
+  
   %whos vecs
 else
   nvecs=get_struct_mem(myopts,'nbadmode',10);

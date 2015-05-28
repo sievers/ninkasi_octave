@@ -1,5 +1,12 @@
 function[value]=write_map(map,fname,varargin)
 if isstruct(map)
+  if isfield(map,'partition')
+    %write_partitioned_map(map,fname,varargin);
+    fname=postpend_tag(fname,'.fits');
+    write_partitioned_skymap_cea_fits(map,fname,varargin{:});
+    return
+  end
+  
   octave2skymap(map);
   map=map.mapptr;
 end

@@ -1,7 +1,7 @@
 function[n_samp,samp_offset]=read_cuts_octave(tod,cutsname,varargin)
 %C code was seg faulting on seemingly OK input, it was fragile to the presence of whitespace.  this should fix that...
 ll=read_text_file(cutsname);
-tags=strsplit(ll{1},' =',true);
+tags=strsplit(strtrim(ll{1}),' =',true);
 
 if numel(tags)>=2
   if (strcmp(tags{1},'format'))&(strcmp(strtrim(tags{2}),'''TODCuts'''))
@@ -20,7 +20,7 @@ found_cuts=false(size(rr));
 nmax=get_tod_ndata(tod)
 
 strip_tag=' ()rc:,';  %these characters need to die...
-global_cuts=cellstr2mat(strsplit(ll{2},strip_tag,true));
+global_cuts=cellstr2mat(strsplit(strtrim(ll{2}),strip_tag,true));
 if ~isempty(global_cuts)
   mdisp(['Have some global cuts in ' cutsname]);
   for j=1:2:length(global_cuts),
@@ -31,7 +31,7 @@ if ~isempty(global_cuts)
 end
 
 for j=3:length(ll)
-  det_cuts=cellstr2mat(strsplit(ll{j},strip_tag,true));
+  det_cuts=cellstr2mat(strsplit(strtrim(ll{j}),strip_tag,true));
   ii=find((det_cuts(1)==rr)&(det_cuts(2)==cc));
   have_det=~isempty(ii);
   found_cuts(ii)=true;
