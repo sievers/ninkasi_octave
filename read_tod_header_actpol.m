@@ -148,10 +148,22 @@ end
     %calfile=[calib_dir '/' tt '.calib.txt'];
     if isempty(calib_fmt)
       calfile=[calib_dir '/' tt '.' calib_tail];
+      if ~exist(calfile)
+        calfile=[calib_dir '/' tt(1:5) '/' tt '.cal'];
+        if ~exist(calfile)
+          warning(['calibration on file ' tt ' is missing.']);
+        end
+      end
     else
       calfile=get_actpol_cutsname([tt '.' calib_tail],[calib_dir '/'],'date_format',calib_fmt);
+      if isempty(calfile)
+        calfile=[calib_dir '/' tt(1:5) '/' tt '.cal'];
+        if ~exist(calfile)
+          calfile='';
+        end
+      end
     end
-
+    
     cals=read_python_dict(calfile);
     cals.rr=floor(cals.det_uid/32);
     cals.cc=cals.det_uid-32*cals.rr;

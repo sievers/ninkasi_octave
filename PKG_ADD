@@ -20,6 +20,7 @@ autoload('pull_oneband_tod_noise_banded_projvec',fullfile(fileparts(mfilename("f
 autoload('apply_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('save_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('rescale_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
+autoload('return_saved_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('tod_has_calib_facs_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_rotmat_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('assign_tod_time_constants_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
