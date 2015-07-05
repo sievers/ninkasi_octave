@@ -19,4 +19,8 @@ if tod_name(end)=='/'
   tod_name=tod_name(1:end-1);
 end
 ind=max(find(tod_name=='/'));
-tag=tod_name(ind+1:end);
+if isempty(ind)
+  tag=tod_name;
+else
+  tag=tod_name(ind+1:end);
+end

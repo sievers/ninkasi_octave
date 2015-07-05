@@ -16,6 +16,7 @@ calib_fmt=get_keyval_default('calib_fmt','',varargin{:});
 tod_offsets=get_keyval_default('tod_offsets',[],varargin{:});
 offsets=get_keyval_default('offsets',[],varargin{:});
 cuts=get_keyval_default('cuts','',varargin{:});
+force_maxprime=get_keyval_default('force_maxprime',false,varargin{:}); %due to problems with season 1 cuts, make this an option
 if isempty(offsets)
   error(['must have offsets defined']);
 end
@@ -41,6 +42,7 @@ end
   [cpu_s,cpu_us,az_raw,el_raw,flags]=read_many_dirfile_channels(tod_name,'cpu_s','cpu_us','az','el','enc_flags');
   if ~isempty(cuts)
     [nsamp,samp_offset]=read_cuts_octave([],cuts,varargin{:})
+    nsamp_org=nsamp;
     if (nsamp<numel(cpu_s))
       warning(['too few samples in cuts file ' cuts])
       nsamp=numel(cpu_s);
@@ -51,7 +53,9 @@ end
     end
     %hard-wire in that shit will pass
     nsamp=numel(cpu_s)-samp_offset;
-
+    if (force_maxprime) %season 2 cuts seem to be OK, if so, let the max prime argument work again
+      nsamp=nsamp_org;
+    end
     
     last_samp=samp_offset+nsamp;
     if last_samp>numel(cpu_s)

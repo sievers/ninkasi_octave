@@ -12,6 +12,7 @@ tod_times=zeros(size(tod_names));
 
 names_in=get_tod_tags_from_names(names_in);
 tags=get_tod_tags_from_names(tod_names);
+
 tt(length(tags),length(tags{1}))=' ';
 for j=1:length(tags),
   tt(j,:)=tags{j};
