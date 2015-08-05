@@ -123,6 +123,9 @@ DEFUN_DLD (set_tod_pointing_saved, args, nargout, "Read a TOD header, including 
   Matrix ra=args(1).matrix_value();
   Matrix dec=args(2).matrix_value();
   
+
+
+
   dim_vector dm_ra=ra.dims();
   dim_vector dm_dec=dec.dims();
 
@@ -134,6 +137,13 @@ DEFUN_DLD (set_tod_pointing_saved, args, nargout, "Read a TOD header, including 
   memcpy(mytod->ra_saved[0],ra.fortran_vec(),mytod->ndet*mytod->ndata*sizeof(actData));
   memcpy(mytod->dec_saved[0],dec.fortran_vec(),mytod->ndet*mytod->ndata*sizeof(actData));
 
+  if (args.length()>3) {
+    Matrix twogamma=args(3).matrix_value();
+    dim_vector dm_2gamma=twogamma.dims();
+    mytod->twogamma_saved=matrix(mytod->ndet,mytod->ndata);
+    memcpy(mytod->twogamma_saved[0],twogamma.fortran_vec(),mytod->ndet*mytod->ndata*sizeof(actData));
+  }
+  
   return octave_value_list();
 
 }
