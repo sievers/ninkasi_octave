@@ -305,6 +305,7 @@ autoload('does_tod_have_twogamma_fit',fullfile(fileparts(mfilename("fullpath")),
 
 autoload('init_getdata_file_c',fullfile(fileparts(mfilename("fullpath")),'octgetdata.oct'));
 autoload('getdata_double_channel_c',fullfile(fileparts(mfilename("fullpath")),'octgetdata.oct'));
+autoload('getdata_double_channel_piece_c',fullfile(fileparts(mfilename("fullpath")),'octgetdata.oct'));
 autoload('close_getdata_file_c',fullfile(fileparts(mfilename("fullpath")),'octgetdata.oct'));
 
 
