@@ -5,7 +5,7 @@ function[mapset]=tod2mapset_octave(mapset,tod,which_tod)
 if isfield(mapset,'skymap')
   if (mytype==0)
     if (is_map_polarized(mapset.skymap.mapptr))
-
+      
       %dat=get_tod_data(tod);whos dat
       %mypix=get_tod_pixellization(tod);
       %whos mypix

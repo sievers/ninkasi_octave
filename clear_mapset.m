@@ -7,7 +7,12 @@ if ~exist('copyptr')
 end
 
 if isfield(mapset,'skymap')
-  mapset.skymap.map=0*mapset.skymap.map;
+    
+  if isfield(mapset.skymap,'map')    
+    if ~isstruct(mapset.skymap.map)
+      mapset.skymap.map=0*mapset.skymap.map;
+    end
+  end
   if isfield(mapset.skymap,'mapptr')
     if (copyptr)
       mapset.skymap.mapptr=make_map_copy(mapset.skymap.mapptr);
@@ -15,6 +20,7 @@ if isfield(mapset,'skymap')
     clear_map(mapset.skymap.mapptr);
   end
 end
+
 
 
 if isfield(mapset,'ground')

@@ -135,7 +135,9 @@ if do_actpol_pointing %we're going to do some precalculating of pointing.  If th
 end
 
 if isfield(mapset,'skymap')
-  mapset.skymap=rmfield(mapset.skymap,'map');
+  if isfield(mapset.skymap,'map')
+    mapset.skymap=rmfield(mapset.skymap,'map');
+  end
 end
 
 for j=1:length(tods),
@@ -150,8 +152,13 @@ for j=1:length(tods),
   if (do_actpol_pointing)
 
     precalc_actpol_pointing_exact(mytod,1);
+
     if isfield(mapset.skymap,'mapptr')
-      convert_saved_pointing_to_pixellization(mytod,mapset.skymap.mapptr)
+      if isstruct(mapset.skymap.mapptr)
+        convert_saved_pointing_to_pixellization(mytod,mapset.skymap.mapptr.mapptr)
+      else
+          convert_saved_pointing_to_pixellization(mytod,mapset.skymap.mapptr)
+      end
     end
     free_tod_pointing_saved(mytod,free_2gamma);
     
