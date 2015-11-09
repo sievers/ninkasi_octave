@@ -3,7 +3,7 @@ function[map]=make_weightmap_octave(tods,map,do_window,varargin)
 do_new_pointing=get_keyval_default('do_new_pointing',false,varargin{:})
 do_reduce=get_keyval_default('mpi_reduce',false,varargin{:});
 free_2gamma=get_keyval_default('free_2gamma',true,varargin{:});
-
+do_noise=get_keyval_default('do_noise',false,varargin{:});  %added ability to do noise instead of hitcounts.
 
 
 if isstruct(map)
@@ -33,7 +33,16 @@ end
 for j=1:length(tods),    
   mytod=tods(j);
   allocate_tod_storage(mytod);
-  assign_tod_value(mytod,1.0);
+  if (do_noise)
+    mynoise=get_detector_average_noise_banded_projvecs(mytod);
+    nn=get_tod_ndata(mytod);
+    wt_per_samp=1./mynoise.^2;
+    dat=repmat(wt_per_samp',[nn 1]);
+    push_tod_data(dat,mytod);
+    clear dat;
+  else
+    assign_tod_value(mytod,1.0);
+  end
   if do_window,
     window_data(mytod);
     window_data(mytod);
@@ -76,3 +85,14 @@ if (do_reduce)
 end
 
   
+if (do_noise)
+  weight=skymap2octave(map);
+  if numel(size(weight))==3,
+    asdf=weight(1,:,:);
+    asdf(asdf>0)=1./sqrt(asdf(asdf>0));
+    weight(1,:,:)=asdf;
+  else
+    weight(weight>0)=1./sqrt(weight(weight>0));
+  end
+  octave2skymap(weight,map);
+end

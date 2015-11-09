@@ -3136,6 +3136,30 @@ DEFUN_DLD (simple_test_diag_proj_noise_inv, args, nargout, "Test some C-version 
 }
 #endif
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (get_detector_white_noises_banded_projvec,args,nargout,"Pull white noises and band edges for all detectors in a TOD.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (!mytod->band_vecs_noise) {
+    fprintf(stderr,"missing band_vecs_noise in tod.\n");
+    return octave_value_list();
+  }
+  int ndet=mytod->band_vecs_noise->ndet;
+  int nband=mytod->band_vecs_noise->nband;
+  Matrix det_noises(ndet,nband);
+  Matrix band_edges(nband+1,1);
+  //printf("getting band limits.\n");
+  for (int i=0;i<nband+1;i++)
+    band_edges(i)=mytod->band_vecs_noise->band_edges[i];
+  //printf("getting detector noises.\n");
+  for (int i=0;i<ndet;i++)
+    for (int j=0;j<nband;j++)
+      det_noises(i,j)=mytod->band_vecs_noise->noises[j][i];
+  octave_value_list retval;
+  retval(0)=det_noises;
+  retval(1)=band_edges;
+  return retval;
+}
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD (pull_oneband_tod_noise_banded_projvec,args,nargout,"Pull parameters for a single band in a TOD noise + projection vector model.\n")
 {
   if (args.length()<2) {

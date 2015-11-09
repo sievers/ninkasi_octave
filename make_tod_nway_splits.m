@@ -1,7 +1,11 @@
 function[myset]=make_tod_nway_splits(tod_names,varargin)
 nway=get_keyval_default('nway',2,varargin{:});
 len=get_keyval_default('len',86400,varargin{:});
-ct=get_tod_ctimes_from_names(tod_names);
+if isnumeric(tod_names)
+  ct=tod_names; %assume if tod_names is numbers then it's the direct ctimes
+else
+  ct=get_tod_ctimes_from_names(tod_names);
+end
 
 tt=ct/len;tt=tt-floor(tt);
 vec=sort([tt;1+tt]);

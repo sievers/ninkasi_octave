@@ -1,8 +1,9 @@
-function[ra,dec,amps]=read_tamsrc_catalog(fname,varargin)
+function[ra,dec,amps,snr]=read_tamsrc_catalog(fname,varargin)
 
 racol=get_keyval_default('ra',3,varargin{:});
 deccol=get_keyval_default('dec',4,varargin{:});
 ampcol=get_keyval_default('amps',5,varargin{:});
+snrcol=get_keyval_default('snr',7,varargin{:});
 mdisp([racol deccol ampcol])
 
 cat=read_text_file_comments(fname);
@@ -10,6 +11,7 @@ cat=read_text_file_comments(fname);
 ra=zeros(numel(cat),1);
 dec=zeros(numel(cat),1);
 amps=zeros(numel(cat),1);
+snr=zeros(numel(cat),1);
 for j=1:length(cat),
   tags=strsplit(strtrim(cat{j}),' ',true);  
   %if isempty(tags{1})
@@ -35,6 +37,7 @@ for j=1:length(cat),
   end
   %dec(j)=str2num(tags{deccol});
   amps(j)=str2num(tags{ampcol});
+  snr(j)=str2num(tags{snrcol});
 
   %rr=str2num(tags{3})/15;
   %rah=floor(rr);
