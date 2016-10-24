@@ -464,6 +464,7 @@ for j=1:length(tods),
     fname=sprintf('%s.%d.data',outroot,myctime);
     write_tod_data_c(mytod,fname);
   end
+  
 
   if (find_modes) 
     if (find_modes_new)

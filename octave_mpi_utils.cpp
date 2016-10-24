@@ -107,16 +107,21 @@ DEFUN_DLD (mpi_allreduce, args, nargout, "Reduce .\n")
   assert(numel_min==numel);
   assert(numel_max==numel);
   
-  
+  //printf("numel is %d\n",numel);
 
   MPI_Op op=MPI_SUM;
   if (args.length()>1)
     op=get_op(args(1));
   //if (MPI_Allreduce (valptr,reducedptr,numel,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD)) {
+  //printf("reducing\n");
+  //MPI_Barrier(MPI_COMM_WORLD);  //make sure this line is commented out for production
+  //double t0= MPI_Wtime();
+  double t0= 0.0;
   if (MPI_Allreduce (valptr,reducedptr,numel,MPI_DOUBLE,op,MPI_COMM_WORLD)) {
     fprintf(stderr,"Error in MPI_Allreduce.\n");
     return octave_value_list();
   }
+  //printf("reduced in %12.5f seconds.\n",MPI_Wtime()-t0);
   return octave_value(reduced);
   
 }
@@ -265,7 +270,7 @@ DEFUN_DLD(mpi_recv,args,nargout,"MPI Receive.  args are source, <tag>, <communic
   //according to the header file, this is how to get n-dimensional dim_vectors assembled.
   dim_vector dm;
   if (ndim==1) {
-    dim_vector dm_tmp(dims[0]);
+    dim_vector dm_tmp(dims[0],1);
     dm=dm_tmp;
   }
 
@@ -400,7 +405,7 @@ DEFUN_DLD (mpi_bcast_array, args, nargout, "Broadcast .\n")
   else  {
     int ndim;
     MPI_Bcast(&ndim,1,MPI_INT,from_whom,MPI_COMM_WORLD);
-    dim_vector dm(ndim);
+    dim_vector dm(ndim,1);
 
     //would like to do the following, but no fortran_vec
     // MPI_Bcast(dm.fortran_vec(),ndim,MPI_DOUBLE,from_whom,MPI_COMM_WORLD);

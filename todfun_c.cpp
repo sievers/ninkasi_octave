@@ -1430,9 +1430,10 @@ DEFUN_DLD (pull_bad_timestreams, args, nargout, "Pull the bad timestreams out of
     return octave_value_list();    
   }
   
-  dim_vector dm(2);
-  dm(0)=mytod->bad_timestreams->n;
-  dm(1)=mytod->bad_timestreams->nstream;
+  //dim_vector dm(2);
+  //dm(0)=mytod->bad_timestreams->n;
+  //dm(1)=mytod->bad_timestreams->nstream;
+  dim_vector dm(mytod->bad_timestreams->n,mytod->bad_timestreams->nstream);
   Matrix vecs(dm);
   double *vec=vecs.fortran_vec();
   memcpy(vec,mytod->bad_timestreams->timestreams[0],dm(0)*dm(1)*sizeof(double));
@@ -1726,10 +1727,12 @@ DEFUN_DLD (tod2timestreams_blas, args, nargout, "Multiply a set of timestreams b
     return octave_value_list();
   }
   
-  dim_vector dm(2);
+
   int nvec=mytod->bad_timestreams->nstream;
-  dm(0)=nvec;
-  dm(1)=mytod->ndet;
+  //dim_vector dm(2);
+  //dm(0)=nvec;
+  //dm(1)=mytod->ndet;
+  dim_vector dm(nvec,mytod->ndet);
   Matrix rows(dm);
   double *rowptr=rows.fortran_vec();
   //printf("calling blas.\n");
@@ -1967,9 +1970,10 @@ DEFUN_DLD (get_data_correlation_c, args, nargout, "Get the correlation matrix of
     fprintf(stderr,"Data not present in get_data_correlation.\n");
     return octave_value_list();
   }
-  dim_vector dm(2);
-  dm(0)=mytod->ndet;
-  dm(1)=mytod->ndet;
+  //dim_vector dm(2);
+  //dm(0)=mytod->ndet;
+  //dm(1)=mytod->ndet;
+  dim_vector dm(mytod->ndet,mytod->ndet);
   Matrix corrs(dm);
   
   get_data_corrs(mytod);

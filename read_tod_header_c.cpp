@@ -220,6 +220,7 @@ DEFUN_DLD (read_tod_header_c, args, nargout, "Read a TOD header, including point
       free(pointing_file);
     }
     else {
+#if 0  //this block of code seems to be bust under octave 4
       Octave_map poff = args(1).map_value ();
       Octave_map::const_iterator myalt = poff.seek ("dalt");
       octave_value tmpalt =  poff.contents(myalt)(0);
@@ -254,6 +255,7 @@ DEFUN_DLD (read_tod_header_c, args, nargout, "Read a TOD header, including point
 	  offset->offsetAzCosAlt[i][j]=daz(i,j);
 	}
       mytod->pointingOffset=offset;
+      #endif
     }
   }
   else

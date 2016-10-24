@@ -40,6 +40,9 @@ for j=1:length(tods),
     dat=repmat(wt_per_samp',[nn 1]);
     push_tod_data(dat,mytod);
     clear dat;
+    array_noise=1/sqrt(sum(wt_per_samp))*sqrt(get_tod_dt(mytod));
+    disp(['TOD ' get_tod_name(mytod) ' has array noise ' num2str(array_noise)]);
+
   else
     assign_tod_value(mytod,1.0);
   end
@@ -77,9 +80,19 @@ end
 
 
 if (do_reduce)
+  %disp(['at barrier ' num2str(mpi_comm_rank+1)]);
+  mpi_barrier;
   mdisp('reducing')
   weight=skymap2octave(map);
-  weight=mpi_allreduce(weight);
+  %whos weight
+  %scinet mpi_allreduce started to act up for large matrices, so split up polarization ones
+  if length(size(weight))==3,
+    for j=1:size(weight,1),
+      weight(j,:,:)=mpi_allreduce(weight(j,:,:));
+    end
+  else
+    weight=mpi_allreduce(weight);
+  end
   octave2skymap(weight,map);
   clear weight;
 end

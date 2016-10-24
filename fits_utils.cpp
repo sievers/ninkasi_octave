@@ -91,11 +91,12 @@ DEFUN_DLD (convert_char_to_num_fits, args, nargout, "Convert a block of unsigned
 
   dim_vector dm=cm.dims();
   //printf("dimensions are %d %d\n",dm(0),dm(1));
-  dim_vector dd(2);
+  //dim_vector dd(2);
   int nrow=dm(0)/nb;
   int ncol=dm(1);
-  dd(0)=nrow;
-  dd(1)=ncol;
+  //dd(0)=nrow;
+  //dd(1)=ncol;
+  dim_vector dd(nrow,ncol);
   Matrix mat(dd);
   double *mm=mat.fortran_vec();
 
@@ -119,9 +120,10 @@ DEFUN_DLD (convert_fits_bintable, args, nargout, "Read TOD data into memory.\n")
   dim_vector dm=my_format.dims();
   int ncol=dm(0)*dm(1);
 
-  dim_vector dd(2);
-  dd(0)=ncol;
-  dd(1)=nrow;
+  //dim_vector dd(2);
+  //dd(0)=ncol;
+  //dd(1)=nrow;
+  dim_vector dd(ncol,nrow);
   Matrix mat(dd);
   double *mm=mat.fortran_vec();
   int *ifmt=(int *)malloc(sizeof(int)*ncol);
