@@ -90,7 +90,7 @@ DEFUN_DLD (set_tod_timevec_c, args, nargout, "Store a full time vector, useful f
   double *tt=tvec.fortran_vec();
   for (int i=0;i<mytod->ndata;i++)
     mytod->dt[i]=tt[i];
-  printf("first time sample is %16.7e %16.7e %d\n",mytod->dt[0],tt[0],mytod->ndata);
+  //printf("first time sample is %16.7e %16.7e %d\n",mytod->dt[0],tt[0],mytod->ndata);
   mytod->ctime=tt[0];
 
   return octave_value_list();
@@ -129,7 +129,7 @@ DEFUN_DLD (set_tod_pointing_saved, args, nargout, "Read a TOD header, including 
   dim_vector dm_ra=ra.dims();
   dim_vector dm_dec=dec.dims();
 
-  printf("dm_ra is %d %d\n",dm_ra(0),dm_ra(1));
+  //printf("dm_ra is %d %d\n",dm_ra(0),dm_ra(1));
 
   mytod->ra_saved=matrix(mytod->ndet,mytod->ndata);
   mytod->dec_saved=matrix(mytod->ndet,mytod->ndata);

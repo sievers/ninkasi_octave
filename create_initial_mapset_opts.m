@@ -731,7 +731,7 @@ for j=1:length(tods),
   mdisp(['finished processing TOD in ' num2str(86400*(tt_stop-tt_start))])
 end
 mdisp('master has finished his TODs');
-
+disp(['process ' num2str(myid) ' has finished initial mapset.']);
 if isfield(mapset,'skymap')
   if isfield(mapset.skymap,'partition')
     mapset.skymap=skymap2octave(mapset.skymap);

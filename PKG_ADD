@@ -317,4 +317,7 @@ autoload('map2alm_intensity_c',fullfile(fileparts(mfilename("fullpath")),'healpi
 autoload('pix2ang_c',fullfile(fileparts(mfilename("fullpath")),'healpix_utils.oct'));
 
 autoload('qp_init_c',fullfile(fileparts(mfilename("fullpath")),'octave_qpoint.oct'));
+autoload('qp_boresight_pointing_c',fullfile(fileparts(mfilename("fullpath")),'octave_qpoint.oct'));
 autoload('qp_detector_pointing_c',fullfile(fileparts(mfilename("fullpath")),'octave_qpoint.oct'));
+
+autoload('find_good_fft_lens_fast_c',fullfile(fileparts(mfilename("fullpath")),'misc_utils.oct'));
