@@ -1,4 +1,4 @@
-function[x]=run_pcg_corrnoise_precon_octave_partitioned(tods,x,b,precon,fun,priorfun,varargin)
+function[x]=run_pcg_corrnoise_precon_octave(tods,x,b,precon,fun,priorfun,varargin)
 %function[x,best]=run_pcg_corrnoise_precon_octave(tods,x,b,precon,fun,priorfun,varargin)
 
 %x is a mapset, could be clear
@@ -87,7 +87,10 @@ if isfield(ax,'skymap')
     if myid==1
       write_map(ax.skymap,[save_tag '_ax']);
     end
-    fieldnames(ax)
+    if myid==1,
+      fieldnames(ax)
+    end
+
   end
 end
 

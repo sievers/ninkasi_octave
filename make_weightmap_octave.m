@@ -1,6 +1,7 @@
 function[map]=make_weightmap_octave(tods,map,do_window,varargin)
 
-do_new_pointing=get_keyval_default('do_new_pointing',false,varargin{:})
+do_new_pointing=get_keyval_default('do_new_pointing',false,varargin{:});
+have_pointing=get_keyval_default('have_pointing',false,varargin{:}); %pointing is already saved in TODs, and you don't want to throw it away
 do_reduce=get_keyval_default('mpi_reduce',false,varargin{:});
 free_2gamma=get_keyval_default('free_2gamma',true,varargin{:});
 do_noise=get_keyval_default('do_noise',false,varargin{:});  %added ability to do noise instead of hitcounts.
@@ -42,7 +43,6 @@ for j=1:length(tods),
     clear dat;
     array_noise=1/sqrt(sum(wt_per_samp))*sqrt(get_tod_dt(mytod));
     disp(['TOD ' get_tod_name(mytod) ' has array noise ' num2str(array_noise)]);
-
   else
     assign_tod_value(mytod,1.0);
   end
@@ -58,7 +58,10 @@ for j=1:length(tods),
     convert_saved_pointing_to_pixellization(mytod,map);
     free_tod_pointing_saved(mytod,free_2gamma);
   end
-  
+  if (have_pointing)
+    convert_saved_pointing_to_pixellization(mytod,map);
+  end
+
   mdisp('assigned value');
   if (is_map_polarized(map))
     tod2polmap(mytod,map);
@@ -67,7 +70,7 @@ for j=1:length(tods),
   end
   mdisp('projected');
   
-  if (do_new_pointing)
+  if (do_new_pointing)|(have_pointing)
     %free_tod_pointing_saved(mytod);
     free_saved_pixellization(mytod);
     
