@@ -407,6 +407,13 @@ DEFUN_DLD(set_tod_twogamma_fit_c,args,nargout,"Install a saved twogamma fit to a
 
   Matrix sinmat=args(1).matrix_value();
   Matrix cosmat=args(2).matrix_value();
+  actData az_cent=0;
+  if (args.length()>3)
+    az_cent=get_value(args(3));
+  actData az_std=1;
+  if (args.length()>4)    
+    az_std=get_value(args(4));
+  printf("az cents/stds are %12.5f %12.5f\n",az_cent,az_std);
   dim_vector dm_sin=sinmat.dims();
   dim_vector dm_cos=cosmat.dims();
   //printf("dims are %d %d, %d %d\n",dm_sin(0),dm_sin(1),dm_cos(0),dm_cos(1));
@@ -416,6 +423,8 @@ DEFUN_DLD(set_tod_twogamma_fit_c,args,nargout,"Install a saved twogamma fit to a
   }
   ACTpolPointingFit *pfit=tod->actpol_pointing;
   int nterm=dm_sin(0)-1;
+  pfit->az_cent=az_cent;
+  pfit->az_std=az_std;
   pfit->gamma_az_sin_coeffs=matrix(tod->ndet,nterm);
   pfit->gamma_az_cos_coeffs=matrix(tod->ndet,nterm);
   pfit->gamma_ctime_sin_coeffs=(actData *)malloc(sizeof(actData)*tod->ndet);
