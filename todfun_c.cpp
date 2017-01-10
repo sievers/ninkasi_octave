@@ -589,6 +589,34 @@ DEFUN_DLD (get_cuts_statistics, args, nargout,"Find statistics of cuts lengths i
   return octave_value(vec);
 }
 /*--------------------------------------------------------------------------------*/
+DEFUN_DLD (jumpvec2tod_c, args, nargout, "Add detector jumps into a tod.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->jumps==NULL) {
+    fprintf(stderr,"Error, tod does not contain jumps in tod2jumpvec_c\n");
+    return octave_value_list();
+  }
+  Matrix mat=args(1).matrix_value();
+  actData *ptr=mat.fortran_vec();
+  jumpvec2tod(mytod,ptr);
+  return octave_value_list();
+}
+
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (tod2jumpvec_c, args, nargout, "Project detector jumps into a vector.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->jumps==NULL) {
+    fprintf(stderr,"Error, tod does not contain jumps in tod2jumpvec_c\n");
+    return octave_value_list();
+  }
+  ColumnVector vec(mytod->jumps->njump);
+  actData *myptr=vec.fortran_vec();
+  tod2jumpvec(mytod,myptr);
+  return octave_value(vec);
+
+}
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD (tod2cutvec_c, args, nargout, "Put cut data from a TOD into a vector.\n")
 {
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
@@ -902,10 +930,29 @@ DEFUN_DLD (free_tod_storage_c, args, nargout, "Free storage for a tod.  Arg is (
 
 DEFUN_DLD (assign_tod_value_c, args, nargout, "Assign a value to a tod.  Args are (tod,value)\n")
 {
+  if (args.length()<2) {
+    printf("need at least two inputs (tod,value) in assign_tod_value_c.\n");
+    return octave_value_list();
+  }
+
   mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
   NDArray vv=args(1).array_value();
   actData val=vv(0,0);
   assign_tod_value(mytod,val);
+  return octave_value_list();  
+}
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD (assign_tod_value_uncut_c, args, nargout, "Assign a value to a tod uncut regions.  Args are (tod,value)\n")
+{
+  if (args.length()<2) {
+    printf("need at least two inputs (tod,value) in assign_tod_value_uncut_c.\n");
+    return octave_value_list();
+  }
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));  
+  NDArray vv=args(1).array_value();
+  actData val=vv(0,0);
+  assign_tod_value_uncut(mytod,val);
   return octave_value_list();  
 }
 /*--------------------------------------------------------------------------------*/

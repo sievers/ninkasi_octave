@@ -37,6 +37,16 @@ if (mytype==0)
 end
 
 if (mytype==0)
+  if isfield(mapset,'jumps')
+    if iscell(mapset.jumps),    
+      jumps2tod_c(tod,mapset.jumps{which_tod});
+    else
+      jumps2tod_c(tod,mapset.jumps);
+    end
+  end
+end
+
+if (mytype==0)
   if isfield(mapset,'corrnoise')
     corrnoise=mapset.corrnoise(which_tod);
     

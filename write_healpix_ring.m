@@ -6,7 +6,8 @@ if ~is_map_polarized(map)
 else
   for j=1:size(mm,1),
     ii=max(strfind(fname,'.fits'));
-    mytag=['_' get_map_poltag(map,j)];
+    %mytag=['_' get_map_poltag(map,j)];
+    mytag=['_' get_map_poltag_octave(map,j)];
     if ~isempty(ii)
       fname_use=[fname(1:ii-1) mytag fname(ii:end)];
     else

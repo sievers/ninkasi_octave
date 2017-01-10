@@ -31,5 +31,25 @@ if isfield(mapset,'cutvecs')
   end
 end
 
+if isfield(mapset,'jumps')  
+  for j=1:length(tods),
+    tod_name=get_tod_name(tods(j));
+    if iscell(tod_name)
+      tod_name=tod_name{1};
+    end
+    tag=get_tod_tags_from_names(tod_name);
+    fid=fopen([dirname 'jumps_' tag],'w');
+    if iscell(mapset.jumps)
+      fwrite(fid,numel(mapset.jumps{j}),'int');
+      fwrite(fid,mapset.jumps{j},'double');
+    else
+      fwrite(fid,numel(mapset.jumps),'int');
+      fwrite(fid,mapset.jumps,'double');
+    end
+
+    fclose(fid);
+  end
+end
+
 
   

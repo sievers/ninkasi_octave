@@ -163,7 +163,60 @@ DEFUN_DLD (set_tod_pointing_saved_branch,args,nargout,"Set the branch cut on a T
 	mytod->ra_saved[i][j]+=2*3.141592653589793;
   return octave_value_list();
 }
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(set_tod_jumps_c,args,nargout,"Set detector flux jump regions in a tod.  Args are (tod,row,col,start,stop).\n")
+{
+  if (args.length()<5) {
+    printf("not enough arguments to set_tod_jumps_c.  Need tod,row,col,start,stop.\n");
+    return octave_value_list();
+  }
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  Matrix row=args(1).matrix_value();
+  Matrix col=args(2).matrix_value();
+  Matrix start=args(3).matrix_value();
+  Matrix stop=args(4).matrix_value();
+  dim_vector dm=row.dims();
+  int nseg=dm(0)*dm(1);
+  return octave_value_list();
+  int *rr=(int *)malloc(sizeof(int)*nseg);
+  int *cc=(int *)malloc(sizeof(int)*nseg);
+  int *strt=(int *)malloc(sizeof(int)*nseg);
+  int *stp=(int *)malloc(sizeof(int)*nseg);
 
+  int seg=0;
+  for (int i=0;i<dm(0);i++)
+    for (int j=0;j<dm(0);j++) {
+      rr[seg]=row(i,j);
+      cc[seg]=col(i,j);
+      strt[seg]=start(i,j);
+      stp[seg]=stop(i,j);
+      nseg++;
+    }
+  initialize_jumpvecs(mytod,rr,cc,strt,stp,nseg);
+  
+  free(rr);
+  free(cc);
+  free(strt);
+  free(stp);
+  return octave_value_list();
+
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD(free_tod_jumps,args,nargout, "Free jumps saved in a tod.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (!mytod->jumps) {
+    printf("no jumps found in free_tod_jumps.\n");
+    return octave_value_list();
+  }
+  free(mytod->jumps->row);
+  free(mytod->jumps->col);
+  free(mytod->jumps->start);
+  free(mytod->jumps->stop);
+  free(mytod->jumps);
+  mytod->jumps=NULL;
+  return octave_value_list();
+}
 /*--------------------------------------------------------------------------------*/
 DEFUN_DLD (free_tod_ra_saved, args, nargout, "Free cached RA.\n")
 {
@@ -345,6 +398,16 @@ DEFUN_DLD (alloc_tod_cuts_c, args, nargout, "Read a TOD header, including pointi
   return octave_value_list();
 }
 
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (free_tod_cuts_c, args, nargout, "Free the cuts in a TOD.\n")
+{
+  mbTOD  *mytod=(mbTOD *)get_pointer(args(0));
+  if (mytod->cuts) {
+    CutsFree(mytod->cuts);
+    mytod->cuts=NULL;
+  }
+  return octave_value_list();
+}
 /*--------------------------------------------------------------------------------*/
 
 DEFUN_DLD (set_tod_radec_lims_c, args, nargout, "Return the tod pointing limits.\n")

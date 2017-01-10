@@ -35,6 +35,7 @@ double convert_val(const char *c, int fmt)
   double *d;
   short int *s;
   long *l;
+  int *myi;
   switch(fmt) {
   case -4:
     f=(float *)ii;
@@ -54,7 +55,13 @@ double convert_val(const char *c, int fmt)
     //val=(double)(*c);
     //break;
   case 4:
-    val=(int)(*c);
+    //val=(int)(*c);
+    myi=(int *)ii;
+    ii[0]=c[3];
+    ii[1]=c[2];
+    ii[2]=c[1];
+    ii[3]=c[0];
+    val=(double)(*myi);
     break;
   case -8:
     d=(double *)ii;
@@ -69,7 +76,17 @@ double convert_val(const char *c, int fmt)
     val=(double)(*d);
     break;
   case 8:
-    val=(long)(*s);
+    //val=(long)(*s);
+    l=(long *)ii;
+    ii[0]=c[7];
+    ii[1]=c[6];
+    ii[2]=c[5];
+    ii[3]=c[4];
+    ii[4]=c[3];
+    ii[5]=c[2];
+    ii[6]=c[1];
+    ii[7]=c[0];
+    val=(double)(*l);
     break;
   case 1:
     val=(int)(c[0]);
@@ -145,12 +162,13 @@ DEFUN_DLD (convert_fits_bintable, args, nargout, "Read TOD data into memory.\n")
     //offset[i]=offset[i-1]+fabs(ifmt[i-1]);
   }
 
-#pragma omp parallel for shared(nrow,ncol,mm,c,nbyte,offset,ifmt) default(none)
+  //#pragma omp parallel for shared(nrow,ncol,mm,c,nbyte,offset,ifmt) default(none)
   for (int i=0;i<nrow;i++) 
     for (int j=0;j<ncol;j++) {
       mm[i*ncol+j]=convert_val(c+i*nbyte+offset[j],ifmt[j]);
-  }
-
+      
+    }
+  
   free(ifmt);
 
   return octave_value(mat);

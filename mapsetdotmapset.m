@@ -46,6 +46,18 @@ if isfield(a,'cutvecs')
   val=val+mpi_allreduce(tot);
 end
 
+if isfield(a,'jumps')
+  tot=0;
+  if iscell(a.jumps)
+    for j=1:numel(a.jumps),
+      tot=tot+sum( (a.jumps{j}).*(b.jumps{j}));
+    end
+  else
+    tot=tot+sum(a.jumps.*b.jumps);
+  end
+  val=val+mpi_allreduce(tot);
+end
+
 
 if isfield(a,'srccat')
   tot=0;

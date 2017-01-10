@@ -1,4 +1,5 @@
 function[value]=assign_tod_value(tod,val)
+%assign a value to a TOD.  arguments are (tod,val)
 [myptr,mytype]=get_generic_tod_pointer(tod);
 if mytype==0
   assign_tod_value_c(tod,val);

@@ -34,6 +34,7 @@ do_actpol_pointing=get_struct_mem(myopts,'do_actpol_pointing',false);
 free_2gamma=get_struct_mem(myopts,'free_2gamma',1);
 remove_hwp=get_struct_mem(myopts,'remove_hwp',false);
 read_data_new=get_struct_mem(myopts,'read_data_new',false);
+gapfill_eig=get_struct_mem(myopts,'gapfill_eig',false);
 
 abort_before_noise=get_struct_mem(myopts,'abort_before_noise',false);
 skip_mpi=get_struct_mem(myopts,'skip_mpi',false);
@@ -534,6 +535,11 @@ for j=1:length(tods),
     if (abort_before_noise)
       mdisp('Aborting before noise, as requested.');
       return;
+    end
+    
+    if (gapfill_eig)
+      dat=gapfill_eigenmode(get_tod_data(mytod),mytod,myopts);
+      push_tod_data(dat,mytod);
     end
 
 

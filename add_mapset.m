@@ -17,6 +17,17 @@ if isfield(a,'cutvecs')
   end
 end
 
+if isfield(a,'jumps')
+  if iscell(a.jumps)
+    for j=1:numel(a.jumps),
+      a.jumps(j)={a.jumps{j}+fac*b.jumps{j}};
+    end
+  else
+    a.jumps=a.jumps+b.jumps*fac;
+  end
+end
+
+
 if isfield(a,'ground')
   a.ground.ground=a.ground.ground+fac*b.ground.ground;
 end

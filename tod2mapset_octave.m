@@ -43,6 +43,14 @@ if isfield(mapset,'cutvecs')
   end
 end
 
+if isfield(mapset,'jumpss')
+  if iscell(mapset.jumps),
+    mapset.jumps(which_tod)={tod2jumps_c(tod)};
+  else
+    mapset.jumps=tod2jumps_c(tod);
+  end
+end
+
 
 if isfield(mapset,'corrnoise'),
 

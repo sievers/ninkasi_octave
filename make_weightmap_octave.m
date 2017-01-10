@@ -59,6 +59,7 @@ for j=1:length(tods),
     free_tod_pointing_saved(mytod,free_2gamma);
   end
   if (have_pointing)
+    mdisp('converting_pointing')
     convert_saved_pointing_to_pixellization(mytod,map);
   end
 

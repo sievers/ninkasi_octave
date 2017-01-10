@@ -44,6 +44,18 @@ if isfield(mapset,'skymap')
   end
 end
 
+if isfield(mapset,'jumps'),
+  if isfield(precon,'jumps'),
+    if iscell(mapset.jumps),
+      for j=1:length(mapset.jumps),
+        mapset.jumps{j}=mapset.jumps{j}./precon.jumps{j};
+      end
+    else
+      mapset.jumps=mapset.jumps./precon.jumps;
+    end
+  end
+end
+
 
 if isfield(mapset,'ground')
   if isfield(precon,'ground')

@@ -45,6 +45,16 @@ if isfield(mapset,'cutvecs')
   end
 end
 
+if isfield(mapset,'jumps')
+  if iscell(mapset.jumps)
+    for j=1:numel(mapset.jumps),
+      mapset.jumps(j)={0*mapset.jumps{j}};
+    end
+  else
+    mapset.jumps=0*mapset.jumps;
+  end
+end
+
 
 if isfield(mapset,'corrnoise'),
     for j=1:length(mapset.corrnoise),
