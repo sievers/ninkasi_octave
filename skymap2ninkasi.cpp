@@ -36,6 +36,21 @@ actData get_value(octave_value val)
 
 /*--------------------------------------------------------------------------------*/
 
+DEFUN_DLD (set_skymap_car_simple_c, args, nargout, "Turn an RA/DEC map into a CAR map.\n")
+{
+  MAP *map=(MAP *)get_pointer(args(0));
+
+  //if (args.length()>1)
+  //set_map_projection_car_simple_keeppix(map); //as of now, keeppix is unsupported
+  //else  
+  
+  set_map_projection_car_simple(map);
+  return octave_value_list();
+  
+}
+
+/*--------------------------------------------------------------------------------*/
+
 DEFUN_DLD (set_skymap_cea_simple_c, args, nargout, "Turn an RA/DEC map into a CEA map.\n")
 {
   MAP *map=(MAP *)get_pointer(args(0));
@@ -54,6 +69,17 @@ DEFUN_DLD (set_skymap_cea_simple_predef_c,args, nargout, "Turn an RA/DEC map int
   actData pixsize=get_value(args(1));
   actData pv=get_value(args(2));
   set_map_projection_cea_simple_predef(map,pixsize,pv);
+  return octave_value_list();
+  
+
+}
+/*--------------------------------------------------------------------------------*/
+DEFUN_DLD (set_skymap_car_simple_predef_c,args, nargout, "Turn an RA/DEC map into a CEA map with pixelsize/pv2_1 defined.\n")
+{
+  MAP *map=(MAP *)get_pointer(args(0));
+  actData decpix=get_value(args(1));
+  actData rapix=get_value(args(2));
+  set_map_projection_car_simple_predef(map,decpix,rapix);
   return octave_value_list();
   
 

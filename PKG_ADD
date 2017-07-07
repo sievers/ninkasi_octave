@@ -161,11 +161,14 @@ autoload('rotate_tod_data_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c
 autoload('scale_tod_band_noise_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('resize_skymap_cea_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_cea_predef_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('set_skymap_car_predef_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_tan_predef_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_healpix_ring_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_healpix_nest_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
 autoload('set_skymap_tan_explicit_c',fullfile(fileparts(mfilename("fullpath")),'maputils_c.oct'));
+autoload('set_skymap_car_simple_c',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('set_skymap_cea_simple_c',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
+autoload('set_skymap_car_simple_predef_c',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('set_skymap_cea_simple_predef_c',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
 autoload('set_tod_noise_c',fullfile(fileparts(mfilename("fullpath")),'todfun_c.oct'));
 autoload('skymap2octave_c',fullfile(fileparts(mfilename("fullpath")),'skymap2ninkasi.oct'));
@@ -253,6 +256,7 @@ autoload('free_tod_pointer_c',fullfile(fileparts(mfilename("fullpath")),'create_
 autoload('set_tod_pointing_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_pointing_saved_branch',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('set_tod_data_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
+autoload('update_tod_data_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('free_tod_pointing_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('free_tod_ra_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
 autoload('free_tod_dec_saved',fullfile(fileparts(mfilename("fullpath")),'create_tod_from_octave.oct'));
@@ -322,6 +326,7 @@ autoload('map2alm_simple_c',fullfile(fileparts(mfilename("fullpath")),'healpix_u
 autoload('test_healpix_arr',fullfile(fileparts(mfilename("fullpath")),'healpix_utils.oct'));
 autoload('map2alm_intensity_c',fullfile(fileparts(mfilename("fullpath")),'healpix_utils.oct'));
 autoload('pix2ang_c',fullfile(fileparts(mfilename("fullpath")),'healpix_utils.oct'));
+autoload('coordsys2euler_zyz_c',fullfile(fileparts(mfilename("fullpath")),'healpix_utils.oct'));
 
 autoload('qp_init_c',fullfile(fileparts(mfilename("fullpath")),'octave_qpoint.oct'));
 autoload('qp_boresight_pointing_c',fullfile(fileparts(mfilename("fullpath")),'octave_qpoint.oct'));

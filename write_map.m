@@ -20,6 +20,9 @@ switch mytype
  case{'cea'}
   fname=postpend_tag(fname,'.fits');
   write_skymap_cea_fits(map,fname,varargin{:});
+ case{'car'}
+  fname=postpend_tag(fname,'.fits');
+  write_skymap_car_fits(map,fname,varargin{:});
  case{'tan'}
   fname=postpend_tag(fname,'.fits');
   write_skymap_tan_fits(map,fname);

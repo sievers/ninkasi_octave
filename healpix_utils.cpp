@@ -25,7 +25,7 @@ extern "C"
 
   void map2alm_sc_d_(int *nsmax, int *nlmax, int *nmmax, double *map, double *alm, double *zbounds, double *w8ring);
   void __alm_tools_MOD_map2alm_sc_d(int *nsmax, int *nlmax, int *nmmax, double *map, double *alm, double *zbounds, double *w8ring);
-
+  void __coord_v_convert_MOD_coordsys2euler_zyz(double *iepoch, double *oepoch, char *isys, char *osys, double *psi, double *theta, double *phi,int len1, int len2);
 
 #ifdef __cplusplus
 }  /* end extern "C" */
@@ -40,6 +40,34 @@ double get_value(octave_value val)
   NDArray myptr=val.array_value();
   double myval=(double)myptr(0,0);
   return myval;
+
+}
+
+/*--------------------------------------------------------------------------------*/
+
+DEFUN_DLD(coordsys2euler_zyz_c,args,nargout,"Get Euler angles for coordinate system rotations.\n")
+{
+
+  double epoch1=get_value(args(0));
+  double epoch2=get_value(args(1));
+  charMatrix ch1=args(2).char_matrix_value();
+  charMatrix ch2=args(3).char_matrix_value();
+
+
+  double epoch=2000.0;
+  char insys=ch1(0);
+  char outsys=ch2(0);
+  double psi,theta,phi;
+
+
+  __coord_v_convert_MOD_coordsys2euler_zyz(&epoch1,&epoch2,&insys,&outsys,&psi,&theta,&phi,1,1);
+
+  octave_value_list retval;
+  retval(0)=psi;
+  retval(1)=theta;
+  retval(2)=phi;
+
+  return retval;
 
 }
 

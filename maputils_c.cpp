@@ -100,6 +100,9 @@ DEFUN_DLD (get_map_type_c, args, nargout, "Find out what kind of map we have.\n"
   case (NK_CEA):
     return octave_value("cea");
     break;
+  case (NK_CAR):
+    return octave_value("car");
+    break;
   case (NK_TAN):
     return octave_value("tan");
     break;
@@ -368,6 +371,29 @@ DEFUN_DLD (set_skymap_cea_predef_c, args, nargout, "Dial in parameters for a CEA
   
 }
 /*--------------------------------------------------------------------------------*/
+
+
+DEFUN_DLD (set_skymap_car_predef_c, args, nargout, "Dial in parameters for a CAR map.  Args are (map,radelt,decdelt,rapix,decpix,nra,ndec\n")
+{
+  if (args.length()<7) {
+    printf("Need 7 arguments in set_skymap_cea_predef_c.\n");
+    return octave_value_list();
+  }
+  MAP *map=(MAP *)get_pointer(args(0));
+  actData radelt=get_value(args(1));
+  actData decdelt=get_value(args(2));
+
+  actData rapix=get_value(args(3));
+  actData decpix=get_value(args(4));
+
+  int nra=get_value(args(5));
+  int ndec=get_value(args(6));
+
+  set_map_projection_car_predef(map,radelt,decdelt,rapix,decpix,nra,ndec);
+  return octave_value_list();
+  
+}
+/*--------------------------------------------------------------------------------*/
 DEFUN_DLD (resize_skymap_cea_c, args, nargout, "Change the size of a CEA skymap, perhaps for e.g. faster FFTs.  Will nuke current map data, so maybe do this early on.\n")
 {
   MAP *map=(MAP *)get_pointer(args(0));
@@ -471,15 +497,15 @@ DEFUN_DLD (upres_map,args,nargout,"Increase the resolution of a map by a factor 
 /*--------------------------------------------------------------------------------*/
 
 
-DEFUN_DLD (get_skymap_cea_params_c, args, nargout, "Return current cea params from a map.")
+DEFUN_DLD (get_skymap_cea_params_c, args, nargout, "Return current cea/car params from a map.")
 {
   MAP *map=(MAP *)get_pointer(args(0));
   if (!map->projection) {
     printf("Map doesn't have a projection.\n");
     return octave_value_list();
   }
-  if (map->projection->proj_type!=NK_CEA) {
-    printf("Map is not in CEA format.\n");
+  if ((map->projection->proj_type!=NK_CEA) &&  (map->projection->proj_type!=NK_CAR)) {
+    printf("Map is not in CEA/CAR format.\n");
     return octave_value_list();
   }
   

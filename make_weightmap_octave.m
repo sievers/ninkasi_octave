@@ -94,9 +94,15 @@ if (do_reduce)
     for j=1:size(weight,1),
       weight(j,:,:)=mpi_allreduce(weight(j,:,:));
     end
+    myweight=sum(sum(sum(abs(weight))));
+    disp(['node ' num2str(mpi_comm_rank+1) ' has weight ' num2str(myweight)]);
   else
+    myweight=sum(sum(sum(abs(weight))));
+    disp(['node ' num2str(mpi_comm_rank+1) ' has weight ' num2str(myweight)]);
+    
     weight=mpi_allreduce(weight);
   end
+  mdisp(['new total weight is ' num2str(sum(sum(sum(abs(weight)))))]);
   octave2skymap(weight,map);
   clear weight;
 end

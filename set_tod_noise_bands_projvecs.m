@@ -136,6 +136,7 @@ for j=nband:-1:1,
   else
     %the usual path - rather than store eigenmode and amplitudes separately, scale each mode by the sqrt of its
     %amplitude so the correlated noise just becomes VV' instead of V*lambda*V'
+
     vecs_use=vecs;for k=1:nvecs, vecs_use(:,k)=vecs(:,k)*sqrt(big_block_amps(j,k))*mode_scale_fac;end;
   end
   %Tell the C part of the code what we found
