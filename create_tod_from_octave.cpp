@@ -141,6 +141,15 @@ DEFUN_DLD (set_tod_pointing_saved, args, nargout, "Read a TOD header, including 
     Matrix twogamma=args(3).matrix_value();
     dim_vector dm_2gamma=twogamma.dims();
     mytod->twogamma_saved=matrix(mytod->ndet,mytod->ndata);
+    long nelem=mytod->ndet*mytod->ndata;
+    actData *ptr=twogamma.fortran_vec();
+    for (long i=0;i<nelem;i++) {
+      if (ptr[i]<-M_PI)
+	ptr[i]+=2*M_PI;
+      if (ptr[i]>M_PI)
+	ptr[i]-=2*M_PI;
+    }
+    
     memcpy(mytod->twogamma_saved[0],twogamma.fortran_vec(),mytod->ndet*mytod->ndata*sizeof(actData));
   }
   
